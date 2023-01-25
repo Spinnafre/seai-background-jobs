@@ -4,15 +4,38 @@ import cors from "cors";
 import puppeteer from "puppeteer";
 import { setTimeout } from "node:timers/promises";
 
+import Joi from 'joi'
+
 var app = express();
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin:"*",
+  methods:"GET,POST"
+}));
 
 app.get("/test", async (req, res) => {
+  const {country,type} = req.query
+
+  const schema = Joi.object({
+    country: Joi
+      .string()
+      .valid('BRAZIL','N','NE','CO','SE','S')
+      .required(),
+    type: Joi
+      .string()
+      .valid('todas','automaticas','convencionais')
+      .required()
+  })
+
   try {
+    await schema.validateAsync({
+      country,
+      type
+    })
+
     const browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
       args: [
         // "--disable-gpu",
         // "--disable-dev-shm-usage",
@@ -32,7 +55,7 @@ app.get("/test", async (req, res) => {
     page.on("load", () => console.log("Página carregada com sucesso"));
     page.on("error", (err) => console.log("ERROR ", err));
 
-    // await page.setViewport({ width: 500, height: 500 });
+    await page.setViewport({ width: 500, height: 500 });
 
     await page.setUserAgent(
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
@@ -57,6 +80,15 @@ app.get("/test", async (req, res) => {
 
     await setTimeout(1000);
 
+    //Selecionar região = [BRASIL,N,NE,CO,SE,S]
+    const selectStationRegionBtn = await page.$('#estacao-regiao')
+    await selectStationRegionBtn.select(country)
+
+    //Selecionar tipo da estação (todas, automaticas, convencionais)
+    const selectStationTypeBtn = await page.$('#estacao-tipo')
+    await selectStationTypeBtn.select(type)
+
+
     await page.waitForSelector(".btn-green");
 
     const data = await page.$eval("#btn-estacao-BUSCAR", (el) => {
@@ -78,7 +110,7 @@ app.get("/test", async (req, res) => {
 
     const webResponse = await ajaxResponse.json();
 
-    await setTimeout(1000);
+    await setTimeout(10000);
 
     await page.close();
 
@@ -97,10 +129,15 @@ app.get("/test", async (req, res) => {
       message: "Não foi possível obter dados da estação",
     });
   } catch (error) {
+    if(error instanceof Joi.ValidationError){
+      return res
+      .status(400)
+      .json(error.details);
+    }
     console.log("Deu erro aí meu irmão = ", error);
     return res
       .status(500)
-      .json({ msg: "Falha ao tentar obter dados da estação" });
+      .json({ message: "Falha ao tentar obter dados da estação" });
   }
 });
 
