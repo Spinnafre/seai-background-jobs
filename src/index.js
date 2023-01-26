@@ -4,35 +4,47 @@ import cors from "cors";
 import puppeteer from "puppeteer";
 import { setTimeout } from "node:timers/promises";
 
-import Joi from 'joi'
+import Joi from "joi";
+
+import { createWriteStream } from "node:fs";
+import { Readable, Transform } from "node:stream";
+
+import expect from "node:assert";
+
+import { dataAsStream } from "./server_utils.js";
+
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 var app = express();
 
 app.use(express.json());
-app.use(cors({
-  origin:"*",
-  methods:"GET,POST"
-}));
+app.use(
+  cors({
+    origin: "*",
+    methods: "GET,POST",
+  })
+);
 
 app.get("/test", async (req, res) => {
-  const {country,type} = req.query
+  const { country, type } = req.query;
 
   const schema = Joi.object({
-    country: Joi
-      .string()
-      .valid('BRAZIL','N','NE','CO','SE','S')
+    country: Joi.string()
+      .valid("BRAZIL", "N", "NE", "CO", "SE", "S")
       .required(),
-    type: Joi
-      .string()
-      .valid('todas','automaticas','convencionais')
-      .required()
-  })
+    type: Joi.string()
+      .valid("todas", "automaticas", "convencionais")
+      .required(),
+  });
 
   try {
     await schema.validateAsync({
       country,
-      type
-    })
+      type,
+    });
 
     const browser = await puppeteer.launch({
       headless: true,
@@ -81,13 +93,12 @@ app.get("/test", async (req, res) => {
     await setTimeout(1000);
 
     //Selecionar região = [BRASIL,N,NE,CO,SE,S]
-    const selectStationRegionBtn = await page.$('#estacao-regiao')
-    await selectStationRegionBtn.select(country)
+    const selectStationRegionBtn = await page.$("#estacao-regiao");
+    await selectStationRegionBtn.select(country);
 
     //Selecionar tipo da estação (todas, automaticas, convencionais)
-    const selectStationTypeBtn = await page.$('#estacao-tipo')
-    await selectStationTypeBtn.select(type)
-
+    const selectStationTypeBtn = await page.$("#estacao-tipo");
+    await selectStationTypeBtn.select(type);
 
     await page.waitForSelector(".btn-green");
 
@@ -119,6 +130,40 @@ app.get("/test", async (req, res) => {
     if (webResponse) {
       const { estacoes } = webResponse;
 
+      const stationsStream = dataAsStream(estacoes);
+
+      const readableStream = Readable.from(stationsStream);
+
+      const writable = createWriteStream(
+        resolve(__dirname, "..", "data", "test.ndjson")
+      );
+
+      readableStream
+        .pipe(
+          new Transform({
+            objectMode: true,
+            transform(chunk, enc, cb) {
+              const { nome, estado, regiao, latitude, longitude, valor } =
+                chunk;
+
+              const data = Object.assign(
+                {},
+                {
+                  nome,
+                  estado,
+                  regiao,
+                  latitude,
+                  longitude,
+                  valor,
+                }
+              );
+
+              cb(null, JSON.stringify(data).concat("\n"));
+            },
+          })
+        )
+        .pipe(writable);
+
       return res.status(200).json({
         message: `Sucesso ao obter dados da url ${urlPage}`,
         data: estacoes,
@@ -129,10 +174,8 @@ app.get("/test", async (req, res) => {
       message: "Não foi possível obter dados da estação",
     });
   } catch (error) {
-    if(error instanceof Joi.ValidationError){
-      return res
-      .status(400)
-      .json(error.details);
+    if (error instanceof Joi.ValidationError) {
+      return res.status(400).json(error.details);
     }
     console.log("Deu erro aí meu irmão = ", error);
     return res
