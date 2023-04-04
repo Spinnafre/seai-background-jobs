@@ -88,7 +88,7 @@ app.get("/test", async (req, res) => {
     await setTimeout(2000);
 
     await page.waitForSelector(".sidebar", {
-      timeout: 10000,
+      timeout: 20000,
     });
 
     await setTimeout(1000);
