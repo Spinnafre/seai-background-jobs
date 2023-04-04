@@ -1,84 +1,13 @@
-{"nome":"SÃO LUIS","estado":"MA","regiao":"NE","latitude":-2.52666666,"longitude":-44.21361111,"valor":321}
-{"nome":"BALSAS","estado":"MA","regiao":"NE","latitude":-7.45555555,"longitude":-46.02749999,"valor":92}
-{"nome":"CAROLINA","estado":"MA","regiao":"NE","latitude":-7.33722221,"longitude":-47.45972222,"valor":77}
-{"nome":"CHAPADINHA","estado":"MA","regiao":"NE","latitude":-3.74277777,"longitude":-43.35222222,"valor":330}
-{"nome":"BARRA DO CORDA","estado":"MA","regiao":"NE","latitude":-5.50666666,"longitude":-45.23694444,"valor":25}
-{"nome":"COLINAS","estado":"MA","regiao":"NE","latitude":-6.03305554,"longitude":-44.23333333,"valor":45}
-{"nome":"ESTREITO","estado":"MA","regiao":"NE","latitude":-6.65333333,"longitude":-47.41833332,"valor":113}
-{"nome":"IMPERATRIZ","estado":"MA","regiao":"NE","latitude":-5.55583333,"longitude":-47.45972222,"valor":346}
-{"nome":"CAXIAS","estado":"MA","regiao":"NE","latitude":-4.82138888,"longitude":-43.3436111,"valor":348}
-{"nome":"MACEIÓ","estado":"AL","regiao":"NE","latitude":-9.55111111,"longitude":-35.77027777,"valor":25}
-{"nome":"FORTALEZA","estado":"CE","regiao":"NE","latitude":-3.81583333,"longitude":-38.53777777,"valor":339}
-{"nome":"PARNAÍBA","estado":"PI","regiao":"NE","latitude":-3.08666666,"longitude":-41.78305554,"valor":69}
-{"nome":"ARCO VERDE","estado":"PE","regiao":"NE","latitude":-8.4336111,"longitude":-37.05555555,"valor":105}
-{"nome":"AREIA","estado":"PB","regiao":"NE","latitude":-6.975451,"longitude":-35.718128,"valor":86}
-{"nome":"TERESINA","estado":"PI","regiao":"NE","latitude":-5.03472221,"longitude":-42.80138888,"valor":311}
-{"nome":"CAMPINA GRANDE","estado":"PB","regiao":"NE","latitude":-7.225574,"longitude":-35.904831,"valor":158}
-{"nome":"GUARAMIRANGA","estado":"CE","regiao":"NE","latitude":-4.22916666,"longitude":-38.95888888,"valor":30}
-{"nome":"MACAU","estado":"RN","regiao":"NE","latitude":-5.15111111,"longitude":-36.57305554,"valor":96}
-{"nome":"IGUATÚ","estado":"CE","regiao":"NE","latitude":-6.39638888,"longitude":-39.26888888,"valor":15}
-{"nome":"GARANHUNS","estado":"PE","regiao":"NE","latitude":-8.91083333,"longitude":-36.49333333,"valor":73}
-{"nome":"PÃO DE AÇUCAR","estado":"AL","regiao":"NE","latitude":-9.74916666,"longitude":-37.43083332,"valor":106}
-{"nome":"TAUÁ","estado":"CE","regiao":"NE","latitude":-6.01749999,"longitude":-40.28138888,"valor":320}
-{"nome":"QUIXERAMOBIM","estado":"CE","regiao":"NE","latitude":-5.17444443,"longitude":-39.28944444,"valor":284}
-{"nome":"BOM JESUS DO PIAUI","estado":"PI","regiao":"NE","latitude":-9.08333333,"longitude":-44.32638888,"valor":62}
-{"nome":"PALMEIRA DOS INDIOS","estado":"AL","regiao":"NE","latitude":-9.42027777,"longitude":-36.62027777,"valor":69}
-{"nome":"SURUBIM","estado":"PE","regiao":"NE","latitude":-7.83972221,"longitude":-35.80111111,"valor":231}
-{"nome":"CABROBÓ","estado":"PE","regiao":"NE","latitude":-8.50388888,"longitude":-39.31527777,"valor":69}
-{"nome":"MORADA NOVA","estado":"CE","regiao":"NE","latitude":-5.0911111,"longitude":-38.36472222,"valor":2}
-{"nome":"SÃO GONÇALO","estado":"PB","regiao":"NE","latitude":-6.835777,"longitude":-38.311583,"valor":87}
-{"nome":"MONTEIRO","estado":"PB","regiao":"NE","latitude":-7.89444444,"longitude":-37.12472221,"valor":91}
-{"nome":"CARACOL","estado":"PI","regiao":"NE","latitude":-9.28583333,"longitude":-43.32444443,"valor":284}
-{"nome":"APODI","estado":"RN","regiao":"NE","latitude":-5.62666666,"longitude":-37.815,"valor":17}
-{"nome":"CRATEUS","estado":"CE","regiao":"NE","latitude":-5.18666666,"longitude":-40.67222221,"valor":341}
-{"nome":"PICOS","estado":"PI","regiao":"NE","latitude":-7.0711111,"longitude":-41.40416666,"valor":37}
-{"nome":"SAO RAIMUNDO NONATO","estado":"PI","regiao":"NE","latitude":-9.03305554,"longitude":-42.70111111,"valor":337}
-{"nome":"URUÇUI","estado":"PI","regiao":"NE","latitude":-7.44138888,"longitude":-44.34499999,"valor":5}
-{"nome":"CABACEIRAS","estado":"PB","regiao":"NE","latitude":-7.48333333,"longitude":-36.28638888,"valor":138}
-{"nome":"IBIMIRIM","estado":"PE","regiao":"NE","latitude":-8.50944444,"longitude":-37.71166666,"valor":159}
-{"nome":"FLORESTA","estado":"PE","regiao":"NE","latitude":-8.59888888,"longitude":-38.58416666,"valor":112}
-{"nome":"CAMARATUBA","estado":"PB","regiao":"NE","latitude":-6.56194444,"longitude":-35.13527777,"valor":101}
-{"nome":"OEIRAS","estado":"PI","regiao":"NE","latitude":-6.97416666,"longitude":-42.14694444,"valor":268}
-{"nome":"CORURIPE","estado":"AL","regiao":"NE","latitude":-10.1286111,"longitude":-36.28638888,"valor":75}
-{"nome":"SÃO LUIS DO QUITUNDE","estado":"AL","regiao":"NE","latitude":-9.28749999,"longitude":-35.56583333,"valor":311}
-{"nome":"PALMARES","estado":"PE","regiao":"NE","latitude":-8.66666666,"longitude":-35.56805554,"valor":75}
-{"nome":"JAGUARIBE","estado":"CE","regiao":"NE","latitude":-5.90555555,"longitude":-38.62777777,"valor":13}
-{"nome":"ITAPIPOCA","estado":"CE","regiao":"NE","latitude":-3.48416666,"longitude":-39.5886111,"valor":43}
-{"nome":"CASTELO DO PIAUÍ","estado":"PI","regiao":"NE","latitude":-5.34916666,"longitude":-41.51222222,"valor":16}
-{"nome":"VALENÇA DO PIAUI","estado":"PI","regiao":"NE","latitude":-6.39916666,"longitude":-41.73999999,"valor":12}
-{"nome":"GILBUÉS","estado":"PI","regiao":"NE","latitude":-9.87527777,"longitude":-45.34583333,"valor":340}
-{"nome":"CANTO DO BURITI","estado":"PI","regiao":"NE","latitude":-8.11805554,"longitude":-42.97583332,"valor":327}
-{"nome":"OURICURI","estado":"PE","regiao":"NE","latitude":-7.88583333,"longitude":-40.10277777,"valor":2}
-{"nome":"SANTA CRUZ","estado":"RN","regiao":"NE","latitude":-6.22805554,"longitude":-36.02666666,"valor":94}
-{"nome":"QUIXADA","estado":"CE","regiao":"NE","latitude":-4.97888888,"longitude":-39.05722222,"valor":95}
-{"nome":"SALGUEIRO","estado":"PE","regiao":"NE","latitude":-8.05805555,"longitude":-39.0961111,"valor":76}
-{"nome":"PIRANHAS","estado":"AL","regiao":"NE","latitude":-9.62222221,"longitude":-37.76722221,"valor":95}
-{"nome":"CORRENTE","estado":"PI","regiao":"NE","latitude":-10.42916666,"longitude":-45.17305554,"valor":296}
-{"nome":"ANGICAL DO PIAUI","estado":"PI","regiao":"NE","latitude":-6.08944444,"longitude":-42.72749999,"valor":349}
-{"nome":"SALVADOR","estado":"BA","regiao":"NE","latitude":-13.005515,"longitude":-38.50576,"valor":52}
-{"nome":"BARREIRAS","estado":"BA","regiao":"NE","latitude":-12.12472221,"longitude":-45.02694443,"valor":352}
-{"nome":"LUIZ EDUARDO MAGALHAES","estado":"BA","regiao":"NE","latitude":-12.1525,"longitude":-45.82972221,"valor":281}
-{"nome":"CARAVELAS","estado":"BA","regiao":"NE","latitude":-17.73944444,"longitude":-39.25861111,"valor":37}
-{"nome":"CRUZ DAS ALMAS","estado":"BA","regiao":"NE","latitude":-12.67555554,"longitude":-39.08944444,"valor":99}
-{"nome":"ITABERABA","estado":"BA","regiao":"NE","latitude":-12.52416666,"longitude":-40.29972221,"valor":107}
-{"nome":"ARACAJÚ","estado":"SE","regiao":"NE","latitude":-10.9525,"longitude":-37.05444444,"valor":78}
-{"nome":"ILHEUS","estado":"BA","regiao":"NE","latitude":-14.65888888,"longitude":-39.18138888,"valor":33}
-{"nome":"VITORIA DA CONQUISTA","estado":"BA","regiao":"NE","latitude":-14.88638888,"longitude":-40.80138888,"valor":53}
-{"nome":"CORRENTINA","estado":"BA","regiao":"NE","latitude":-13.33249999,"longitude":-44.61749999,"valor":267}
-{"nome":"POÇO VERDE","estado":"SE","regiao":"NE","latitude":-10.73805555,"longitude":-38.10833333,"valor":81}
-{"nome":"REMANSO","estado":"BA","regiao":"NE","latitude":-9.62555554,"longitude":-42.07722221,"valor":332}
-{"nome":"LENÇOIS","estado":"BA","regiao":"NE","latitude":-12.557854,"longitude":-41.388808,"valor":212}
-{"nome":"PORTO SEGURO","estado":"BA","regiao":"NE","latitude":-16.38888888,"longitude":-39.18249999,"valor":77}
-{"nome":"SENHOR DO BONFIM","estado":"BA","regiao":"NE","latitude":-10.44305555,"longitude":-40.14833333,"valor":113}
-{"nome":"PIATÃ","estado":"BA","regiao":"NE","latitude":-13.155681,"longitude":-41.774125,"valor":96}
-{"nome":"BURITIRAMA","estado":"BA","regiao":"NE","latitude":-10.72305554,"longitude":-43.65111111,"valor":306}
-{"nome":"BRUMADO","estado":"BA","regiao":"NE","latitude":-14.18194443,"longitude":-41.67222221,"valor":23}
-{"nome":"QUEIMADAS","estado":"BA","regiao":"NE","latitude":-10.98472221,"longitude":-39.61694443,"valor":98}
-{"nome":"UNA","estado":"BA","regiao":"NE","latitude":-15.28027777,"longitude":-39.09138888,"valor":17}
-{"nome":"MARAU","estado":"BA","regiao":"NE","latitude":-13.90694444,"longitude":-38.97222221,"valor":73}
-{"nome":"SERRINHA","estado":"BA","regiao":"NE","latitude":-11.66472222,"longitude":-39.02305554,"valor":86}
-{"nome":"VALENÇA","estado":"BA","regiao":"NE","latitude":-13.3436111,"longitude":-39.12666666,"valor":232}
-{"nome":"ITAPETINGA","estado":"BA","regiao":"NE","latitude":-15.24472221,"longitude":-40.22944443,"valor":56}
-{"nome":"BELMONTE","estado":"BA","regiao":"NE","latitude":-16.08805555,"longitude":-39.21527777,"valor":51}
-{"nome":"JEREMOABO","estado":"BA","regiao":"NE","latitude":-10.08083332,"longitude":-38.34583333,"valor":107}
-{"nome":"SALVADOR (RADIO FAROL)","estado":"BA","regiao":"NE","latitude":-12.80833333,"longitude":-38.49583333,"valor":155}
+{"nome":"FORTALEZA","estado":"CE","regiao":"NE","latitude":-3.81583333,"longitude":-38.53777777,"valor":149}
+{"nome":"SOBRAL","estado":"CE","regiao":"NE","latitude":-3.74805555,"longitude":-40.34583333,"valor":60}
+{"nome":"GUARAMIRANGA","estado":"CE","regiao":"NE","latitude":-4.22916666,"longitude":-38.95888888,"valor":133}
+{"nome":"BARBALHA","estado":"CE","regiao":"NE","latitude":-7.30083333,"longitude":-39.2711111,"valor":186}
+{"nome":"IGUATÚ","estado":"CE","regiao":"NE","latitude":-6.39638888,"longitude":-39.26888888,"valor":18}
+{"nome":"QUIXERAMOBIM","estado":"CE","regiao":"NE","latitude":-5.17444443,"longitude":-39.28944444,"valor":206}
+{"nome":"MORADA NOVA","estado":"CE","regiao":"NE","latitude":-5.0911111,"longitude":-38.36472222,"valor":196}
+{"nome":"CRATEUS","estado":"CE","regiao":"NE","latitude":-5.18666666,"longitude":-40.67222221,"valor":163}
+{"nome":"CAMPOS SALES","estado":"CE","regiao":"NE","latitude":-7.07777777,"longitude":-40.36277777,"valor":13}
+{"nome":"JAGUARIBE","estado":"CE","regiao":"NE","latitude":-5.90555555,"longitude":-38.62777777,"valor":120}
+{"nome":"ITAPIPOCA","estado":"CE","regiao":"NE","latitude":-3.48416666,"longitude":-39.5886111,"valor":106}
+{"nome":"ACARAÚ","estado":"CE","regiao":"NE","latitude":-3.1211111,"longitude":-40.08722221,"valor":31}
+{"nome":"TIANGUA","estado":"CE","regiao":"NE","latitude":-3.73222221,"longitude":-41.01194444,"valor":142}
