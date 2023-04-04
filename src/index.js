@@ -189,9 +189,11 @@ app.get("/test", async (req, res) => {
         const readableStream = Readable.from(stationsStream);
 
         const param = medition.split("-")[0];
+
         // const writable = createWriteStream(
         //   resolve(__dirname, "..", "data", "test.ndjson")
         // );
+
         const writable = new Writable({
           objectMode: true,
           write(chunk, enc, next) {
@@ -255,8 +257,6 @@ app.get("/test", async (req, res) => {
     }
 
     const stationDataToArray = [...datas.values()];
-
-    // await setTimeout(30000);
 
     await page.close();
 
