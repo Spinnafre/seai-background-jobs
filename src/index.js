@@ -28,8 +28,6 @@ app.use(
 );
 
 app.get("/test", async (req, res) => {
-  const { country, type, state } = req.query;
-
   const schema = Joi.object({
     country: Joi.string()
       .valid("BRAZIL", "N", "NE", "CO", "SE", "S")
@@ -40,6 +38,10 @@ app.get("/test", async (req, res) => {
   });
 
   try {
+    const country = "NE";
+    const type = "automaticas";
+    const state = "CE";
+
     await schema.validateAsync({
       country,
       type,
