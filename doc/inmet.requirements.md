@@ -37,3 +37,11 @@
 - Caso não haver dados de alguma das medições, deverá haver uma sinalização de que não foi possível extrair dados de tal estação e no fim irá deixar valores como nulos.
 
 - Se não conseguir obter dados da página, deverá avisar que tal operação não foi possível ser realizada
+
+### Critérios de aceitação
+
+- Script deve avisar quando houver erros operacionais, não operacionais e também erros de conexão
+
+- Script deve tentar pelo menos 3 vezes realizar operações caso der problemas de conexões com a fonte (portal do INMET)
+
+- Deve haver testes automáticos para saber se o script ainda está válido tendo em vista o risco de haver modificações no sistema em que irá ser buscado as informações via scrapper.

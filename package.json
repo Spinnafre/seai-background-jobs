@@ -5,15 +5,13 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon src/index.js ",
+    "start:dev": "nodemon src/cli/controllers",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "Davi Silva <https://github.com/Spinnafre>",
   "license": "ISC",
   "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^4.18.2",
     "joi": "^17.7.0",
     "nodemon": "^2.0.20",
     "puppeteer": "^19.6.0"
