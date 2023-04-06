@@ -16,10 +16,12 @@ import { scrapperParams } from "../../config/scrapper.js";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 class RegisterDailyStationsController {
-  #stationsService;
+  #funcemeService;
+  #inmetService;
 
-  constructor(service) {
-    this.#stationsService = service;
+  constructor(funcemeService, inmetService) {
+    this.#funcemeService = funcemeService;
+    this.#inmetService = inmetService;
   }
 
   async execute() {

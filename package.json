@@ -12,6 +12,7 @@
   "author": "Davi Silva <https://github.com/Spinnafre>",
   "license": "ISC",
   "dependencies": {
+    "ftp": "^0.3.10",
     "joi": "^17.7.0",
     "nodemon": "^2.0.20",
     "puppeteer": "^19.6.0"
