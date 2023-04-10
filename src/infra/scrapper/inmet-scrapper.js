@@ -6,26 +6,8 @@ import { setTimeout } from "node:timers/promises";
 
 import { Readable, Transform, Writable } from "node:stream";
 import { pipeline } from "node:stream/promises";
-import { dataAsStream } from "../../utils/generator";
 
-const scrapperConfig = {
-  url: "https://mapas.inmet.gov.br",
-  userAgent:
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36",
-  launch: {
-    headless: true,
-    args: [
-      // "--disable-gpu",
-      // "--disable-dev-shm-usage",
-      // "--disable-setuid-sandbox",
-      "--no-sandbox",
-      // "--disable-web-security",
-      // "--disable-features=IsolateOrigins",
-      // "--disable-site-isolation-trials",
-      // "--disable-features=BlockInsecurePrivateNetworkRequests",
-    ],
-  },
-};
+import { dataAsStream } from "../../utils/generator.js";
 
 class INMETScrappper {
   #browserHandler = {};
@@ -40,23 +22,20 @@ class INMETScrappper {
     params: [],
   };
 
-  constructor(
-    browserHandler,
-    pageHandler,
-    props = {
-      country: "",
-      stations_type: "",
-      state: "",
-      date_type: "",
-      params: [],
-    }
-  ) {
+  constructor(browserHandler, pageHandler) {
     this.#browserHandler = browserHandler;
     this.#pageHandler = pageHandler;
-    this.#props = props;
   }
 
-  static async setup() {
+  static async setup(
+    scrapperConfig = {
+      userAgent: "",
+      launch: {
+        headless: true,
+        args: [],
+      },
+    }
+  ) {
     const browserHandler = await puppeteer.launch(scrapperConfig.launch);
 
     const pageHandler = await browserHandler.newPage();
@@ -73,6 +52,19 @@ class INMETScrappper {
     await pageHandler.setUserAgent(scrapperConfig.userAgent);
 
     return new INMETScrappper(browserHandler, pageHandler);
+  }
+
+  setParamsToQuery(
+    params = {
+      country: "",
+      stations_type: "",
+      state: "",
+      date_type: "",
+      params: [],
+    }
+  ) {
+    this.#props = params;
+    return this;
   }
 
   async #closeBrowser() {
@@ -94,6 +86,8 @@ class INMETScrappper {
     const pageTitle = await this.#pageHandler.title();
 
     console.log("Sucesso ao acessar página ", pageTitle);
+
+    return this;
   }
 
   // Get codes from params specified by users
@@ -235,7 +229,7 @@ class INMETScrappper {
     return [...stations.values()];
   }
 
-  async getStationsWithMeasures() {
+  async getStationsWithMeasures(query) {
     await setTimeout(1000);
 
     await this.#pageHandler.waitForSelector(".sidebar", {
@@ -281,14 +275,53 @@ class INMETScrappper {
 
     this.#closeBrowser();
 
-    if (stationsWithMeasures.length)
+    if (stationsWithMeasures.length) {
       console.log(
         "[✅] Sucesso ao obter dados concatenados de estações com medições \n",
         stationsWithMeasures
       );
-    else
+      return stationsWithMeasures;
+    } else
       console.log("[⚠️] Não há dados de estações com medições especificadas");
+    return [];
   }
 }
 
-export { INMETScrappper };
+// export { INMETScrappper };
+
+// url: "https://mapas.inmet.gov.br",
+const scrapper = await INMETScrappper.setup({
+  userAgent:
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36",
+  launch: {
+    headless: true,
+    args: [
+      // "--disable-gpu",
+      // "--disable-dev-shm-usage",
+      // "--disable-setuid-sandbox",
+      "--no-sandbox",
+      // "--disable-web-security",
+      // "--disable-features=IsolateOrigins",
+      // "--disable-site-isolation-trials",
+      // "--disable-features=BlockInsecurePrivateNetworkRequests",
+    ],
+  },
+});
+
+await scrapper.openUrl("https://mapas.inmet.gov.br");
+
+const queries = {
+  country: "",
+  stations_type: "",
+  state: "",
+  date_type: "",
+  params: [],
+};
+
+const data = await scrapper.getStationsWithMeasures({
+  country: "",
+  stations_type: "",
+  state: "",
+  date_type: "",
+  params: [],
+});

@@ -1,8 +1,16 @@
-import { RegisterDailyStationsController } from "./cli/controllers/registerDailyStations";
+class App {
+  constructor
+  async runner() {
+    try {
+    } catch (error) {
+      if (error) {
+        //
+      }
+    }
+  }
+}
 
-const registerDailyStations = new RegisterDailyStationsController({});
-
-await registerDailyStations.execute();
+async () => {};
 
 process.on("uncaughtException", function (err) {
   console.log("Caught exception: " + err);

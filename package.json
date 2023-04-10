@@ -5,10 +5,12 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start:dev": "nodemon src/cli/controllers",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:dev": "cross-env NODE_ENV=development nodemon src/cli/controllers",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:dev":"node --experimental-vm-modules node_modules/jest/bin/jest.js --watchAll",
+    "testWithCoverage": "jest --coverage"
   },
-  "keywords": [],
+  "keywords": ["puppeteer","ftp","node","scrapper"],
   "author": "Davi Silva <https://github.com/Spinnafre>",
   "license": "ISC",
   "dependencies": {
@@ -16,5 +18,10 @@
     "joi": "^17.7.0",
     "nodemon": "^2.0.20",
     "puppeteer": "^19.6.0"
+  },
+  "devDependencies": {
+    "@jest/globals": "^29.5.0",
+    "cross-env": "^7.0.3",
+    "jest": "^29.5.0"
   }
 }
