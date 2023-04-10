@@ -1,53 +1,73 @@
-import {Result} from './Result.js'
+import { Result } from "./Result.js";
 
 export class Validator {
-  
-  static combine (guardResults= []) {
-    throw new Error("Not implemented")
+  static checkIfEmpty(arg) {
+    if (typeof arg == "string") {
+      const value = arg.trim();
+      return value === "";
+    }
+    const value = arg.length;
+    return !!value === false;
   }
-
-  static greaterThan (minValue, actualValue) {
-    throw new Error("Not implemented")
-  }
-
-  static againstNullOrUndefined (argument, argumentName) {
-    if (argument === null || argument === undefined) {
-      return {
-        status:
-        message:`${argumentName} is null or undefined`
-      }
+  static againstNullOrUndefined(argument, argumentName) {
+    if (
+      argument === null ||
+      argument === undefined ||
+      Validator.checkIfEmpty(argument)
+    ) {
+      return Result.error({
+        error: `[ERROR] : ${argumentName} is null or undefined`,
+      });
     } else {
       return Result.success();
     }
   }
 
-  static againstNullOrUndefinedBulk(args=[]) {
-    for (let arg of args) {
-      const result = this.againstNullOrUndefined(arg.argument, arg.argumentName);
+  static againstNullOrUndefinedBulk(args = []) {
+    for (const arg of args) {
+      const result = this.againstNullOrUndefined(
+        arg.argument,
+        arg.argumentName
+      );
       if (result.isFailure) return result;
     }
 
-    return Result.ok<GuardResponse>();
+    return Result.success();
   }
 
+  static isOneOf(argument, argumentName, validValues = []) {
+    const isValid = validValues.includes(argument);
 
-  static inRange (num, min, max, argumentName)  {
-    const isInRange = num >= min && num <= max;
-    if (!isInRange) {
-      return Result.fail<GuardResponse>(`${argumentName} is not within range ${min} to ${max}.`);
-    } else {
-      return Result.ok<GuardResponse>()
+    if (isValid) {
+      return Result.success();
     }
+
+    return Result.error({
+      error: `${argumentName} isn't oneOf the correct types in ${JSON.stringify(
+        validValues
+      )}. Got "${argument}".`,
+    });
   }
 
-  static allInRange (numbers=[], min, max, argumentName) {
-    let failingResult = null;
-
-    for(let num of numbers) {
-      const numIsInRangeResult = this.inRange(num, min, max, argumentName);
-      if (!numIsInRangeResult.isFailure) failingResult = numIsInRangeResult;
+  static checkIfRawArrayHasValidValues(args = [], validValues = []) {
+    for (const arg of args) {
+      const result = validValues.includes(arg);
+      if (!result)
+        return Result.error({
+          error: `[ERROR] : ${arg} is not included in ${JSON.stringify(
+            validValues
+          )}`,
+        });
     }
 
+    return Result.success();
+  }
 
+  static inRange(num, min, max, argumentName) {
+    throw new Error("Not implemented");
+  }
+
+  static allInRange(numbers = [], min, max, argumentName) {
+    throw new Error("Not implemented");
   }
 }

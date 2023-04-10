@@ -3,15 +3,13 @@ export class Result {
 
   #message = "";
 
-  #operation = "";
+  #operation = null;
   #status = "ERROR";
-  #date = 0;
 
-  constructor(status, operation, message = "") {
+  constructor({ status = "", message = "", operation = null }) {
     this.#status = status;
     this.#operation = operation;
     this.#message = message;
-    this.#date = Date.now();
   }
 
   get message() {
@@ -31,37 +29,46 @@ export class Result {
     return this.#operation;
   }
 
-  get date() {
-    return this.#date;
+  get isSuccess() {
+    return ["SUCCESS", "WARNING"].includes(this.#status);
   }
 
-  static success(operation) {
-    if (!operation) {
+  get isFailure() {
+    return this.#status === "ERROR";
+  }
+
+  static success(operation = null) {
+    return new Result({
+      status: "SUCCESS",
+      operation,
+    });
+  }
+
+  static error({ error, operation = null }) {
+    if (!error) {
       throw new Error(
-        "InvalidOperation: A success result needs to contain an operation name."
+        "InvalidOperation: A failing result needs to contain an error message"
       );
     }
 
-    return new Result("SUCCESS", operation);
+    return new Result({
+      status: "ERROR",
+      message: error,
+      operation,
+    });
   }
 
-  static error(operation, error) {
-    if (!operation && !error) {
-      throw new Error(
-        "InvalidOperation: A failing result needs to contain an error message and operation name."
-      );
-    }
-
-    return new Result("ERROR", operation, error);
-  }
-
-  static warning(operation, message) {
-    if (!operation && !message) {
+  static warning({ message, operation = null }) {
+    if (!message) {
       throw new Error(
         "InvalidOperation: A warning result needs to contain an message and operation name."
       );
     }
 
-    return new Result("WARNING", operation, message);
+    return new Result({
+      status: "WARNING",
+      message,
+      operation,
+    });
   }
 }

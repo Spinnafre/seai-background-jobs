@@ -8,6 +8,7 @@ import { Readable, Transform, Writable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 
 import { dataAsStream } from "../../utils/generator.js";
+import { Validator } from "../../utils/Validator.js";
 
 class INMETScrappper {
   #browserHandler = {};
@@ -21,6 +22,23 @@ class INMETScrappper {
     date_type: "",
     params: [],
   };
+
+  static validParams = [
+    "Precipitação Total (mm)",
+    "Vel. do Vento Média (m/s)",
+    "Raj. do Vento Máxima (m/s)",
+    "Temp. Média (°C)",
+    "Temp. Máxima (°C)",
+    "Temp. Mínima (°C)",
+    "Umi. Média (%)",
+    "Umi. Mínima (%)",
+  ];
+
+  static validCountries = ["BRAZIL", "N", "NE", "CO", "SE", "S"];
+
+  static validStationsTypes = ["todas", "automaticas", "convencionais"];
+
+  static validDates = ["diario", "horario", "mensal", "prec", "extremos"];
 
   constructor(browserHandler, pageHandler) {
     this.#browserHandler = browserHandler;
@@ -54,7 +72,15 @@ class INMETScrappper {
     return new INMETScrappper(browserHandler, pageHandler);
   }
 
-  setParamsToQuery(
+  async #closeBrowser() {
+    console.log("Closing page...");
+    await this.#pageHandler.close();
+
+    console.log("Closing browser...");
+    await this.#browserHandler.close();
+  }
+
+  setParams(
     params = {
       country: "",
       stations_type: "",
@@ -63,16 +89,13 @@ class INMETScrappper {
       params: [],
     }
   ) {
-    this.#props = params;
-    return this;
-  }
-
-  async #closeBrowser() {
-    console.log("Closing page...");
-    await this.#pageHandler.close();
-
-    console.log("Closing browser...");
-    await this.#browserHandler.close();
+    const result = Validator.againstNullOrUndefinedBulk({
+      argument: params.country,
+      argument: params.stations_type,
+      argument: params.state,
+      argument: params.date_type,
+      argument: params.params,
+    });
   }
 
   async openUrl(url, timeout = 30000) {
@@ -229,7 +252,15 @@ class INMETScrappper {
     return [...stations.values()];
   }
 
-  async getStationsWithMeasures(query) {
+  async getStationsWithMeasures(
+    query = {
+      country: "",
+      stations_type: "",
+      state: "",
+      date_type: "",
+      params: [],
+    }
+  ) {
     await setTimeout(1000);
 
     await this.#pageHandler.waitForSelector(".sidebar", {
@@ -311,11 +342,16 @@ const scrapper = await INMETScrappper.setup({
 await scrapper.openUrl("https://mapas.inmet.gov.br");
 
 const queries = {
-  country: "",
-  stations_type: "",
-  state: "",
-  date_type: "",
-  params: [],
+  country: "NE",
+  stations_type: "automaticas",
+  state: "CE",
+  date_type: "diario",
+  params: [
+    "Precipitação Total (mm)",
+    "Temp. Média (°C)",
+    "Umi. Média (%)",
+    "Vel. do Vento Média (m/s)",
+  ],
 };
 
 const data = await scrapper.getStationsWithMeasures({
