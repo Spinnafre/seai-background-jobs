@@ -3,12 +3,13 @@ export class Result {
 
   #message = "";
 
-  #operation = null;
+  #value = "";
+
   #status = "ERROR";
 
-  constructor({ status = "", message = "", operation = null }) {
+  constructor({ status = "", message = "", value = null }) {
     this.#status = status;
-    this.#operation = operation;
+    this.#value = value;
     this.#message = message;
   }
 
@@ -21,12 +22,15 @@ export class Result {
     return this.#message;
   }
 
-  get status() {
-    return this.#status;
+  get value() {
+    if (this.#status === "ERROR") {
+      throw new Error("Can't get the value of an result.");
+    }
+    return this.#value;
   }
 
-  get operation() {
-    return this.#operation;
+  get status() {
+    return this.#status;
   }
 
   get isSuccess() {
@@ -37,14 +41,14 @@ export class Result {
     return this.#status === "ERROR";
   }
 
-  static success(operation = null) {
+  static success(value) {
     return new Result({
       status: "SUCCESS",
-      operation,
+      value,
     });
   }
 
-  static error({ error, operation = null }) {
+  static error({ error, value }) {
     if (!error) {
       throw new Error(
         "InvalidOperation: A failing result needs to contain an error message"
@@ -54,11 +58,11 @@ export class Result {
     return new Result({
       status: "ERROR",
       message: error,
-      operation,
+      value,
     });
   }
 
-  static warning({ message, operation = null }) {
+  static warning({ message, value }) {
     if (!message) {
       throw new Error(
         "InvalidOperation: A warning result needs to contain an message and operation name."
@@ -68,7 +72,7 @@ export class Result {
     return new Result({
       status: "WARNING",
       message,
-      operation,
+      value,
     });
   }
 }

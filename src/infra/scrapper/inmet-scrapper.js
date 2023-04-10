@@ -8,7 +8,9 @@ import { Readable, Transform, Writable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 
 import { dataAsStream } from "../../utils/generator.js";
+
 import { Validator } from "../../utils/Validator.js";
+import { Result } from "../../utils/Result.js";
 
 class INMETScrappper {
   #browserHandler = {};
@@ -23,7 +25,7 @@ class INMETScrappper {
     params: [],
   };
 
-  static validParams = [
+  static validMeasures = [
     "Precipitação Total (mm)",
     "Vel. do Vento Média (m/s)",
     "Raj. do Vento Máxima (m/s)",
@@ -80,7 +82,7 @@ class INMETScrappper {
     await this.#browserHandler.close();
   }
 
-  setParams(
+  #validateParams(
     params = {
       country: "",
       stations_type: "",
@@ -89,13 +91,66 @@ class INMETScrappper {
       params: [],
     }
   ) {
-    const result = Validator.againstNullOrUndefinedBulk({
-      argument: params.country,
-      argument: params.stations_type,
-      argument: params.state,
-      argument: params.date_type,
-      argument: params.params,
-    });
+    const hasNullOrUndefined = Validator.againstNullOrUndefinedBulk([
+      { argument: params.country, argumentName: "Country" },
+      { argument: params.date_type, argumentName: "Date type" },
+      { argument: params.params, argumentName: "Stations measures" },
+      { argument: params.state, argumentName: "State" },
+      { argument: params.stations_type, argumentName: "Stations types" },
+    ]);
+
+    if (hasNullOrUndefined.isFailure) {
+      return Result.error({
+        error: hasNullOrUndefined.message,
+      });
+    }
+
+    const hasValidMeasures = Validator.checkIfRawArrayHasValidValues(
+      params.params,
+      INMETScrappper.validMeasures
+    );
+
+    if (hasValidMeasures.isFailure) {
+      return Result.error({
+        error: hasValidMeasures.message,
+      });
+    }
+
+    const attrs = [
+      {
+        argument: params.country,
+        argumentName: "Country",
+        validValues: INMETScrappper.validCountries,
+      },
+      {
+        argument: params.date_type,
+        argumentName: "Date type",
+        validValues: INMETScrappper.validDates,
+      },
+      {
+        argument: params.stations_type,
+        argumentName: "Stations types",
+        validValues: INMETScrappper.validStationsTypes,
+      },
+    ];
+
+    for (const { argument, argumentName, validValues } of attrs) {
+      const hasValidAttr = Validator.isOneOf(
+        {
+          argument,
+          argumentName,
+        },
+        validValues
+      );
+
+      if (hasValidAttr.isFailure) {
+        return Result.error({
+          error: hasValidAttr.message,
+        });
+      }
+    }
+
+    return Result.success(params);
   }
 
   async openUrl(url, timeout = 30000) {
@@ -115,13 +170,13 @@ class INMETScrappper {
 
   // Get codes from params specified by users
   async #getCodesFromStationsParams(userParams) {
-    const codes = await this.#pageHandler.evaluate(() => {
+    const codes = await this.#pageHandler.evaluate((params) => {
       const options = document.querySelector("#estacao-parametro").children;
 
       return Array.from(options)
-        .filter((option) => userParams.includes(option.innerHTML))
+        .filter((option) => params.includes(option.innerHTML))
         .map((option) => option.value);
-    });
+    }, userParams);
 
     return codes;
   }
@@ -252,15 +307,19 @@ class INMETScrappper {
     return [...stations.values()];
   }
 
-  async getStationsWithMeasures(
-    query = {
-      country: "",
-      stations_type: "",
-      state: "",
-      date_type: "",
-      params: [],
+  setParams(params) {
+    const result = this.#validateParams(params);
+
+    if (result.isFailure) {
+      throw new Error({
+        error: result.message,
+      });
     }
-  ) {
+
+    this.#props = params;
+  }
+
+  async getStationsWithMeasures() {
     await setTimeout(1000);
 
     await this.#pageHandler.waitForSelector(".sidebar", {
@@ -341,7 +400,7 @@ const scrapper = await INMETScrappper.setup({
 
 await scrapper.openUrl("https://mapas.inmet.gov.br");
 
-const queries = {
+scrapper.setParams({
   country: "NE",
   stations_type: "automaticas",
   state: "CE",
@@ -352,12 +411,6 @@ const queries = {
     "Umi. Média (%)",
     "Vel. do Vento Média (m/s)",
   ],
-};
-
-const data = await scrapper.getStationsWithMeasures({
-  country: "",
-  stations_type: "",
-  state: "",
-  date_type: "",
-  params: [],
 });
+
+const data = await scrapper.getStationsWithMeasures();

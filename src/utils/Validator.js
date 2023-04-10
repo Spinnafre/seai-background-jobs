@@ -35,7 +35,7 @@ export class Validator {
     return Result.success();
   }
 
-  static isOneOf(argument, argumentName, validValues = []) {
+  static isOneOf({ argument, argumentName }, validValues = []) {
     const isValid = validValues.includes(argument);
 
     if (isValid) {
