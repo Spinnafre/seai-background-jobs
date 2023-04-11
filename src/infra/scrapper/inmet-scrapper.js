@@ -12,10 +12,13 @@ import { dataAsStream } from "../../utils/generator.js";
 import { Validator } from "../../utils/Validator.js";
 import { Result } from "../../utils/Result.js";
 
-class INMETScrappper {
+class InmetScrapper {
   #browserHandler = {};
 
   #pageHandler = {};
+
+  #pageUrl = null;
+  #pageTimeout = 30000;
 
   #props = {
     country: "",
@@ -42,13 +45,16 @@ class INMETScrappper {
 
   static validDates = ["diario", "horario", "mensal", "prec", "extremos"];
 
-  constructor(browserHandler, pageHandler) {
+  constructor(url, browserHandler, pageHandler) {
+    this.#pageUrl = url;
     this.#browserHandler = browserHandler;
     this.#pageHandler = pageHandler;
   }
 
-  static async setup(
+  static async build(
     scrapperConfig = {
+      url: "",
+      timeout: "",
       userAgent: "",
       launch: {
         headless: true,
@@ -71,10 +77,16 @@ class INMETScrappper {
 
     await pageHandler.setUserAgent(scrapperConfig.userAgent);
 
-    return new INMETScrappper(browserHandler, pageHandler);
+    const scrapper = new InmetScrapper(
+      scrapperConfig.url,
+      browserHandler,
+      pageHandler
+    );
+
+    return scrapper;
   }
 
-  async #closeBrowser() {
+  async closeBrowser() {
     console.log("Closing page...");
     await this.#pageHandler.close();
 
@@ -82,7 +94,7 @@ class INMETScrappper {
     await this.#browserHandler.close();
   }
 
-  #validateParams(
+  static validateParams(
     params = {
       country: "",
       stations_type: "",
@@ -100,37 +112,33 @@ class INMETScrappper {
     ]);
 
     if (hasNullOrUndefined.isFailure) {
-      return Result.error({
-        error: hasNullOrUndefined.message,
-      });
+      return Result.error(hasNullOrUndefined.message);
     }
 
     const hasValidMeasures = Validator.checkIfRawArrayHasValidValues(
       params.params,
-      INMETScrappper.validMeasures
+      InmetScrapper.validMeasures
     );
 
     if (hasValidMeasures.isFailure) {
-      return Result.error({
-        error: hasValidMeasures.message,
-      });
+      return Result.error(hasValidMeasures.error);
     }
 
     const attrs = [
       {
         argument: params.country,
         argumentName: "Country",
-        validValues: INMETScrappper.validCountries,
+        validValues: InmetScrapper.validCountries,
       },
       {
         argument: params.date_type,
         argumentName: "Date type",
-        validValues: INMETScrappper.validDates,
+        validValues: InmetScrapper.validDates,
       },
       {
         argument: params.stations_type,
         argumentName: "Stations types",
-        validValues: INMETScrappper.validStationsTypes,
+        validValues: InmetScrapper.validStationsTypes,
       },
     ];
 
@@ -144,28 +152,33 @@ class INMETScrappper {
       );
 
       if (hasValidAttr.isFailure) {
-        return Result.error({
-          error: hasValidAttr.message,
-        });
+        return Result.error(hasValidAttr.message);
       }
     }
 
     return Result.success(params);
   }
 
-  async openUrl(url, timeout = 30000) {
-    console.log(`Acessando URL: ${url}.`);
+  #setPageUrl(url) {
+    this.#pageUrl = url;
+  }
 
-    await this.#pageHandler.goto(url, {
+  setPageTimeout(timeout) {
+    this.#pageTimeout = timeout;
+    return this;
+  }
+
+  async #openPage() {
+    console.log(`Acessando URL: ${this.#pageUrl}.`);
+
+    await this.#pageHandler.goto(this.#pageUrl, {
       waitUntil: "domcontentloaded",
-      timeout,
+      timeout: this.#pageTimeout,
     });
 
     const pageTitle = await this.#pageHandler.title();
 
     console.log("Sucesso ao acessar página ", pageTitle);
-
-    return this;
   }
 
   // Get codes from params specified by users
@@ -308,18 +321,11 @@ class INMETScrappper {
   }
 
   setParams(params) {
-    const result = this.#validateParams(params);
-
-    if (result.isFailure) {
-      throw new Error({
-        error: result.message,
-      });
-    }
-
     this.#props = params;
   }
-
   async getStationsWithMeasures() {
+    await this.#openPage();
+
     await setTimeout(1000);
 
     await this.#pageHandler.waitForSelector(".sidebar", {
@@ -345,10 +351,8 @@ class INMETScrappper {
       this.#props.params
     );
 
-    console.log("PARAMS CODES = ", parametersCodes);
-
     if (!parametersCodes.length) {
-      this.#closeBrowser();
+      this.closeBrowser();
 
       throw new Error(
         "Não foi possível obter identificadores dos parâmetros das medições das estações"
@@ -361,56 +365,10 @@ class INMETScrappper {
       parametersCodes
     );
 
-    console.log("Stations With Meditions = ", stationsWithMeasures);
+    this.closeBrowser();
 
-    this.#closeBrowser();
-
-    if (stationsWithMeasures.length) {
-      console.log(
-        "[✅] Sucesso ao obter dados concatenados de estações com medições \n",
-        stationsWithMeasures
-      );
-      return stationsWithMeasures;
-    } else
-      console.log("[⚠️] Não há dados de estações com medições especificadas");
-    return [];
+    return stationsWithMeasures;
   }
 }
 
-// export { INMETScrappper };
-
-// url: "https://mapas.inmet.gov.br",
-const scrapper = await INMETScrappper.setup({
-  userAgent:
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36",
-  launch: {
-    headless: true,
-    args: [
-      // "--disable-gpu",
-      // "--disable-dev-shm-usage",
-      // "--disable-setuid-sandbox",
-      "--no-sandbox",
-      // "--disable-web-security",
-      // "--disable-features=IsolateOrigins",
-      // "--disable-site-isolation-trials",
-      // "--disable-features=BlockInsecurePrivateNetworkRequests",
-    ],
-  },
-});
-
-await scrapper.openUrl("https://mapas.inmet.gov.br");
-
-scrapper.setParams({
-  country: "NE",
-  stations_type: "automaticas",
-  state: "CE",
-  date_type: "diario",
-  params: [
-    "Precipitação Total (mm)",
-    "Temp. Média (°C)",
-    "Umi. Média (%)",
-    "Vel. do Vento Média (m/s)",
-  ],
-});
-
-const data = await scrapper.getStationsWithMeasures();
+export { InmetScrapper };

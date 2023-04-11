@@ -15,9 +15,7 @@ export class Validator {
       argument === undefined ||
       Validator.checkIfEmpty(argument)
     ) {
-      return Result.error({
-        error: `[ERROR] : ${argumentName} is null or undefined`,
-      });
+      return Result.error(`[ERROR] : ${argumentName} is null or undefined`);
     } else {
       return Result.success();
     }
@@ -42,32 +40,22 @@ export class Validator {
       return Result.success();
     }
 
-    return Result.error({
-      error: `${argumentName} isn't oneOf the correct types in ${JSON.stringify(
+    return Result.error(
+      `${argumentName} isn't oneOf the correct types in ${JSON.stringify(
         validValues
-      )}. Got "${argument}".`,
-    });
+      )}. Got "${argument}".`
+    );
   }
 
   static checkIfRawArrayHasValidValues(args = [], validValues = []) {
     for (const arg of args) {
       const result = validValues.includes(arg);
       if (!result)
-        return Result.error({
-          error: `[ERROR] : ${arg} is not included in ${JSON.stringify(
-            validValues
-          )}`,
-        });
+        return Result.error(
+          `[ERROR] : ${arg} is not included in ${JSON.stringify(validValues)}`
+        );
     }
 
     return Result.success();
-  }
-
-  static inRange(num, min, max, argumentName) {
-    throw new Error("Not implemented");
-  }
-
-  static allInRange(numbers = [], min, max, argumentName) {
-    throw new Error("Not implemented");
   }
 }

@@ -1,16 +1,15 @@
-const scrapperParams = {
-  country: "NE",
-  stations_type: "automaticas",
-  state: "CE",
-  date_type: null,
-  params: [
-    "Precipitação Total (mm)",
-    "Temp. Média (°C)",
-    "Umi. Média (%)",
-    "Vel. do Vento Média (m/s)",
-  ],
+export default {
+  page: {
+    url: "https://mapas.inmet.gov.br",
+    timeout: 30000,
+  },
+  toleranceTime: 40000,
+  launchConfig: {
+    userAgent:
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36",
+    launch: {
+      headless: true,
+      args: ["--no-sandbox"],
+    },
+  },
 };
-
-const urlToScrapper = "https://mapas.inmet.gov.br";
-
-export { scrapperParams, urlToScrapper };

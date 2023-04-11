@@ -1,78 +1,45 @@
 export class Result {
-  static status = ["SUCCESS", "ERROR", "WARNING", "PENDING"];
+  #error = {};
 
-  #message = "";
+  #value = null;
 
-  #value = "";
+  isSuccess = false;
+  isFailure = false;
 
-  #status = "ERROR";
-
-  constructor({ status = "", message = "", value = null }) {
-    this.#status = status;
-    this.#value = value;
-    this.#message = message;
-  }
-
-  get message() {
-    if (this.#status === "SUCCESS") {
+  constructor(isSuccess, error, value = null) {
+    if (isSuccess && error) {
       throw new Error(
-        "Can't get the value of an message result. Use 'message' instead."
+        "InvalidOperation: A result cannot be successful and contain an error"
       );
     }
-    return this.#message;
-  }
 
-  get value() {
-    if (this.#status === "ERROR") {
-      throw new Error("Can't get the value of an result.");
-    }
-    return this.#value;
-  }
-
-  get status() {
-    return this.#status;
-  }
-
-  get isSuccess() {
-    return ["SUCCESS", "WARNING"].includes(this.#status);
-  }
-
-  get isFailure() {
-    return this.#status === "ERROR";
-  }
-
-  static success(value) {
-    return new Result({
-      status: "SUCCESS",
-      value,
-    });
-  }
-
-  static error({ error, value }) {
-    if (!error) {
+    if (!isSuccess && !error) {
       throw new Error(
         "InvalidOperation: A failing result needs to contain an error message"
       );
     }
 
-    return new Result({
-      status: "ERROR",
-      message: error,
-      value,
-    });
+    this.isSuccess = isSuccess;
+    this.isFailure = !isSuccess;
+    this.#error = error;
+    this.#value = value;
+
+    Object.freeze(this);
   }
 
-  static warning({ message, value }) {
-    if (!message) {
-      throw new Error(
-        "InvalidOperation: A warning result needs to contain an message and operation name."
-      );
-    }
+  get error() {
+    return this.#error;
+  }
 
-    return new Result({
-      status: "WARNING",
-      message,
-      value,
-    });
+  get value() {
+    return this.#value;
+  }
+
+  static success(value) {
+    return new Result(true, null, value);
+  }
+
+  static error(error) {
+    return new Result(false, error, null);
   }
 }
