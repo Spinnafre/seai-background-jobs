@@ -6,6 +6,8 @@ export class Result {
   isSuccess = false;
   isFailure = false;
 
+  #time = null;
+
   constructor(isSuccess, error, value = null) {
     if (isSuccess && error) {
       throw new Error(
@@ -19,16 +21,21 @@ export class Result {
       );
     }
 
+    this.#time = new Date();
     this.isSuccess = isSuccess;
     this.isFailure = !isSuccess;
-    this.#error = error;
     this.#value = value;
+    this.#error = error;
 
     Object.freeze(this);
   }
 
   get error() {
     return this.#error;
+  }
+
+  get time() {
+    return this.#time;
   }
 
   get value() {
