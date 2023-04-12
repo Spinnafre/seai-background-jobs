@@ -11,7 +11,7 @@ class RegisterDailyStationsController {
     const date = new Date();
     try {
       console.log(
-        `[${date}] - Iniciando extração de dados das estações do Inmet e Funcreme`
+        `[${date}] - Iniciando extração de dados das estações do Inmet e Funceme`
       );
 
       await this.#service.execute(params);

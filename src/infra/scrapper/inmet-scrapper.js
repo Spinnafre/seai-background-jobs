@@ -314,7 +314,7 @@ class InmetScrapper {
       const measures = await this.#fetchMeasures();
 
       if (measures) {
-        console.log("[✅] Sucesso ao obter dados de medição ", measures);
+        console.log("[✅] Sucesso ao obter dados de medição ");
 
         const { estacoes } = measures;
 

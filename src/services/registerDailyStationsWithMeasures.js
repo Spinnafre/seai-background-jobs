@@ -3,6 +3,7 @@ import { Result } from "../utils/Result.js";
 import { setTimeout } from "node:timers/promises";
 
 import scrapperConfig from "../config/scrapper.js";
+import { formatDate } from "../utils/date.js";
 class RegisterDailyStationsWithMeasures {
   #getStationsFromInmetService;
   #getStationsFromFuncemeService;
@@ -23,7 +24,7 @@ class RegisterDailyStationsWithMeasures {
       if (this.#attemptsResults.length) {
         process.nextTick(() =>
           console.log(
-            `Tetando novamente em ${
+            `⏲️ Tetando novamente em ${
               scrapperConfig.timeToAttemptAgain / 1000
             } segundos`
           )
@@ -47,9 +48,23 @@ class RegisterDailyStationsWithMeasures {
     );
 
     console.log("Tentativas: ", this.#currentAttempt);
+
     console.log(
-      "Erros",
-      this.#attemptsResults.map((tempt) => tempt.time + tempt.error)
+      "Erros: ",
+      this.#attemptsResults.map(
+        (tempt) =>
+          formatDate(
+            tempt.time,
+            {
+              day: "numeric",
+              month: "numeric",
+              year: "numeric",
+            },
+            "pt-BR"
+          ) +
+          " : " +
+          tempt.error
+      )
     );
 
     console.log(inmetStations);

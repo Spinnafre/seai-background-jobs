@@ -31,7 +31,7 @@ class ExtractStationsFromInmet {
 
       const timeoutPromise = sleep(
         scrapperConfig.toleranceTime,
-        "Timeout trying to open INMET page"
+        `Exceeded the tolerance time limit ${scrapperConfig.toleranceTime}`
       );
 
       const stationsWithMeasures = await Promise.race([
