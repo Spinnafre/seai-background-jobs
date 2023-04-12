@@ -217,6 +217,7 @@ class InmetScrapper {
       write(chunk, enc, next) {
         if (!stations.has(chunk.codigo)) {
           stations.set(chunk.codigo, {
+            codigo: chunk.codigo,
             nome: chunk.nome,
             estado: chunk.estado,
             regiao: chunk.regiao,
