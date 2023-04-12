@@ -11,6 +11,7 @@ import { dataAsStream } from "../../utils/generator.js";
 
 import { Validator } from "../../utils/Validator.js";
 import { Result } from "../../utils/Result.js";
+import { getYesterdayDate } from "../../utils/date.js";
 
 class InmetScrapper {
   #browserHandler = {};
@@ -217,6 +218,7 @@ class InmetScrapper {
       write(chunk, enc, next) {
         if (!stations.has(chunk.codigo)) {
           stations.set(chunk.codigo, {
+            date: chunk.date,
             codigo: chunk.codigo,
             nome: chunk.nome,
             estado: chunk.estado,
@@ -254,6 +256,20 @@ class InmetScrapper {
   }
 
   #formatMeasures() {
+    const hasDateTime =
+      Reflect.has(this.#props, "date_time") && this.#props.date_time;
+
+    const dateTime = hasDateTime
+      ? this.#props.date_type
+      : getYesterdayDate({
+          locale: "pt-BR",
+          formatOptions: {
+            day: "numeric",
+            month: "numeric",
+            year: "numeric",
+          },
+        });
+
     return new Transform({
       objectMode: true,
       transform(chunk, enc, cb) {
@@ -263,6 +279,7 @@ class InmetScrapper {
         const data = Object.assign(
           {},
           {
+            date: dateTime,
             nome,
             codigo,
             estado,
