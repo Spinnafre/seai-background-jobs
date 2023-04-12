@@ -31,6 +31,7 @@ class App {
 
 process.on("uncaughtException", function (err) {
   console.log("Caught exception: " + err);
+  process.exit(1);
 });
 
 process.on("exit", (code) => {
