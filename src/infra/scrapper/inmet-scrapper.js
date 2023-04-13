@@ -215,25 +215,36 @@ class InmetScrapper {
 
     return measures;
   }
+  #translateMeasureName(measureName) {
+    const measures = {
+      temperatura: "temperature",
+      ventovel: "windSpeed",
+      umidade: "humidity",
+    };
 
+    return measures[measureName];
+  }
   #concatenateMeasures(stations, measureName) {
     return new Writable({
       objectMode: true,
       write(chunk, enc, next) {
-        if (!stations.has(chunk.codigo)) {
-          stations.set(chunk.codigo, {
-            date: chunk.date,
-            codigo: chunk.codigo,
-            nome: chunk.nome,
-            estado: chunk.estado,
-            regiao: chunk.regiao,
+        const { date, name, code, state, country, latitude, longitude, value } =
+          chunk;
+
+        if (!stations.has(code)) {
+          stations.set(code, {
+            date,
+            code,
+            name,
+            state,
+            country,
           });
         }
 
         stations.set(
-          chunk.codigo,
-          Object.assign(stations.get(chunk.codigo), {
-            [measureName]: chunk.valor,
+          code,
+          Object.assign(stations.get(code), {
+            [measureName]: value,
           })
         );
 
@@ -243,14 +254,14 @@ class InmetScrapper {
   }
 
   #filterMeasuresByState() {
-    const state = this.#props.state;
+    const filter = this.#props.state;
 
     return new Transform({
       objectMode: true,
       transform(chunk, enc, cb) {
-        const { estado } = chunk;
-        if (state) {
-          if (state == estado) return cb(null, chunk);
+        const { state } = chunk;
+        if (filter) {
+          if (filter == state) return cb(null, chunk);
           else return cb(null);
         } else {
           cb(null, chunk);
@@ -280,21 +291,22 @@ class InmetScrapper {
         const { codigo, nome, estado, regiao, latitude, longitude, valor } =
           chunk;
 
-        const data = Object.assign(
-          {},
-          {
-            date: dateTime,
-            nome,
-            codigo,
-            estado,
-            regiao,
-            latitude,
-            longitude,
-            valor,
-          }
+        cb(
+          null,
+          Object.assign(
+            {},
+            {
+              date: dateTime,
+              name: nome,
+              code: codigo,
+              state: estado,
+              country: regiao,
+              latitude,
+              longitude,
+              value: valor,
+            }
+          )
         );
-
-        cb(null, data);
       },
     });
   }
@@ -324,7 +336,7 @@ class InmetScrapper {
 
         const readableStream = Readable.from(dataAsStream(estacoes));
 
-        const measureName = parameter.split("-")[0];
+        const measureName = this.#translateMeasureName(parameter.split("-")[0]);
 
         // const writable = createWriteStream(
         //   resolve(__dirname, "..", "data", "test.ndjson")
@@ -381,7 +393,7 @@ class InmetScrapper {
     );
 
     if (!parametersCodes.length) {
-      this.closeBrowser();
+      await this.closeBrowser();
 
       throw new Error(
         "Não foi possível obter identificadores dos parâmetros das medições das estações"
@@ -394,7 +406,7 @@ class InmetScrapper {
       parametersCodes
     );
 
-    this.closeBrowser();
+    await this.closeBrowser();
 
     return stationsWithMeasures;
   }

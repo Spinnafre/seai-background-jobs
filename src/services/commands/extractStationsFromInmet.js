@@ -8,13 +8,13 @@ class ExtractStationsFromInmet {
     this.#inmetScrapper = inmetScrapper;
   }
 
-  sleep(time, value) {
+  #sleep(time, value) {
     return new Promise((resolve, reject) => {
       setTimeout(() => reject(new Error(value)), time);
     });
   }
 
-  async execute(params) {
+  async execute(params, toleranceTime = scrapperConfig.toleranceTime) {
     const scrapper = await this.#inmetScrapper.build({
       ...scrapperConfig.page,
       ...scrapperConfig.launchConfig,
@@ -27,9 +27,9 @@ class ExtractStationsFromInmet {
         return Result.error(result.error);
       }
 
-      const timeoutPromise = this.sleep(
-        scrapperConfig.toleranceTime,
-        `Exceeded the tolerance time limit ${scrapperConfig.toleranceTime}`
+      const timeoutPromise = this.#sleep(
+        toleranceTime,
+        `Exceeded the tolerance time limit ${toleranceTime}`
       );
 
       const stationsWithMeasures = await Promise.race([
@@ -50,7 +50,7 @@ class ExtractStationsFromInmet {
       );
     } catch (error) {
       console.log("[ERROR] - ", error.message);
-      scrapper.closeBrowser();
+      await scrapper.closeBrowser();
       return Result.error(error.message);
     }
   }
