@@ -29,23 +29,6 @@ class InmetScrapper {
     params: [],
   };
 
-  static validMeasures = [
-    "Precipitação Total (mm)",
-    "Vel. do Vento Média (m/s)",
-    "Raj. do Vento Máxima (m/s)",
-    "Temp. Média (°C)",
-    "Temp. Máxima (°C)",
-    "Temp. Mínima (°C)",
-    "Umi. Média (%)",
-    "Umi. Mínima (%)",
-  ];
-
-  static validCountries = ["BRAZIL", "N", "NE", "CO", "SE", "S"];
-
-  static validStationsTypes = ["todas", "automaticas", "convencionais"];
-
-  static validDates = ["diario", "horario", "mensal", "prec", "extremos"];
-
   constructor(url, browserHandler, pageHandler) {
     this.#pageUrl = url;
     this.#browserHandler = browserHandler;
@@ -95,7 +78,11 @@ class InmetScrapper {
     await this.#browserHandler.close();
   }
 
-  static validateParams(
+  get props() {
+    return this.#props;
+  }
+
+  #validateParams(
     params = {
       country: "",
       stations_type: "",
@@ -113,12 +100,29 @@ class InmetScrapper {
     ]);
 
     if (hasNullOrUndefined.isFailure) {
-      return Result.error(hasNullOrUndefined.message);
+      return Result.error(hasNullOrUndefined.error);
     }
+
+    const validMeasures = [
+      "Precipitação Total (mm)",
+      "Vel. do Vento Média (m/s)",
+      "Raj. do Vento Máxima (m/s)",
+      "Temp. Média (°C)",
+      "Temp. Máxima (°C)",
+      "Temp. Mínima (°C)",
+      "Umi. Média (%)",
+      "Umi. Mínima (%)",
+    ];
+
+    const validCountries = ["BRAZIL", "N", "NE", "CO", "SE", "S"];
+
+    const validStationsTypes = ["todas", "automaticas", "convencionais"];
+
+    const validDates = ["diario", "horario", "mensal", "prec", "extremos"];
 
     const hasValidMeasures = Validator.checkIfRawArrayHasValidValues(
       params.params,
-      InmetScrapper.validMeasures
+      validMeasures
     );
 
     if (hasValidMeasures.isFailure) {
@@ -129,17 +133,17 @@ class InmetScrapper {
       {
         argument: params.country,
         argumentName: "Country",
-        validValues: InmetScrapper.validCountries,
+        validValues: validCountries,
       },
       {
         argument: params.date_type,
         argumentName: "Date type",
-        validValues: InmetScrapper.validDates,
+        validValues: validDates,
       },
       {
         argument: params.stations_type,
         argumentName: "Stations types",
-        validValues: InmetScrapper.validStationsTypes,
+        validValues: validStationsTypes,
       },
     ];
 
@@ -153,7 +157,7 @@ class InmetScrapper {
       );
 
       if (hasValidAttr.isFailure) {
-        return Result.error(hasValidAttr.message);
+        return Result.error(hasValidAttr.error);
       }
     }
 
@@ -339,8 +343,15 @@ class InmetScrapper {
   }
 
   setParams(params) {
-    this.#props = params;
+    const paramsOrError = this.#validateParams(params);
+
+    if (paramsOrError.isSuccess) {
+      this.#props = params;
+    }
+
+    return paramsOrError;
   }
+
   async getStationsWithMeasures() {
     await this.#openPage();
 

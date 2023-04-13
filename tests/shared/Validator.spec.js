@@ -10,7 +10,7 @@ describe("Validator", function () {
 
     expect(result.isSuccess).toBeFalsy();
     expect(result.isFailure).toBeTruthy();
-    expect(result.message).toEqual(
+    expect(result.error).toEqual(
       `[ERROR] : ${argumentName} is null or undefined`
     );
   });
@@ -41,7 +41,7 @@ describe("Validator", function () {
 
     expect(result.isSuccess).toBeFalsy();
     expect(result.isFailure).toBeTruthy();
-    expect(result.message).toEqual(
+    expect(result.error).toEqual(
       `[ERROR] : ${args[4].argumentName} is null or undefined`
     );
   });
@@ -95,7 +95,7 @@ describe("Validator", function () {
 
     expect(result.isSuccess).toBeFalsy();
     expect(result.isFailure).toBeTruthy();
-    expect(result.message).toEqual(
+    expect(result.error).toEqual(
       `[ERROR] : Precipitação Total is not included in ${JSON.stringify(
         validMeasures
       )}`
