@@ -220,6 +220,7 @@ class InmetScrapper {
       temperatura: "temperature",
       ventovel: "windSpeed",
       umidade: "humidity",
+      precipitacao: "precipitation",
     };
 
     return measures[measureName];
@@ -393,7 +394,7 @@ class InmetScrapper {
     );
 
     if (!parametersCodes.length) {
-      await this.closeBrowser();
+      // await this.closeBrowser();
 
       throw new Error(
         "Não foi possível obter identificadores dos parâmetros das medições das estações"
