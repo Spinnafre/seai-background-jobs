@@ -46,15 +46,18 @@ class StationReadings {
       const [date, temperature, humidity, radiation] = row.split(",");
       return {
         date,
-        temperature: parseFloat(temperature) || 0,
-        humidity: parseFloat(humidity) || 0,
-        radiation: parseFloat(radiation) || 0,
+        temperature: parseFloat(temperature) || null,
+        humidity: parseFloat(humidity) || null,
+        radiation: parseFloat(radiation) || null,
       };
     });
 
+    const stationName = name && name.trim();
+    const stationCode = code && code.trim();
+
     return {
-      code,
-      name,
+      code: stationCode,
+      name: stationName,
       latitude,
       longitude,
       altitude,
