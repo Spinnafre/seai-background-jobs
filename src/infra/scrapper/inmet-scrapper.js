@@ -11,7 +11,7 @@ import { dataAsStream } from "../../utils/generator.js";
 
 import { Validator } from "../../utils/Validator.js";
 import { Result } from "../../utils/Result.js";
-import { getYesterdayDate } from "../../utils/date.js";
+import { getYesterdayDateFormatted } from "../../utils/date.js";
 
 class InmetScrapper {
   #browserHandler = {};
@@ -277,7 +277,7 @@ class InmetScrapper {
 
     const dateTime = hasDateTime
       ? this.#props.date_type
-      : getYesterdayDate({
+      : getYesterdayDateFormatted({
           locale: "pt-BR",
           formatOptions: {
             day: "numeric",

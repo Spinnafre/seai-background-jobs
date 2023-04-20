@@ -2,7 +2,6 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 
-import { createWriteStream } from "fs";
 import Client from "ftp";
 
 import zlib from "zlib";
@@ -10,150 +9,200 @@ import tar from "tar-stream";
 import { StationReadings } from "./readingsOfStationsFromFunceme.js";
 
 import { Writable, Transform, Readable } from "stream";
-import { createReadStream } from "fs";
+import { pipeline } from "stream/promises";
 
-const connection = new Client();
-
-let dirs = [];
+import { formatDateToYYMMDD, getYesterday } from "../../../utils/date.js";
 
 const DATE = "2023-04-18";
 const STATION_CODE = "B8505818";
 const PLIVIOMETER_CODE = "";
 
-const extract = tar.extract();
+// extract.once("finish", () => {
+//   console.log("Finalizado o processo de extração de dados das estações");
+//   if (stationsCodes.some((station_code) => station_code === STATION_CODE)) {
+//     console.log(
+//       `Não foi possível obter dados da estação ${STATION_CODE}, por favor verifique se a estação existe.`
+//     );
+//   }
+//   connection.end();
+// });
+class FTPClientAdapter {
+  connection;
+  constructor() {
+    this.connection = new Client();
+  }
 
-const stationsCodes = [];
+  close() {
+    console.log("Closing connection...");
+    this.connection.end();
+  }
 
-connection.connect({
-  host: process.env.FTP_FUNCEME_HOST,
-  user: process.env.FTP_FUNCEME_USER,
-  password: process.env.FTP_FUNCEME_PASSWORD,
-  keepalive: 10000,
-  pasvTimeout: 10000,
-  connTimeout: 10000,
-});
+  connect() {
+    this.connection.connect({
+      host: process.env.FTP_FUNCEME_HOST,
+      user: process.env.FTP_FUNCEME_USER,
+      password: process.env.FTP_FUNCEME_PASSWORD,
+      keepalive: 10000,
+      pasvTimeout: 10000,
+      connTimeout: 10000,
+    });
 
-extract.on("entry", function (header, stream, cb) {
-  const stations = [];
-  const selectedStation = "";
+    this.connection.once("close", (err) => {
+      if (err) throw new Error(err);
+      console.log("Conexão com ftp fechada com sucesso");
+    });
 
-  const writable = new Writable({
-    objectMode: true,
-    write(chunk, enc, next) {
-      if (!chunk) {
-        return next(null);
-      }
-      const { station, fileName } = chunk;
+    this.connection.once("error", (err) => {
+      console.log("Falha ao realizar conexão com ftp da funceme.\n", err);
+      this.close();
+    });
 
-      console.log("Escrevendo...", station.props.measures.length);
+    this.connection.on("greeting", (msg) => console.log("Greeting ", msg));
 
-      stations.push({
-        code: station.props.code,
-        name: station.props.name,
-        fileName,
+    this.connection.on("end", () => console.log("FTP connection ended..."));
+  }
+
+  async getFolderStream(directory, file) {
+    console.log(`[🔍] Getting stream from path ${directory}/${file}`);
+    return new Promise((resolve, reject) => {
+      this.connect();
+
+      this.connection.on("ready", () => {
+        this.connection.cwd(directory, (error) => {
+          if (error) reject(error);
+        });
+        this.connection.get(file, function (error, stream) {
+          if (error) reject(error);
+
+          resolve(stream);
+        });
+      });
+    });
+  }
+
+  async unTar(tarballStream) {
+    const results = {};
+    return new Promise((resolve, reject) => {
+      const extract = tar.extract();
+
+      extract.on("entry", async function (header, stream, next) {
+        const chunks = [];
+        for await (let chunk of stream) {
+          chunks.push(chunk);
+        }
+        //Transforma array de buffers em um único buffer
+        results[header.name] = Buffer.concat(chunks);
+        next();
       });
 
-      if (station.props.code === STATION_CODE) {
+      extract.on("finish", function () {
+        resolve(results);
+      });
+      tarballStream.pipe(zlib.createUnzip()).pipe(extract);
+    });
+  }
+
+  convertCsvToJson() {
+    return new Transform({
+      objectMode: true,
+      transform(chunk, enc, next) {
+        const data = chunk.toString();
+        if (!data) return next(new Error("File is empty"));
+        const station = StationReadings.create(data);
+        next(null, station);
+      },
+    });
+  }
+
+  filterByStationCode(code) {
+    return new Transform({
+      objectMode: true,
+      transform(chunk, enc, next) {
+        const station = chunk;
+
+        if (station.props.code === code) {
+          next(null, station);
+        }
+
+        next();
+      },
+    });
+  }
+
+  logStation() {
+    return new Writable({
+      objectMode: true,
+      write(chunk, enc, next) {
+        if (!chunk) {
+          return next();
+        }
+
+        const station = chunk;
+        console.log("Escrevendo...", station.props.measures.length);
+
+        // stations.push({
+        //   code: station.props.code,
+        //   name: station.props.name,
+        //   fileName,
+        // });
         console.log(
           "[✅] - Sucesso ao obter dados da estação: ",
           station.props
         );
-      }
 
-      next(null);
-    },
-  });
-
-  let buffer = null;
-  let receivedItems = 0;
-
-  const transform = new Transform({
-    objectMode: true,
-    transform(chunk, enc, next) {
-      const data = chunk.toString();
-
-      if (!data) return next(null, null);
-
-      const fileName = header.name;
-
-      console.log(`Formatando dados do arquivo ${fileName}`);
-
-      const station = StationReadings.create(data);
-
-      next(null, { station, fileName });
-    },
-  });
-
-  // evento emitido quando todos os pedaços da stream são recuperados
-  stream.on("data", (chunk) => {
-    receivedItems++;
-    buffer += chunk;
-    console.log(`Recebido ${receivedItems} pacote(s)`);
-  });
-
-  // Emitido após todos os chunks da stream serem processados
-  stream.on("end", () => {
-    const readable = Readable.from(buffer);
-
-    readable
-      .pipe(transform)
-      .pipe(writable)
-      .on("finish", () => {
-        console.log(
-          "Sucesso ao buscar dados de estação, iniciando leitura de próximo arquivo"
-        );
-        cb();
-      });
-  });
-
-  stream.resume();
-});
-
-extract.once("finish", () => {
-  console.log("Finalizado o processo de extração de dados das estações");
-  if (stationsCodes.some((station_code) => station_code === STATION_CODE)) {
-    console.log(
-      `Não foi possível obter dados da estação ${STATION_CODE}, por favor verifique se a estação existe.`
-    );
+        next();
+      },
+    });
   }
-  connection.end();
-});
 
-// /pcds
-connection.on("ready", function () {
-  console.log("Buscando dados das estações...");
+  async getYesterdayStationByCode(code) {
+    const date = formatDateToYYMMDD(getYesterday());
+    //Ver uma forma de automatizar
+    const stationFolder = "pcds";
+    const file = "stn_data_2023.tar.gz";
 
-  connection.cwd("pcds", (error) => {
-    if (error) throw error;
-  });
-
-  console.log("[🔍] - Lendo dados de 2023...");
-
-  connection.get("stn_data_2023.tar.gz", (error, stream) => {
-    if (error) throw new Error(error);
+    const stream = await this.getFolderStream(stationFolder, file);
 
     stream.once("close", function () {
       // connection.end();
-      console.log("Sucesso ao obter dados das estações da FUNCEME.");
+      console.log(
+        `Sucesso ao obter dados do diretório ${stationFolder}/${file}`
+      );
     });
 
-    console.log("Iniciando extração de dados das estações");
-    stream.pipe(zlib.createUnzip()).pipe(extract);
-    // .pipe(createWriteStream("test.tar"));
-  });
-});
+    console.log(
+      `Iniciando extração de dados do diretório ${stationFolder}/${file}`
+    );
+    // stream.pipe(zlib.createUnzip()).pipe(extract);
 
-// const stream = createReadStream(
-//   "../../../../data/mock/funceme/pcds/stn_data_2023.tar.gz"
-// );
-// stream.pipe(zlib.createUnzip()).pipe(extract);
+    // [fileName] : Buffer
+    const streamsOfFiles = await this.unTar(stream);
 
-connection.once("close", (err) => {
-  if (err) throw new Error(err);
-  console.log("Conexão com ftp fechada com sucesso");
-});
+    // Closing ftp connection
+    this.close();
 
-connection.once("error", (err) => {
-  console.log("Falha ao realizar conexão com ftp da funceme.\n", err);
-  connection.end();
-});
+    for (const [fileName, buffer] of Object.entries(streamsOfFiles)) {
+      console.log(`Lendo arquivo ${fileName}`);
+
+      const readable = Readable.from(buffer);
+
+      try {
+        await pipeline(
+          readable,
+          this.convertCsvToJson(),
+          this.filterByStationCode(code),
+          this.logStation(code)
+        );
+      } catch (error) {
+        console.log(
+          `Falha ao converter dados do arquivo ${fileName}.\n ${error}`
+        );
+      }
+    }
+  }
+
+  getPluviometers() {}
+}
+
+const ftp = new FTPClientAdapter();
+await ftp.getYesterdayStationByCode(STATION_CODE);
