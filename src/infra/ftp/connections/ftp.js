@@ -121,7 +121,7 @@ class FTPClientAdapter {
         const station = chunk;
 
         if (station.props.code === code) {
-          next(null, station);
+          return next(null, station);
         }
 
         next();
