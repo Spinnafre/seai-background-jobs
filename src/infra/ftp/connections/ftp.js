@@ -13,10 +13,6 @@ import { pipeline } from "stream/promises";
 
 import { formatDateToYYMMDD, getYesterday } from "../../../utils/date.js";
 
-const DATE = "2023-04-18";
-const STATION_CODE = "B8505818";
-const PLIVIOMETER_CODE = "";
-
 // extract.once("finish", () => {
 //   console.log("Finalizado o processo de extração de dados das estações");
 //   if (stationsCodes.some((station_code) => station_code === STATION_CODE)) {
@@ -81,12 +77,13 @@ class FTPClientAdapter {
   }
 
   async unTar(tarballStream) {
-    const results = {};
+    const results = {}; // [fileName] : Buffer
     return new Promise((resolve, reject) => {
       const extract = tar.extract();
 
       extract.on("entry", async function (header, stream, next) {
         const chunks = [];
+        // Semelhante ao stream.on('data',()=>{})
         for await (let chunk of stream) {
           chunks.push(chunk);
         }
@@ -114,13 +111,13 @@ class FTPClientAdapter {
     });
   }
 
-  filterByStationCode(code) {
+  filterByStationCode(codes=[]) {
     return new Transform({
       objectMode: true,
       transform(chunk, enc, next) {
         const station = chunk;
 
-        if (station.props.code === code) {
+        if (codes.includes(station.props.code)) {
           return next(null, station);
         }
 
@@ -155,11 +152,16 @@ class FTPClientAdapter {
     });
   }
 
-  async getYesterdayStationByCode(code) {
+  async getYesterdayStationByCode() {
     const date = formatDateToYYMMDD(getYesterday());
     //Ver uma forma de automatizar
     const stationFolder = "pcds";
     const file = "stn_data_2023.tar.gz";
+
+    // const DATE = "2023-04-18";
+
+    // TODO: Buscar códigos das estações da FUNCEME
+    const STATIONS_CODES = ["A305","B8505818"]
 
     const stream = await this.getFolderStream(stationFolder, file);
 
@@ -190,8 +192,8 @@ class FTPClientAdapter {
         await pipeline(
           readable,
           this.convertCsvToJson(),
-          this.filterByStationCode(code),
-          this.logStation(code)
+          this.filterByStationCode(STATIONS_CODES),
+          this.logStation()
         );
       } catch (error) {
         console.log(
@@ -205,4 +207,4 @@ class FTPClientAdapter {
 }
 
 const ftp = new FTPClientAdapter();
-await ftp.getYesterdayStationByCode(STATION_CODE);
+await ftp.getYesterdayStationByCode();
