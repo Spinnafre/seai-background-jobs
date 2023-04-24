@@ -7,6 +7,7 @@ import Client from "ftp";
 import zlib from "zlib";
 import tar from "tar-stream";
 import { StationReadings } from "./readingsOfStationsFromFunceme.js";
+import { PluviometerReadings } from "./readingsOfPluviometers.js";
 
 import { Writable, Transform, Readable } from "stream";
 import { pipeline } from "stream/promises";
@@ -99,13 +100,25 @@ class FTPClientAdapter {
     });
   }
 
-  convertCsvToJson() {
+  convertStationCsvToJson() {
     return new Transform({
       objectMode: true,
       transform(chunk, enc, next) {
         const data = chunk.toString();
         if (!data) return next(new Error("File is empty"));
         const station = StationReadings.create(data);
+        next(null, station);
+      },
+    });
+  }
+
+  convertPluviometerCsvToJson() {
+    return new Transform({
+      objectMode: true,
+      transform(chunk, enc, next) {
+        const data = chunk.toString();
+        if (!data) return next(new Error("File is empty"));
+        const station = PluviometerReadings.create(data);
         next(null, station);
       },
     });
@@ -191,7 +204,7 @@ class FTPClientAdapter {
       try {
         await pipeline(
           readable,
-          this.convertCsvToJson(),
+          this.convertStationCsvToJson(),
           this.filterByStationCode(STATIONS_CODES),
           this.logStation()
         );
@@ -203,8 +216,56 @@ class FTPClientAdapter {
     }
   }
 
-  getPluviometers() {}
+  async getPluviometers() {
+    const date = formatDateToYYMMDD(getYesterday());
+    //Ver uma forma de automatizar
+    const stationFolder = "pluviometros";
+    const file = "prec_data_2023.tar.gz";
+
+    
+    const PLUVIOMETERS_CODES = ["23978"]
+
+    const stream = await this.getFolderStream(stationFolder, file);
+
+    stream.once("close", function () {
+      // connection.end();
+      console.log(
+        `Sucesso ao obter dados do diretório ${stationFolder}/${file}`
+      );
+    });
+
+    console.log(
+      `Iniciando extração de dados do diretório ${stationFolder}/${file}`
+    );
+    // stream.pipe(zlib.createUnzip()).pipe(extract);
+
+    // [fileName] : Buffer
+    const streamsOfFiles = await this.unTar(stream);
+
+    // Closing ftp connection
+    this.close();
+
+    for (const [fileName, buffer] of Object.entries(streamsOfFiles)) {
+      console.log(`Lendo arquivo ${fileName}`);
+
+      const readable = Readable.from(buffer);
+
+      try {
+        await pipeline(
+          readable,
+          this.convertPluviometerCsvToJson(),
+          this.filterByStationCode(PLUVIOMETERS_CODES),
+          this.logStation()
+        );
+      } catch (error) {
+        console.log(
+          `Falha ao converter dados do arquivo ${fileName}.\n ${error}`
+        );
+      }
+    }
+
+  }
 }
 
 const ftp = new FTPClientAdapter();
-await ftp.getYesterdayStationByCode();
+await ftp.getPluviometers();

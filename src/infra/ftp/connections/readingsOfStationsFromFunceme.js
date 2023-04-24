@@ -21,7 +21,7 @@ class StationReadings {
     this.props = props;
   }
 
-  extractMeasuresByDate(date) {
+  getMeasuresByDate(date) {
     const data = this.props.measures.find((row) => row.date === date);
 
     if (data) {
