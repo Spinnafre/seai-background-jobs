@@ -1,20 +1,20 @@
 import { StationsRepository } from "../../infra/database/postgreSQL/stations-repository.js";
 import { ExtractStationsFromInmet } from "../../services/commands/extractStationsFromInmet.js";
-import { RegisterDailyStationsWithMeasures } from "../../services/registerDailyStationsWithMeasures.js";
+import { InmetDataMinerService } from "../../services/inmetDataMiner.js";
 import { InmetScrapper } from "../../infra/scrapper/inmet-scrapper.js";
 
-class DailyStationServiceFactory {
+class InmetServiceFactory {
   static create() {
     const stationRepository = new StationsRepository();
     const getStationsFromInmetService = new ExtractStationsFromInmet(
       InmetScrapper
     );
 
-    return new RegisterDailyStationsWithMeasures(
+    return new InmetDataMinerService(
       getStationsFromInmetService,
       stationRepository
     );
   }
 }
 
-export { DailyStationServiceFactory };
+export { InmetServiceFactory };

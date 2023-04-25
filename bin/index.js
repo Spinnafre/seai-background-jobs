@@ -1,6 +1,11 @@
+import * as dotenv from "dotenv";
+
+dotenv.config();
+
 class App {
-  constructor(factory) {
-    this.factory = factory.create();
+  constructor(inmetFactory, funcemeFactory) {
+    this.inmetController = inmetFactory.create();
+    this.funcemeController = funcemeFactory.create();
   }
 
   async run() {
@@ -17,15 +22,26 @@ class App {
       ],
     };
 
-    await this.factory.execute(params);
+    await this.funcemeController.execute();
+
+    // await this.inmetController.execute(params);
   }
 }
 
 (async function main() {
-  const { DailyStationControllerFactory } = await import(
-    "../src/factories/controllers/registerDailyStationsFactory.js"
+  const { InmetDataMinerControllerFactory } = await import(
+    "../src/factories/controllers/inmetDataMinerFactory.js"
   );
-  const app = new App(DailyStationControllerFactory);
+
+  const { FuncemeDataMinerControllerFactory } = await import(
+    "../src/factories/controllers/funcemeDataMinerFactory.js"
+  );
+
+  const app = new App(
+    InmetDataMinerControllerFactory,
+    FuncemeDataMinerControllerFactory
+  );
+
   await app.run();
 })();
 
