@@ -19,6 +19,7 @@
   "author": "Davi Silva <https://github.com/Spinnafre>",
   "license": "ISC",
   "dependencies": {
+    "csvtojson": "^2.0.10",
     "ftp": "^0.3.10",
     "joi": "^17.7.0",
     "nodemon": "^2.0.20",

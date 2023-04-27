@@ -1,76 +1,74 @@
 import Client from "ftp";
-import { unTar } from "../../../utils/untar.js";
-
 class FTPClientAdapter {
   connection;
   constructor() {
     this.connection = new Client();
   }
 
-  close() {
-    console.log("Closing connection...");
-    this.connection.end();
+  async close() {
+    return new Promise((resolve) => {
+      console.log("Closing connection...");
+      this.connection.end();
+      resolve();
+    });
   }
 
-  connect() {
-    this.connection.connect({
-      host: process.env.FTP_FUNCEME_HOST,
-      user: process.env.FTP_FUNCEME_USER,
-      password: process.env.FTP_FUNCEME_PASSWORD,
-      keepalive: 10000,
-      pasvTimeout: 10000,
-      connTimeout: 10000,
-    });
-
-    this.connection.once("close", (err) => {
-      if (err) throw new Error(err);
-      console.log("Conexão com ftp fechada com sucesso");
-    });
-
-    this.connection.once("error", (err) => {
-      console.log("Falha ao realizar conexão com ftp da funceme.\n", err);
-      this.close();
-    });
-
-    this.connection.on("greeting", (msg) => console.log("Greeting ", msg));
-
-    this.connection.on("end", () => console.log("FTP connection ended..."));
-  }
-
-  async #getFileStream(folder, file) {
-    console.log(`[🔍] Getting stream from path ${folder}/${file}`);
+  async status() {
     return new Promise((resolve, reject) => {
-      this.connect();
+      this.connection.status((err, status) => {
+        if (err) reject(err);
 
-      this.connection.on("ready", () => {
-        this.connection.cwd(folder, (error) => {
-          if (error) reject(error);
-        });
-        this.connection.get(file, function (error, stream) {
-          if (error) reject(error);
-
-          resolve(stream);
-        });
+        resolve(status);
       });
     });
   }
 
-  async getUntarFiles(folder, file) {
-    const stream = await this.#getFileStream(folder, file);
+  async connect() {
+    return new Promise((resolve, reject) => {
+      this.connection.connect({
+        host: process.env.FTP_FUNCEME_HOST,
+        user: process.env.FTP_FUNCEME_USER,
+        password: process.env.FTP_FUNCEME_PASSWORD,
+        keepalive: 10000,
+        pasvTimeout: 10000,
+        connTimeout: 10000,
+      });
 
-    stream.once("close", function () {
-      // connection.end();
-      console.log(`Sucesso ao obter dados do diretório ${folder}/${file}`);
+      this.connection.once("close", (err) => {
+        if (err) reject(err);
+        console.log("Conexão com ftp fechada com sucesso");
+      });
+
+      this.connection.once("error", (err) => {
+        reject("Falha ao realizar conexão com ftp da funceme.\n", err);
+        this.close();
+      });
+
+      this.connection.on("greeting", (msg) => console.log("Greeting ", msg));
+
+      this.connection.on("end", () => console.log("FTP connection ended..."));
+
+      this.connection.on("ready", () => {
+        resolve(true);
+      });
     });
+  }
 
-    console.log(`Iniciando extração de dados do diretório ${folder}/${file}`);
+  async getFile(folder, file) {
+    console.log(`[🔍] Getting stream from path ${folder}/${file}`);
+    return new Promise((resolve, reject) => {
+      this.connection.cwd("/", (error) => {
+        if (error) reject(error);
+      });
+      this.connection.cwd(folder, (error) => {
+        if (error) reject(error);
+      });
+      this.connection.get(file, function (error, stream) {
+        if (error) reject(error);
 
-    // [fileName] : Buffer
-    const streamsOfFiles = await unTar(stream);
-
-    this.close();
-
-    return streamsOfFiles;
+        resolve(stream);
+      });
+    });
   }
 }
 

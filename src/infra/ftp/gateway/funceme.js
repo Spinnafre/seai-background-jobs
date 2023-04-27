@@ -1,128 +1,88 @@
-import { Writable, Transform, Readable } from "stream";
 import { pipeline } from "stream/promises";
 
 import { FuncemeMap } from "../../../core/mappers/funceme/funcemeMap.js";
 
+import { unTar } from "../../../utils/untar.js";
+import { filterDataByCodes, parseCsvStream } from "./helpers.js";
 class FuncemeGateway {
   ftpConnection;
 
-  #station = {
+  station = {
     folder: "pcds",
-    file: "stn_data_2023.tar.gz",
+    fileName: "stn_data_2023.tar.gz",
   };
 
-  #rainGauges = {
+  rainGauge = {
     folder: "pluviometros",
-    file: "prec_data_2023.tar.gz",
+    fileName: "prec_data_2023.tar.gz",
   };
 
   constructor(ftpClient) {
     this.ftpConnection = ftpClient;
   }
 
-  async getStationsByCodes(codes = []) {
-    const stations = [];
-
-    const streams = await this.ftpConnection.getUntarFiles(
-      this.#station.folder,
-      this.#station.file
-    );
-
-    for (const [fileName, buffer] of Object.entries(streams)) {
-      // console.log(`Lendo arquivo ${fileName}`);
-
-      const readable = Readable.from(buffer);
-
-      try {
-        await pipeline(
-          readable,
-          this.#mapCsvToDomain(FuncemeMap.stationStringToDomain),
-          this.#filterByCodes(codes),
-          this.#concatenateData(stations)
-        );
-      } catch (error) {
-        console.error(
-          `Falha ao converter dados do arquivo ${fileName}.\n ${error}`
-        );
-      }
-    }
-    return stations;
+  async connect() {
+    await this.ftpConnection.connect();
   }
 
-  async getRainGaugesByCodes(codes = []) {
-    const rainGauges = [];
+  async close() {
+    await this.ftpConnection.close();
+  }
 
-    const streams = await this.ftpConnection.getUntarFiles(
-      this.#rainGauges.folder,
-      this.#rainGauges.file
-    );
+  async checkStatus() {
+    return await this.ftpConnection.status();
+  }
 
-    for (const [fileName, buffer] of Object.entries(streams)) {
-      // console.log(`Lendo arquivo ${fileName}`);
+  async getUncompressedFiles(folder, file) {
+    const fileStream = await this.ftpConnection.getFile(folder, file);
 
-      const readable = Readable.from(buffer);
+    fileStream.once("close", function () {
+      console.log(`Sucesso ao obter dados do diretório ${folder}/${file}`);
+    });
 
-      try {
-        await pipeline(
-          readable,
-          this.#mapCsvToDomain(FuncemeMap.rainGaugeStringToDomain),
-          this.#filterByCodes(codes),
-          this.#concatenateData(rainGauges)
-        );
-      } catch (error) {
-        console.error(
-          `Falha ao converter dados do arquivo ${fileName}.\n ${error}`
-        );
-      }
+    console.log(`Iniciando extração de dados do diretório ${folder}/${file}`);
+
+    const filesStream = await unTar(fileStream);
+
+    return filesStream;
+  }
+
+  getDataByCodes(folder, file) {
+    return async (codes = []) => {
+      const stream = await this.getUncompressedFiles(folder, file);
+
+      const parsedData = await parseCsvStream(stream);
+      const result = filterDataByCodes(codes, parsedData);
+      return result;
+    };
+  }
+
+  async getStationDataByCodes(codes = []) {
+    const rawData = await this.getDataByCodes(
+      this.station.folder,
+      this.station.fileName
+    )(codes);
+
+    if (rawData) {
+      const stations = rawData.map((raw) => FuncemeMap.stationToDomain(raw));
+      return stations;
     }
 
-    return rainGauges;
+    return null;
   }
 
-  #mapCsvToDomain(mapper) {
-    return new Transform({
-      objectMode: true,
-      transform(chunk, enc, next) {
-        const string = chunk.toString();
-        if (!string) return next(new Error("File is empty"));
-        const station = mapper(string);
-        next(null, station);
-      },
-    });
-  }
+  async getRainGaugeDataByCodes(codes = []) {
+    const rawData = await this.getDataByCodes(
+      this.rainGauge.folder,
+      this.rainGauge.fileName
+    )(codes);
 
-  #filterByCodes(codes = []) {
-    return new Transform({
-      objectMode: true,
-      transform(chunk, enc, next) {
-        const data = chunk;
+    if (rawData) {
+      const stations = rawData.map((raw) => FuncemeMap.rainGaugeToDomain(raw));
+      return stations;
+    }
 
-        if (codes.includes(data.code)) {
-          return next(null, data);
-        }
-
-        next();
-      },
-    });
-  }
-
-  #concatenateData(array = []) {
-    return new Writable({
-      objectMode: true,
-      write(chunk, enc, next) {
-        if (!chunk) {
-          return next();
-        }
-
-        const data = chunk;
-
-        console.log("[✅] - Sucesso ao obter dados de: ", data.name);
-
-        array.push(data);
-
-        next();
-      },
-    });
+    return null;
   }
 }
 
