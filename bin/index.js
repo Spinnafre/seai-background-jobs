@@ -2,47 +2,13 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 
-class App {
-  constructor(inmetFactory, funcemeFactory) {
-    this.inmetController = inmetFactory.create();
-    this.funcemeController = funcemeFactory.create();
-  }
-
-  async run() {
-    const params = {
-      country: "NE",
-      stations_type: "automaticas",
-      state: "CE",
-      date_type: "diario",
-      params: [
-        "Precipitação Total (mm)",
-        "Temp. Média (°C)",
-        "Umi. Média (%)",
-        "Vel. do Vento Média (m/s)",
-      ],
-    };
-
-    await this.funcemeController.execute();
-
-    // await this.inmetController.execute(params);
-  }
-}
-
 (async function main() {
-  const { InmetDataMinerControllerFactory } = await import(
-    "../src/factories/controllers/inmetDataMinerFactory.js"
+  const { DataMinerFactory } = await import(
+    "../src/factories/controllers/dataMinerFactory.js"
   );
 
-  const { FuncemeDataMinerControllerFactory } = await import(
-    "../src/factories/controllers/funcemeDataMinerFactory.js"
-  );
-
-  const app = new App(
-    InmetDataMinerControllerFactory,
-    FuncemeDataMinerControllerFactory
-  );
-
-  await app.run();
+  const dataMiner = DataMinerFactory.create();
+  await dataMiner.execute();
 })();
 
 process.on("uncaughtException", function (err) {

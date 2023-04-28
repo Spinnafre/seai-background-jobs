@@ -14,4 +14,16 @@ export default {
       args: ["--no-sandbox"],
     },
   },
+  params: {
+    country: "NE",
+    stations_type: "automaticas",
+    state: "CE",
+    date_type: "diario",
+    params: [
+      "Precipitação Total (mm)",
+      "Temp. Média (°C)",
+      "Umi. Média (%)",
+      "Vel. do Vento Média (m/s)",
+    ],
+  },
 };

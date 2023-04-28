@@ -59,5 +59,5 @@ class EntityProtocol {
     }
   }
 }
-// Se percorrer todas as estações, então deve avisar que tal código não existe.
+
 export { EntityProtocol };

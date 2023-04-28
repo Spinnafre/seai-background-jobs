@@ -4,7 +4,7 @@ import { pipeline } from "stream/promises";
 
 import csvParser from "csvtojson";
 
-function parseCsv() {
+function parseCsv(measureType) {
   return new Transform({
     objectMode: true,
     async transform(chunk, enc, next) {
@@ -21,7 +21,10 @@ function parseCsv() {
           .slice(0, 5)
           .map((data) => data.split(":")[1]);
 
-        const measuresRaw = data.slice(5).join("\n");
+        const measuresRaw =
+          measureType === "station"
+            ? data.slice(5).join("\n")
+            : data.slice(4).join("\n");
 
         const measures = await csvParser({
           delimiter: ",",
@@ -45,10 +48,10 @@ function createReadableFromBuffer(buffer) {
   return Readable.from(buffer);
 }
 
-async function parseCsvStream(stream) {
+async function parseCsvStream(stream, measureType) {
   let result = [];
 
-  const parser = parseCsv();
+  const parser = parseCsv(measureType);
 
   parser.on("data", (item) => {
     result = item;
@@ -63,5 +66,12 @@ function filterDataByCodes(codes = [], data = []) {
   const filtered = data.filter((item) => codes.includes(item.code));
   return filtered;
 }
+function filterMeasuresByDate(date, data = []) {
+  data.map((item) => {
+    const measures = item.measures.filter((measures) => measures.data === date);
+    item.measures = measures;
+  });
+  return data;
+}
 
-export { filterDataByCodes, parseCsvStream };
+export { filterDataByCodes, filterMeasuresByDate, parseCsvStream };

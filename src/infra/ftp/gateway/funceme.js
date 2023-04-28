@@ -1,9 +1,12 @@
-import { pipeline } from "stream/promises";
-
 import { FuncemeMap } from "../../../core/mappers/funceme/funcemeMap.js";
 
 import { unTar } from "../../../utils/untar.js";
-import { filterDataByCodes, parseCsvStream } from "./helpers.js";
+
+import {
+  filterDataByCodes,
+  parseCsvStream,
+  filterMeasuresByDate,
+} from "./helpers.js";
 class FuncemeGateway {
   ftpConnection;
 
@@ -47,37 +50,39 @@ class FuncemeGateway {
     return filesStream;
   }
 
-  getDataByCodes(folder, file) {
-    return async (codes = []) => {
+  getData(folder, file) {
+    return async (codes = [], measureType) => {
       const stream = await this.getUncompressedFiles(folder, file);
 
-      const parsedData = await parseCsvStream(stream);
+      const parsedData = await parseCsvStream(stream, measureType);
       const result = filterDataByCodes(codes, parsedData);
       return result;
     };
   }
 
-  async getStationDataByCodes(codes = []) {
-    const rawData = await this.getDataByCodes(
+  async getYesterdayStationDataByCodes(codes = [], date = null) {
+    let rawData = await this.getData(
       this.station.folder,
       this.station.fileName
-    )(codes);
+    )(codes, "station");
 
     if (rawData) {
-      const stations = rawData.map((raw) => FuncemeMap.stationToDomain(raw));
-      return stations;
+      rawData = filterMeasuresByDate(date, rawData);
+      const result = rawData.map((raw) => FuncemeMap.stationToDomain(raw));
+      return result;
     }
 
     return null;
   }
 
-  async getRainGaugeDataByCodes(codes = []) {
-    const rawData = await this.getDataByCodes(
+  async getYesterdayRainGaugeDataByCodes(codes = [], date = null) {
+    let rawData = await this.getData(
       this.rainGauge.folder,
       this.rainGauge.fileName
-    )(codes);
+    )(codes, "raingauge");
 
     if (rawData) {
+      rawData = filterMeasuresByDate(date, rawData);
       const stations = rawData.map((raw) => FuncemeMap.rainGaugeToDomain(raw));
       return stations;
     }

@@ -1,5 +1,5 @@
 import { StationsRepository } from "../../infra/database/postgreSQL/stations-repository.js";
-import { ExtractStationsFromInmet } from "../../services/commands/extractStationsFromInmet.js";
+import { ExtractStationsFromInmet } from "../../services/extractStationsFromInmet.js";
 import { InmetDataMinerService } from "../../services/inmetDataMiner.js";
 import { InmetScrapper } from "../../infra/scrapper/inmet-scrapper.js";
 
