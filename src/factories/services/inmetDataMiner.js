@@ -1,4 +1,4 @@
-import { StationsRepository } from "../../infra/database/postgreSQL/stations-repository.js";
+/*import { StationsRepository } from "../../infra/database/postgreSQL/stations-repository.js";
 import { ExtractStationsFromInmet } from "../../services/extractStationsFromInmet.js";
 import { InmetDataMinerService } from "../../services/inmetDataMiner.js";
 import { InmetScrapper } from "../../infra/scrapper/inmet-scrapper.js";
@@ -18,3 +18,4 @@ class InmetServiceFactory {
 }
 
 export { InmetServiceFactory };
+*/
