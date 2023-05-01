@@ -4,7 +4,6 @@ class EntityProtocol {
     name: "",
     latitude: 0,
     longitude: 0,
-    altitude: null,
     measures: [],
   };
 
@@ -14,7 +13,6 @@ class EntityProtocol {
       name: "",
       latitude: 0,
       longitude: 0,
-      altitude: null,
       measures: [],
     }
   ) {
@@ -37,26 +35,21 @@ class EntityProtocol {
     return this.props.longitude;
   }
 
-  get altitude() {
-    return this.props.altitude;
-  }
-
   get measures() {
     return this.props.measures;
   }
 
-  getMeasuresByDate(date) {
-    const data = this.measures.find((row) => row.date === date);
+  filterMeasuresByDate(date) {
+    this.props.measures = this.measures.filter((row) => row.date === date);
 
-    if (data) {
-      return data;
-    } else {
+    if (!this.measures) {
       console.log(
         `Error in try to get measure data from date ${date}, data not found.`
       );
-
-      return null;
+      return false;
     }
+
+    return true;
   }
 }
 

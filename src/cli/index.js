@@ -12,7 +12,7 @@ class DataMiner {
 
     try {
       console.log(
-        `[${date}] - Iniciando extração de dados das estações da Funceme`
+        `[${date}] - Iniciando extração de dados das estações do Inmet`
       );
 
       //await this.#inmetService.execute();

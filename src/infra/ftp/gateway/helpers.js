@@ -2,7 +2,8 @@ function filterDataByCodes(codes = [], data = []) {
   const filtered = data.filter((item) => codes.includes(item.code));
   return filtered;
 }
-function filterMeasuresByDate(date, data = []) {
+
+function filterStationsMeasuresByDate(data = [], date) {
   data.map((item) => {
     const measures = item.measures.filter((measures) => measures.data === date);
     item.measures = measures;
@@ -10,4 +11,4 @@ function filterMeasuresByDate(date, data = []) {
   return data;
 }
 
-export { filterDataByCodes, filterMeasuresByDate};
+export { filterDataByCodes, filterStationsMeasuresByDate };

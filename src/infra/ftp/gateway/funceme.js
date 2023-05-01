@@ -1,13 +1,12 @@
-import { FuncemeMap } from "../../../core/mappers/funceme/funcemeMap.js";
-
-import { RainGaugeCsvParser, StationCsvParser } from "../../../utils/csvParser.js";
-
-import { convertCompressedFileStreamToStrings } from "../../../utils/untar.js";
-
 import {
-  filterDataByCodes,
-  filterMeasuresByDate,
-} from "./helpers.js";
+  formatDateToYYMMDD,
+  getYesterday,
+  StationParser,
+  RainGaugeParser,
+  convertCompressedFileStream,
+} from "../../../utils/index.js";
+
+import { FuncemeMap } from "../../../core/mappers/funceme/funcemeMap.js";
 
 class FuncemeGateway {
   ftpConnection;
@@ -39,64 +38,75 @@ class FuncemeGateway {
   }
 
   async extractCsvFromFile(folder, file) {
-    let data = []
+    let data = [];
 
-    const compressedFile = await this.ftpConnection.getFile(folder, file);
+    const compressedFileStream = await this.ftpConnection.getFile(folder, file);
 
-    compressedFile.once("close", function () {
+    compressedFileStream.once("close", function () {
       console.log(`Sucesso ao obter dados do diretório ${folder}/${file}`);
     });
 
-    console.log(`Iniciando extração de dados do diretório ${folder}/${file}`)
+    console.log(`Iniciando extração de dados do diretório ${folder}/${file}`);
 
-    data = await convertCompressedFileStreamToStrings(compressedFile);
+    data = await convertCompressedFileStream(compressedFileStream);
 
     return data;
   }
 
-  async getStationData(folder, file) {
+  async getYesterdayStationsByCodes(codes = []) {
+    const date = formatDateToYYMMDD(getYesterday());
 
-    const result = filterDataByCodes(codes, parsedData);
-    return result;
-  }
-  async parseCSVData(parser) {
-    return await parser.parse()
-  }
-  async getYesterdayStationDataByCodes(codes = [], date = null) {
-    const rawList = await this.extractCsvFromFile(this.station.folder,
-      this.station.fileName);
+    const rawList = await this.extractCsvFromFile(
+      this.station.folder,
+      this.station.fileName
+    );
 
-
-    if (rawList) {
-      const parsedData = await this.parseCSVData(new StationCsvParser(rawList))
-
-      const filteredData = filterMeasuresByDate(date, filterDataByCodes(codes, parsedData))
-
-      const mappedData = filteredData.map((raw) => FuncemeMap.stationToDomain(raw));
-
-      return mappedData;
+    if (!rawList) {
+      return null;
     }
 
-    return null;
-  }
+    const parsedData = await StationParser.parse(rawList);
+    const stations = [];
 
-  async getYesterdayRainGaugeDataByCodes(codes = [], date = null) {
-    
-    const rawList = await this.extractCsvFromFile(this.rainGauge.folder,
-      this.rainGauge.fileName);
+    for (const data of parsedData) {
+      const station = FuncemeMap.stationToDomain(data);
 
-
-    if (rawList) {
-      const parsedData = await this.parseCSVData(new RainGaugeCsvParser(rawList))
-
-      const filteredData = filterMeasuresByDate(date, filterDataByCodes(codes, parsedData))
-
-      const mappedData = filteredData.map((raw) => FuncemeMap.stationToDomain(raw));
-
-      return mappedData;
+      if (codes.includes(station.code) && station.filterMeasuresByDate(date)) {
+        stations.push(station);
+      }
     }
 
-    return null;
+    return stations;
+  }
+
+  async getYesterdayRainGaugesByCodes(codes = []) {
+    const date = formatDateToYYMMDD(getYesterday());
+
+    const rawList = await this.extractCsvFromFile(
+      this.rainGauge.folder,
+      this.rainGauge.fileName
+    );
+
+    if (!rawList) {
+      return null;
+    }
+
+    const parsedData = await RainGaugeParser.parse(rawList);
+
+    const rainGauges = [];
+
+    for (const data of parsedData) {
+      const rainGauge = FuncemeMap.rainGaugeToDomain(data);
+
+      if (
+        codes.includes(rainGauge.code) &&
+        rainGauge.filterMeasuresByDate(date)
+      ) {
+        rainGauges.push(rainGauge);
+      }
+    }
+
+    return rainGauges;
   }
 }
 

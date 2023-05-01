@@ -1,86 +1,85 @@
 import csvParser from "csvtojson";
 
 class CsvParser {
-    #rawDatas
+  splitMeasures(string) {
+    throw new Error("Not implemented");
+  }
 
-    constructor(rawDatas=[]){
-        this.#rawDatas = rawDatas
+  getMetadata(string) {
+    throw new Error("Not implemented");
+  }
+
+  async parse(rawData = []) {
+    const parsed = [];
+
+    for (const item of rawData) {
+      const data = item.trim().split("\n");
+
+      const metadata = this.getMetadata(data);
+
+      const measuresRaw = this.splitMeasures(data);
+
+      const measures = await csvParser({
+        delimiter: ",",
+      }).fromString(measuresRaw);
+
+      parsed.push({
+        ...metadata,
+        measures,
+      });
     }
 
-    async getMeasures(string) {
-        throw new Error("Not implemented")
-    }
-
-    getMetadata(string) {
-        const [code, name, latitude, longitude] = string
-            .slice(0, 5)
-            .map((data) => data.split(":")[1]);
-
-        return {
-            code:code.trim(),
-            name:name.trim(),
-            latitude:latitude.trim(),
-            longitude:longitude.trim()
-        }
-    }
-
-    async parser() {
-        const parsed = [];
-
-        for (const item of this.#rawDatas) {
-            const data = item.trim().split("\n");
-
-            const { code, name, latitude, longitude } = this.getMetadata(data)
-
-            const measures = await this.getMeasures(data)
-
-            parsed.push({
-                code,
-                name,
-                latitude,
-                longitude,
-                measures,
-            });
-        }
-
-
-        return parsed;
-    }
+    return parsed;
+  }
 }
 
-class StationCsvParser extends CsvParser{
-    constructor(rawDatas=[]){
-        super(rawDatas)
-    }
+class StationParser extends CsvParser {
+  getMetadata(string) {
+    const [code, name, latitude, longitude, altitude] = string
+      .slice(0, 5)
+      .map((data) => data.split(":")[1]);
 
-    async getMeasures(string){
-        const data = string.slice(5).join("\n")
+    return {
+      code: code.trim(),
+      name: name.trim(),
+      latitude: latitude.trim(),
+      altitude: altitude.trim(),
+      longitude: longitude.trim(),
+    };
+  }
 
-        const measures = await csvParser({
-            delimiter: ",",
-        }).fromString(data);
+  splitMeasures(string) {
+    return string.slice(5).join("\n");
+  }
 
-        return measures
-    }
+  static async parse(rawData = []) {
+    const parser = new StationParser();
+    return await parser.parse(rawData);
+  }
 }
 
-class RainGaugeCsvParser extends CsvParser{
-    constructor(rawDatas=[]){
-        super(rawDatas)
-    }
+class RainGaugeParser extends CsvParser {
+  getMetadata(string) {
+    const [code, name, latitude, longitude] = string
+      .slice(0, 5)
+      .map((data) => data.split(":")[1]);
 
-    async getMeasures(string){
-        const data = string.slice(4).join("\n")
+    return {
+      code: code.trim(),
+      name: name.trim(),
+      latitude: latitude.trim(),
+      longitude: longitude.trim(),
+    };
+  }
 
-        const measures = await csvParser({
-            delimiter: ",",
-        }).fromString(data);
+  splitMeasures(string) {
+    return string.slice(4).join("\n");
+  }
 
-        return measures
-    }
+  static async parse(rawData = []) {
+    const parser = new RainGaugeParser();
+    return await parser.parse(rawData);
+  }
 }
 
-export {
-    StationCsvParser,
-    RainGaugeCsvParser
-}
+export { StationParser, RainGaugeParser };

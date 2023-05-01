@@ -26,8 +26,7 @@ export class FuncemeMap {
   }
 
   static stationToDomain(raw) {
-    const { code, name, latitude, longitude, measures } = raw;
-
+    const { code, name, latitude, longitude, altitude, measures } = raw;
     const formatedMeasures = FuncemeMap.stationMeasuresMap(measures);
 
     return new StationReadings({
@@ -35,6 +34,7 @@ export class FuncemeMap {
       name,
       latitude,
       longitude,
+      altitude,
       measures: formatedMeasures,
     });
   }

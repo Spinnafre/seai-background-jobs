@@ -1,13 +1,9 @@
-import { formatDateToYYMMDD, getYesterday } from "../utils/date.js";
-
 class FuncemeDataMiner {
   constructor(funcemeGateway) {
     this.funcemeGateway = funcemeGateway;
     this.repository = "";
   }
   async execute() {
-    const date = formatDateToYYMMDD(getYesterday());
-
     try {
       // TODO: Buscar códigos das estações da FUNCEME
       const STATIONS_CODES = ["A305", "B8505818"];
@@ -15,9 +11,8 @@ class FuncemeDataMiner {
 
       await this.funcemeGateway.connect();
 
-      const stations = await this.funcemeGateway.getYesterdayStationDataByCodes(
-        STATIONS_CODES,
-        date
+      const stations = await this.funcemeGateway.getYesterdayStationsByCodes(
+        STATIONS_CODES
       );
 
       console.log(
@@ -26,9 +21,8 @@ class FuncemeDataMiner {
       );
 
       const rainGauges =
-        await this.funcemeGateway.getYesterdayRainGaugeDataByCodes(
-          RAIN_GAUGES_CODES,
-          date
+        await this.funcemeGateway.getYesterdayRainGaugesByCodes(
+          RAIN_GAUGES_CODES
         );
 
       console.log("RAIN = ", rainGauges[0].measures);
@@ -36,6 +30,7 @@ class FuncemeDataMiner {
       await this.funcemeGateway.close();
     } catch (error) {
       // append to errors logs
+      console.log(error);
     }
   }
 }

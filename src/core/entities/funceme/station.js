@@ -1,6 +1,7 @@
 import { EntityProtocol } from "./protocol.js";
 
 class StationReadings extends EntityProtocol {
+  #altitude;
   constructor(
     props = {
       code: "",
@@ -11,7 +12,19 @@ class StationReadings extends EntityProtocol {
       measures: [],
     }
   ) {
-    super(props);
+    super({
+      code: props.code,
+      name: props.name,
+      latitude: props.latitude,
+      longitude: props.longitude,
+      measures: props.measures,
+    });
+
+    this.#altitude = props.altitude;
+  }
+
+  get altitude() {
+    return this.#altitude;
   }
 }
 
