@@ -59,13 +59,28 @@ class FuncemeGateway {
       return null;
     }
 
-    const parsedData = await StationParser.parse(rawList);
+    const parsedStations = await StationParser.parse(rawList);
     const stations = [];
 
-    for (const data of parsedData) {
-      const station = FuncemeMap.stationToDomain(data);
+    for (const parsedStation of parsedStations) {
+      if (codes.includes(parsedStation.code)) {
+        const { code, name, latitude, longitude, altitude, measures } =
+          parsedStation;
 
-      if (codes.includes(station.code) && station.filterMeasuresByDate(date)) {
+        const stationMeasures = measures.find(
+          (measure) => measure.data == date
+        );
+
+        const station = FuncemeMap.stationToDomain({
+          code,
+          name,
+          organ: "FUNCEME",
+          latitude,
+          longitude,
+          altitude,
+          measures: stationMeasures,
+        });
+
         stations.push(station);
       }
     }
@@ -83,17 +98,27 @@ class FuncemeGateway {
       return null;
     }
 
-    const parsedData = await PluviometerParser.parse(rawList);
+    const parsedPluviometers = await PluviometerParser.parse(rawList);
 
     const pluviometers = [];
 
-    for (const data of parsedData) {
-      const pluviometer = FuncemeMap.pluviometerToDomain(data);
+    for (const parsedPluviometer of parsedPluviometers) {
+      if (codes.includes(parsedPluviometer.code)) {
+        const { code, name, latitude, longitude, measures } = parsedPluviometer;
 
-      if (
-        codes.includes(pluviometer.code) &&
-        pluviometer.filterMeasuresByDate(date)
-      ) {
+        const pluviometerMeasures = measures.find(
+          (measure) => measure.data == date
+        );
+
+        const pluviometer = FuncemeMap.pluviometerToDomain({
+          code,
+          name,
+          organ: "FUNCEME",
+          latitude,
+          longitude,
+          measures: pluviometerMeasures,
+        });
+
         pluviometers.push(pluviometer);
       }
     }

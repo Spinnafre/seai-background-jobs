@@ -1,17 +1,19 @@
 import { EntityProtocol } from "./protocol.js";
 
-class PluviometerReadings extends EntityProtocol {
+class Pluviometer extends EntityProtocol {
   constructor(
     props = {
       code: "",
       name: "",
+      organ: "",
       latitude: 0,
       longitude: 0,
-      measures: [],
-    }
+      measures: {},
+    },
+    id
   ) {
-    super(props);
+    super(props, id);
   }
 }
 
-export { PluviometerReadings };
+export { Pluviometer };

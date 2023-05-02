@@ -1,37 +1,35 @@
-import { PluviometerReadings } from "../../entities/funceme/pluviometer.js";
-import { StationReadings } from "../../entities/funceme/station.js";
+import { Pluviometer } from "../../entities/pluviometer.js";
+import { Station } from "../../entities/station.js";
 export class FuncemeMap {
-  static stationMeasuresMap(measures = []) {
-    return measures.map((measure) => {
-      const [date, temperature, humidity, radiation] = Object.values(measure);
+  static stationMeasuresMap(measures) {
+    const [date, temperature, humidity, radiation] = Object.values(measures);
 
-      return {
-        date,
-        temperature: parseFloat(temperature) || null,
-        humidity: parseFloat(humidity) || null,
-        radiation: parseFloat(radiation) || null,
-      };
-    });
+    return {
+      date,
+      temperature: parseFloat(temperature) || null,
+      humidity: parseFloat(humidity) || null,
+      radiation: parseFloat(radiation) || null,
+    };
   }
 
   static PluviometerMeasuresMap(measures = []) {
-    return measures.map((measure) => {
-      const [date, pluviometer] = Object.values(measure);
+    const [date, pluviometer] = Object.values(measures);
 
-      return {
-        date,
-        pluviometer: parseFloat(pluviometer) || null,
-      };
-    });
+    return {
+      date,
+      pluviometer: parseFloat(pluviometer) || null,
+    };
   }
 
   static stationToDomain(raw) {
-    const { code, name, latitude, longitude, altitude, measures } = raw;
+    const { code, name, organ, latitude, longitude, altitude, measures } = raw;
+
     const formatedMeasures = FuncemeMap.stationMeasuresMap(measures);
 
-    return new StationReadings({
+    return new Station({
       code,
       name,
+      organ,
       latitude,
       longitude,
       altitude,
@@ -40,13 +38,14 @@ export class FuncemeMap {
   }
 
   static pluviometerToDomain(raw) {
-    const { code, name, latitude, longitude, measures } = raw;
+    const { code, name, organ, latitude, longitude, measures } = raw;
 
     const formatedMeasures = FuncemeMap.PluviometerMeasuresMap(measures);
 
-    return new PluviometerReadings({
+    return new Pluviometer({
       code,
       name,
+      organ,
       latitude,
       longitude,
       measures: formatedMeasures,

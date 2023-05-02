@@ -2,25 +2,38 @@ class EntityProtocol {
   props = {
     code: "",
     name: "",
+    organ: "",
     latitude: 0,
     longitude: 0,
-    measures: [],
+    measures: {},
   };
+
+  #idEquipment;
 
   constructor(
     props = {
       code: "",
       name: "",
-      latitude: 0,
-      longitude: 0,
-      measures: [],
-    }
+      organ: "",
+      latitude: null,
+      longitude: null,
+      measures: {},
+    },
+    id
   ) {
     this.props = props;
+    this.#idEquipment = id;
   }
 
+  get idEquipment() {
+    return this.#idEquipment;
+  }
   get code() {
     return this.props.code;
+  }
+
+  get organ() {
+    return this.props.organ;
   }
 
   get name() {
@@ -37,21 +50,6 @@ class EntityProtocol {
 
   get measures() {
     return this.props.measures;
-  }
-
-  filterMeasuresByDate(date) {
-    this.props.measures = this.props.measures.filter(
-      (row) => row.date === date
-    );
-
-    if (!this.props.measures.length) {
-      console.log(
-        `Error in try to get measure data from date ${date}, data not found.`
-      );
-      return false;
-    }
-
-    return true;
   }
 }
 
