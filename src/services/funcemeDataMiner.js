@@ -16,6 +16,7 @@ class FuncemeDataMiner {
     try {
       const date = formatDateToYYMMDD(getYesterday());
 
+      // Avaliar o que deve ser feito caso não tenha dados de estação e pluviômetros
       const stations =
         await this.metereologicalEquipmentDao.getFuncemeEquipmentByType(
           "station"
@@ -25,6 +26,8 @@ class FuncemeDataMiner {
         await this.metereologicalEquipmentDao.getFuncemeEquipmentByType(
           "pluviometer"
         );
+
+      // E se não tiver dados dos equipamentos?
 
       const STATIONS_CODES = stations.map(
         (station) => station.IdEquipmentExternal
@@ -38,11 +41,10 @@ class FuncemeDataMiner {
       // de uma só vez sem precisar ficar tendo que se conectar e desconectar no serviço.
       await this.ftpGateway.connect();
 
-      const stationList = await this.ftpGateway.getStationsByCodesAndDate(
-        STATIONS_CODES,
-        date
-      );
-      const pluviometerList =
+      const stationWithMeasures =
+        await this.ftpGateway.getStationsByCodesAndDate(STATIONS_CODES, date);
+
+      const pluviometerWithMeasures =
         await this.ftpGateway.getPluviometersByCodesAndDate(
           PLUVIOMETERS_CODES,
           date
@@ -50,12 +52,25 @@ class FuncemeDataMiner {
 
       await this.ftpGateway.close();
 
-      console.log("STATIONS = ", stationList);
-      console.log("RAIN = ", pluviometerList);
+      if (stationWithMeasures) {
+        stationWithMeasures.map((stationWithMeasure) => {
+          const station = stations.find(
+            (item) => item.IdEquipmentExternal === stationWithMeasure.code
+          );
 
-      await this.stationReadDao.create(stationList);
+          if (!!station) {
+            stationWithMeasure.setIdType(station.Type.FK_Type);
+            stationWithMeasure.setIdOrgan(station.Organ.FK_Organ);
+          }
+        });
+      }
 
-      await this.pluviometerReadDao.create(pluviometerList);
+      console.log("STATIONS = ", stationWithMeasures);
+      console.log("RAIN = ", pluviometerWithMeasures);
+
+      await this.stationReadDao.create(stationWithMeasures);
+
+      await this.pluviometerReadDao.create(pluviometerWithMeasures);
     } catch (error) {
       // append to errors logs
       console.log(error);

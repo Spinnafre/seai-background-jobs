@@ -9,6 +9,9 @@ class EntityProtocol {
   };
 
   #idEquipment;
+  #idType = null;
+  #idOrgan = null;
+  #idTime = null;
 
   constructor(
     props = {
@@ -28,8 +31,33 @@ class EntityProtocol {
   get idEquipment() {
     return this.#idEquipment;
   }
+
   get code() {
     return this.props.code;
+  }
+
+  setIdType(idType) {
+    this.#idType = idType;
+  }
+
+  setIdOrgan(idOrgan) {
+    this.#idOrgan = idOrgan;
+  }
+
+  setIdTime(idTime) {
+    this.#idTime = idTime;
+  }
+
+  get idType() {
+    return this.#idType;
+  }
+
+  get idOrgan() {
+    return this.#idOrgan;
+  }
+
+  get idTime() {
+    return this.#idTime;
   }
 
   get organ() {

@@ -63,8 +63,14 @@ describe("#FuncemeDataMiner", () => {
         IdEquipmentExternal: "A305",
         Name: "Fortaleza-CE",
         Altitude: 35,
-        FK_Organ: 2,
-        FK_Type: 1,
+        Organ: {
+          FK_Organ: 2,
+          Name: "FUNCEME",
+        },
+        Type: {
+          FK_Type: 1,
+          Name: "station",
+        },
         CreatedAt: new Date(),
         UpdatedAt: null,
       },
@@ -73,8 +79,14 @@ describe("#FuncemeDataMiner", () => {
         IdEquipmentExternal: "23984",
         Name: "Teste",
         Altitude: null,
-        FK_Organ: 2,
-        FK_Type: 2,
+        Organ: {
+          FK_Organ: 2,
+          Name: "FUNCEME",
+        },
+        Type: {
+          FK_Type: 2,
+          Name: "station",
+        },
         CreatedAt: new Date(),
         UpdatedAt: null,
       },
@@ -106,10 +118,6 @@ describe("#FuncemeDataMiner", () => {
     const pluviometerReadDaoSpy = jest.spyOn(pluviometerReadDao, "create");
 
     await metereologicalEquipmentDao.createMetereologicalEquipment(equipments);
-
-    await metereologicalEquipmentDao.createMetereologicalOrgan(organs);
-
-    await metereologicalEquipmentDao.createEquipmentType(equipmentType);
 
     await funcemeDataMiner.execute();
 

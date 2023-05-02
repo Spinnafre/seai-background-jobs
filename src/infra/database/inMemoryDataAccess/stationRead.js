@@ -5,7 +5,7 @@ export class StationRead {
 
   async create(reads = []) {
     const toPersistency = reads.map((data) => {
-      const { idEquipment, organ, measures } = data;
+      const { idEquipment, organ, measures, idOrgan } = data;
 
       const TotalRadiation = Reflect.has(measures, "radiation")
         ? measures.radiation
@@ -27,7 +27,7 @@ export class StationRead {
         AtmosphericTemperature,
         WindVelocity,
         FK_Time: "",
-        FK_Organ: organ.id,
+        FK_Organ: idOrgan,
         FK_Equipment: idEquipment,
       };
     });
