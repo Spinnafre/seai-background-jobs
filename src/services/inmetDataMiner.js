@@ -5,15 +5,13 @@ import { setTimeout } from "node:timers/promises";
 import scrapperConfig from "../config/scrapper.js";
 import { formatDate } from "../utils/date.js";
 class InmetDataMinerService {
-  #stationRepository;
-  #inmetScrapper;
-
   #attemptsResults = [];
   #currentAttempt = 0;
 
-  constructor(stationRepository, inmetScrapper) {
-    this.#stationRepository = stationRepository;
+  constructor(inmetScrapper, metereologicalEquipmentDao, stationReadDao) {
     this.#inmetScrapper = inmetScrapper;
+    this.#metereologicalEquipmentDao = metereologicalEquipmentDao;
+    this.#stationReadDao = stationReadDao;
   }
 
   async execute() {

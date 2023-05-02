@@ -14,7 +14,7 @@ export class FuncemeMap {
     });
   }
 
-  static rainGaugeMeasuresMap(measures = []) {
+  static PluviometerMeasuresMap(measures = []) {
     return measures.map((measure) => {
       const [date, pluviometer] = Object.values(measure);
 
@@ -39,10 +39,10 @@ export class FuncemeMap {
     });
   }
 
-  static rainGaugeToDomain(raw) {
+  static pluviometerToDomain(raw) {
     const { code, name, latitude, longitude, measures } = raw;
 
-    const formatedMeasures = FuncemeMap.rainGaugeMeasuresMap(measures);
+    const formatedMeasures = FuncemeMap.PluviometerMeasuresMap(measures);
 
     return new PluviometerReadings({
       code,

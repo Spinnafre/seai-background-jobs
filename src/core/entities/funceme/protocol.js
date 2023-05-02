@@ -40,9 +40,11 @@ class EntityProtocol {
   }
 
   filterMeasuresByDate(date) {
-    this.props.measures = this.measures.filter((row) => row.date === date);
+    this.props.measures = this.props.measures.filter(
+      (row) => row.date === date
+    );
 
-    if (!this.measures) {
+    if (!this.props.measures.length) {
       console.log(
         `Error in try to get measure data from date ${date}, data not found.`
       );

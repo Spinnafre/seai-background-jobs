@@ -58,7 +58,7 @@ class StationParser extends CsvParser {
   }
 }
 
-class RainGaugeParser extends CsvParser {
+class PluviometerParser extends CsvParser {
   getMetadata(string) {
     const [code, name, latitude, longitude] = string
       .slice(0, 5)
@@ -77,9 +77,9 @@ class RainGaugeParser extends CsvParser {
   }
 
   static async parse(rawData = []) {
-    const parser = new RainGaugeParser();
+    const parser = new PluviometerParser();
     return await parser.parse(rawData);
   }
 }
 
-export { StationParser, RainGaugeParser };
+export { StationParser, PluviometerParser };

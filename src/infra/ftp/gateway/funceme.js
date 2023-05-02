@@ -2,7 +2,7 @@ import {
   formatDateToYYMMDD,
   getYesterday,
   StationParser,
-  RainGaugeParser,
+  PluviometerParser,
   convertCompressedFileStream,
 } from "../../../utils/index.js";
 
@@ -16,7 +16,7 @@ class FuncemeGateway {
     fileName: "stn_data_2023.tar.gz",
   };
 
-  rainGauge = {
+  pluviometer = {
     folder: "pluviometros",
     fileName: "prec_data_2023.tar.gz",
   };
@@ -41,10 +41,6 @@ class FuncemeGateway {
     let data = [];
 
     const compressedFileStream = await this.ftpConnection.getFile(folder, file);
-
-    compressedFileStream.once("close", function () {
-      console.log(`Sucesso ao obter dados do diretório ${folder}/${file}`);
-    });
 
     console.log(`Iniciando extração de dados do diretório ${folder}/${file}`);
 
@@ -79,34 +75,34 @@ class FuncemeGateway {
     return stations;
   }
 
-  async getYesterdayRainGaugesByCodes(codes = []) {
+  async getYesterdayPluviometersByCodes(codes = []) {
     const date = formatDateToYYMMDD(getYesterday());
 
     const rawList = await this.extractCsvFromFile(
-      this.rainGauge.folder,
-      this.rainGauge.fileName
+      this.pluviometer.folder,
+      this.pluviometer.fileName
     );
 
     if (!rawList) {
       return null;
     }
 
-    const parsedData = await RainGaugeParser.parse(rawList);
+    const parsedData = await PluviometerParser.parse(rawList);
 
-    const rainGauges = [];
+    const pluviometers = [];
 
     for (const data of parsedData) {
-      const rainGauge = FuncemeMap.rainGaugeToDomain(data);
+      const pluviometer = FuncemeMap.pluviometerToDomain(data);
 
       if (
-        codes.includes(rainGauge.code) &&
-        rainGauge.filterMeasuresByDate(date)
+        codes.includes(pluviometer.code) &&
+        pluviometer.filterMeasuresByDate(date)
       ) {
-        rainGauges.push(rainGauge);
+        pluviometers.push(pluviometer);
       }
     }
 
-    return rainGauges;
+    return pluviometers;
   }
 }
 

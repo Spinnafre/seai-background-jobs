@@ -6,9 +6,17 @@ class FuncemeDataMinerServiceFactory {
   static create() {
     const ftp = new FTPClientAdapter();
     const gateway = new FuncemeGateway(ftp);
-    const repository = {};
 
-    return new FuncemeDataMiner(gateway, repository);
+    const metereologicalEquipmentDao = {};
+    const stationReadDao = {};
+    const pluviometerReadDao = {};
+
+    return new FuncemeDataMiner(
+      gateway,
+      metereologicalEquipmentDao,
+      stationReadDao,
+      pluviometerReadDao
+    );
   }
 }
 
