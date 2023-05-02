@@ -52,7 +52,7 @@ class FuncemeDataMiner {
 
       await this.ftpGateway.close();
 
-      console.log("STATIONS = ", stations[0].measures);
+      console.log("STATIONS = ", stations);
       console.log("RAIN = ", pluviometers);
 
       await this.stationReadDao.create(stations);

@@ -5,6 +5,8 @@ import {
   jest,
   afterEach,
   beforeEach,
+  beforeAll,
+  afterAll,
 } from "@jest/globals";
 
 import { FTPClientAdapterMock } from "../mock/funceme/ftp/connection.js";
@@ -29,6 +31,15 @@ let pluviometerReadDao = null;
 // npm run test:dev -i tests/services/funcemeDataMiner.spec.js
 
 describe("#FuncemeDataMiner", () => {
+  beforeAll(() => {
+    jest.useFakeTimers("modern");
+    jest.setSystemTime(new Date(2023, 4, 2));
+  });
+
+  afterAll(() => {
+    jest.useRealTimers();
+  });
+
   beforeEach(() => {
     ftp = new FTPClientAdapterMock();
     gateway = new FuncemeGateway(ftp);
