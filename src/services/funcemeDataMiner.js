@@ -1,3 +1,5 @@
+import { formatDateToYYMMDD, getYesterday } from "../utils/index.js";
+
 class FuncemeDataMiner {
   constructor(
     funcemeGateway,
@@ -12,6 +14,8 @@ class FuncemeDataMiner {
   }
   async execute() {
     try {
+      const date = formatDateToYYMMDD(getYesterday());
+      console.log("DATA = ", date);
       // TODO: Buscar códigos das estações da FUNCEME
       // const STATIONS_CODES = ["A305", "B8505818"];
       // const RAIN_GAUGES_CODES = ["23984"];
@@ -37,13 +41,14 @@ class FuncemeDataMiner {
       // de uma só vez sem precisar ficar tendo que se conectar e desconectar no serviço.
       await this.ftpGateway.connect();
 
-      const stations = await this.ftpGateway.getYesterdayStationsByCodes(
-        STATIONS_CODES
+      const stations = await this.ftpGateway.getStationsByCodesAndDate(
+        STATIONS_CODES,
+        date
       );
-      const pluviometers =
-        await this.ftpGateway.getYesterdayPluviometersByCodes(
-          PLUVIOMETERS_CODES
-        );
+      const pluviometers = await this.ftpGateway.getPluviometersByCodesAndDate(
+        PLUVIOMETERS_CODES,
+        date
+      );
 
       await this.ftpGateway.close();
 

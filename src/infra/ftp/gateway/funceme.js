@@ -49,9 +49,7 @@ class FuncemeGateway {
     return data;
   }
 
-  async getYesterdayStationsByCodes(codes = []) {
-    const date = formatDateToYYMMDD(getYesterday());
-
+  async getStationsByCodesAndDate(codes = [], date) {
     const rawList = await this.extractCsvFromFile(
       this.station.folder,
       this.station.fileName
@@ -75,9 +73,7 @@ class FuncemeGateway {
     return stations;
   }
 
-  async getYesterdayPluviometersByCodes(codes = []) {
-    const date = formatDateToYYMMDD(getYesterday());
-
+  async getPluviometersByCodesAndDate(codes = [], date) {
     const rawList = await this.extractCsvFromFile(
       this.pluviometer.folder,
       this.pluviometer.fileName
