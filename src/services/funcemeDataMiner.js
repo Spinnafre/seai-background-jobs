@@ -5,12 +5,14 @@ class FuncemeDataMiner {
     funcemeGateway,
     metereologicalEquipmentDao,
     stationReadDao,
-    pluviometerReadDao
+    pluviometerReadDao,
+    readTimeDao
   ) {
     this.ftpGateway = funcemeGateway;
     this.metereologicalEquipmentDao = metereologicalEquipmentDao;
     this.stationReadDao = stationReadDao;
     this.pluviometerReadDao = pluviometerReadDao;
+    this.readTimeDao = readTimeDao;
   }
   async execute() {
     try {
@@ -61,12 +63,10 @@ class FuncemeDataMiner {
           if (!!station) {
             stationWithMeasure.setIdType(station.Type.FK_Type);
             stationWithMeasure.setIdOrgan(station.Organ.FK_Organ);
+            stationWithMeasure.setIdEquipment(station.IdEquipment);
           }
         });
       }
-
-      console.log("STATIONS = ", stationWithMeasures);
-      console.log("RAIN = ", pluviometerWithMeasures);
 
       await this.stationReadDao.create(stationWithMeasures);
 

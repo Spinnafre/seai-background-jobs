@@ -1,4 +1,4 @@
-export class Et0InMemory {
+export class ReadTimeInMemory {
   #Times = [
     {
       IdTime: null,
@@ -13,5 +13,9 @@ export class Et0InMemory {
 
   async list() {
     return this.#Times;
+  }
+
+  async getTimeByValue(value) {
+    return this.#Times.find((time) => time.Time === value);
   }
 }

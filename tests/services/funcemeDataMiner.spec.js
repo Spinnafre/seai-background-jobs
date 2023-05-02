@@ -16,6 +16,7 @@ import { FuncemeDataMiner } from "../../src/services/funcemeDataMiner.js";
 import { StationRead } from "../../src/infra/database/inMemoryDataAccess/stationRead.js";
 
 import { PluviometerRead } from "../../src/infra/database/inMemoryDataAccess/pluviometerRead.js";
+import { ReadTimeInMemory } from "../../src/infra/database/inMemoryDataAccess/readTime.js";
 
 import { MetereologicalEquipmentInMemory } from "../../src/infra/database/inMemoryDataAccess/metereologicalEquipment.js";
 
@@ -27,6 +28,7 @@ let gateway = null;
 let metereologicalEquipmentDao = null;
 let stationReadDao = null;
 let pluviometerReadDao = null;
+let readTimeDao = null;
 
 // npm run test:dev -i tests/services/funcemeDataMiner.spec.js
 
@@ -47,12 +49,15 @@ describe("#FuncemeDataMiner", () => {
     metereologicalEquipmentDao = new MetereologicalEquipmentInMemory();
     stationReadDao = new StationRead();
     pluviometerReadDao = new PluviometerRead();
+    readTimeDao = new PluviometerRead();
+    readTimeDao = new ReadTimeInMemory();
 
     funcemeDataMiner = new FuncemeDataMiner(
       gateway,
       metereologicalEquipmentDao,
       stationReadDao,
-      pluviometerReadDao
+      pluviometerReadDao,
+      readTimeDao
     );
   });
 
@@ -75,7 +80,7 @@ describe("#FuncemeDataMiner", () => {
         UpdatedAt: null,
       },
       {
-        IdEquipment: 3,
+        IdEquipment: 2,
         IdEquipmentExternal: "23984",
         Name: "Teste",
         Altitude: null,
@@ -111,6 +116,13 @@ describe("#FuncemeDataMiner", () => {
       {
         IdOrgan: 2,
         Name: "FUNCEME",
+      },
+    ];
+
+    const times = [
+      {
+        IdTime: 1,
+        Time: "02/04/2023",
       },
     ];
 

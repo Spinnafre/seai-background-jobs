@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1683055611889" clover="3.2.0">
-  <project timestamp="1683055611889" name="All files">
+<coverage generated="1683056126908" clover="3.2.0">
+  <project timestamp="1683056126908" name="All files">
     <metrics statements="36" coveredstatements="32" conditionals="6" coveredconditionals="6" methods="5" coveredmethods="4" elements="47" coveredelements="42" complexity="0" loc="36" ncloc="36" packages="1" files="1" classes="1"/>
     <file name="connection.js" path="C:\Users\davis\Documents\PROJECTS\INMETSCRAPPER\tests\mock\funceme\ftp\connection.js">
       <metrics statements="36" coveredstatements="32" conditionals="6" coveredconditionals="6" methods="5" coveredmethods="4"/>

@@ -40,6 +40,10 @@ class EntityProtocol {
     this.#idType = idType;
   }
 
+  setIdEquipment(idEquipment) {
+    this.#idEquipment = idEquipment;
+  }
+
   setIdOrgan(idOrgan) {
     this.#idOrgan = idOrgan;
   }
