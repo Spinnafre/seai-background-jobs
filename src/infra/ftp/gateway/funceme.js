@@ -1,25 +1,15 @@
 import {
-  formatDateToYYMMDD,
-  getYesterday,
   StationParser,
   PluviometerParser,
   convertCompressedFileStream,
 } from "../../../utils/index.js";
 
+import dataMinerConfig from '../../../config/funcemeDataMiner.js'
+
 import { FuncemeMap } from "../../../core/mappers/funceme/funcemeMap.js";
 
 class FuncemeGateway {
   ftpConnection;
-
-  station = {
-    folder: "pcds",
-    fileName: "stn_data_2023.tar.gz",
-  };
-
-  pluviometer = {
-    folder: "pluviometros",
-    fileName: "prec_data_2023.tar.gz",
-  };
 
   constructor(ftpClient) {
     this.ftpConnection = ftpClient;
@@ -50,9 +40,10 @@ class FuncemeGateway {
   }
 
   async getStationsByCodesAndDate(codes = [], date) {
+    
     const rawList = await this.extractCsvFromFile(
-      this.station.folder,
-      this.station.fileName
+      dataMinerConfig.directories.station.folder,
+      dataMinerConfig.directories.station.fileName
     );
 
     if (!rawList) {
@@ -90,8 +81,8 @@ class FuncemeGateway {
 
   async getPluviometersByCodesAndDate(codes = [], date) {
     const rawList = await this.extractCsvFromFile(
-      this.pluviometer.folder,
-      this.pluviometer.fileName
+      dataMinerConfig.directories.pluviometer.folder,
+      dataMinerConfig.directories.pluviometer.fileName
     );
 
     if (!rawList) {

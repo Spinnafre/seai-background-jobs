@@ -49,7 +49,6 @@ describe("#FuncemeDataMiner", () => {
     metereologicalEquipmentDao = new MetereologicalEquipmentInMemory();
     stationReadDao = new StationRead();
     pluviometerReadDao = new PluviometerRead();
-    readTimeDao = new PluviometerRead();
     readTimeDao = new ReadTimeInMemory();
 
     funcemeDataMiner = new FuncemeDataMiner(

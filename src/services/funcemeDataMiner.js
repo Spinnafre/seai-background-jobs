@@ -19,23 +19,23 @@ class FuncemeDataMiner {
       const date = formatDateToYYMMDD(getYesterday());
 
       // Avaliar o que deve ser feito caso não tenha dados de estação e pluviômetros
-      const stations =
+      const stationsEquipments =
         await this.metereologicalEquipmentDao.getFuncemeEquipmentByType(
           "station"
         );
 
-      const pluviometers =
+      const pluviometersEquipments =
         await this.metereologicalEquipmentDao.getFuncemeEquipmentByType(
           "pluviometer"
         );
 
       // E se não tiver dados dos equipamentos?
 
-      const STATIONS_CODES = stations.map(
+      const STATIONS_CODES = stationsEquipments.map(
         (station) => station.IdEquipmentExternal
       );
 
-      const PLUVIOMETERS_CODES = pluviometers.map(
+      const PLUVIOMETERS_CODES = pluviometersEquipments.map(
         (station) => station.IdEquipmentExternal
       );
 
@@ -56,11 +56,11 @@ class FuncemeDataMiner {
 
       if (stationWithMeasures) {
         stationWithMeasures.map((stationWithMeasure) => {
-          const station = stations.find(
+          const station = stationsEquipments.find(
             (item) => item.IdEquipmentExternal === stationWithMeasure.code
           );
 
-          if (!!station) {
+          if (!!station == true) {
             stationWithMeasure.setIdType(station.Type.FK_Type);
             stationWithMeasure.setIdOrgan(station.Organ.FK_Organ);
             stationWithMeasure.setIdEquipment(station.IdEquipment);

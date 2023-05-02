@@ -1,5 +1,5 @@
 TN:
-SF:tests\mock\funceme\ftp\connection.js
+SF:tests/mock/funceme/ftp/connection.js
 FN:5,FTPClientAdapterMock
 FN:9,close
 FN:16,status
