@@ -12,7 +12,23 @@ export class PluviometerRead {
   #ReadTime = [];
 
   async create(reads = []) {
-    this.#PluviometerRead = [...this.#PluviometerRead, ...reads];
+    const toPersistency = reads.map((data) => {
+      const { IdEquipment, measures, IdOrgan, IdTime } = data;
+
+      const Value = Reflect.has(measures, "pluviometer")
+        ? measures.pluviometer
+        : null;
+
+      return {
+        IdRead: Math.round(Math.random() * 1000),
+        Value,
+        FK_Time: IdTime,
+        FK_Organ: IdOrgan,
+        FK_Equipment: IdEquipment,
+      };
+    });
+
+    this.#PluviometerRead = [...toPersistency];
   }
 
   async list() {

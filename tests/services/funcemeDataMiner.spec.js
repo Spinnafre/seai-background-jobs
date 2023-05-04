@@ -1,3 +1,4 @@
+// npm run test:dev -i tests/services/funcemeDataMiner.spec.js
 import {
   describe,
   expect,
@@ -20,6 +21,11 @@ import { ReadTimeInMemory } from "../../src/infra/database/inMemoryDataAccess/re
 
 import { MetereologicalEquipmentInMemory } from "../../src/infra/database/inMemoryDataAccess/metereologicalEquipment.js";
 
+import {
+  formatDateToForwardSlash,
+  getYesterdayTimestamp,
+} from "../../src/utils/date.js";
+
 let funcemeDataMiner = null;
 
 let ftp = null;
@@ -29,8 +35,6 @@ let metereologicalEquipmentDao = null;
 let stationReadDao = null;
 let pluviometerReadDao = null;
 let readTimeDao = null;
-
-// npm run test:dev -i tests/services/funcemeDataMiner.spec.js
 
 describe("#FuncemeDataMiner", () => {
   beforeAll(() => {
@@ -49,23 +53,23 @@ describe("#FuncemeDataMiner", () => {
     metereologicalEquipmentDao = new MetereologicalEquipmentInMemory();
     stationReadDao = new StationRead();
     pluviometerReadDao = new PluviometerRead();
-    readTimeDao = new ReadTimeInMemory();
 
     funcemeDataMiner = new FuncemeDataMiner(
       gateway,
       metereologicalEquipmentDao,
       stationReadDao,
-      pluviometerReadDao,
-      readTimeDao
+      pluviometerReadDao
     );
+
+    readTimeDao = new ReadTimeInMemory();
   });
 
-  test("Should be able to get equipments by types", async function () {
+  test("When has equipments but measures not exists, should be able to save measures data with null", async function () {
     const equipments = [
       {
         IdEquipment: 1,
-        IdEquipmentExternal: "A305",
-        Name: "Fortaleza-CE",
+        IdEquipmentExternal: "TESTE",
+        Name: "Fortaleza",
         Altitude: 35,
         Organ: {
           FK_Organ: 2,
@@ -80,7 +84,7 @@ describe("#FuncemeDataMiner", () => {
       },
       {
         IdEquipment: 2,
-        IdEquipmentExternal: "23984",
+        IdEquipmentExternal: "TESTE",
         Name: "Teste",
         Altitude: null,
         Organ: {
@@ -89,39 +93,10 @@ describe("#FuncemeDataMiner", () => {
         },
         Type: {
           FK_Type: 2,
-          Name: "station",
+          Name: "pluviometer",
         },
         CreatedAt: new Date(),
         UpdatedAt: null,
-      },
-    ];
-
-    const equipmentType = [
-      {
-        IdType: 1,
-        Name: "station",
-      },
-      {
-        IdType: 2,
-        Name: "pluviometer",
-      },
-    ];
-
-    const organs = [
-      {
-        IdOrgan: 1,
-        Name: "INMET",
-      },
-      {
-        IdOrgan: 2,
-        Name: "FUNCEME",
-      },
-    ];
-
-    const times = [
-      {
-        IdTime: 1,
-        Time: "02/04/2023",
       },
     ];
 
@@ -130,14 +105,69 @@ describe("#FuncemeDataMiner", () => {
 
     await metereologicalEquipmentDao.createMetereologicalEquipment(equipments);
 
-    await funcemeDataMiner.execute();
+    const yesterdayDate = getYesterdayTimestamp();
 
-    console.log("REPOSITÓRIO", await stationReadDao.list());
+    // Irá ser responsabilidade de um serviço principal
+    let lastDate = await readTimeDao.getLastDate();
+
+    // Evitar salvar dados no banco com datas repetidas
+    if (
+      !lastDate ||
+      formatDateToForwardSlash(lastDate.Time) !==
+        formatDateToForwardSlash(yesterdayDate)
+    ) {
+      const id = await readTimeDao.create(yesterdayDate);
+
+      lastDate = {
+        IdTime: id,
+        Time: yesterdayDate,
+      };
+    }
+
+    await funcemeDataMiner.execute(lastDate);
 
     expect(stationReadDaoSpy).toHaveBeenCalled();
     expect(pluviometerReadDaoSpy).toHaveBeenCalled();
+
+    const station = await stationReadDao.list();
+
+    const pluviometer = await pluviometerReadDao.list();
+
+    const pluviometerInDatabase = {
+      Value: null,
+      FK_Time: lastDate.IdTime,
+      FK_Organ: 2,
+      FK_Equipment: 2,
+    };
+
+    const stationInDatabase = {
+      TotalRadiation: null,
+      RelativeHumidity: null,
+      AtmosphericTemperature: null,
+      WindVelocity: null,
+      FK_Time: lastDate.IdTime,
+      FK_Organ: 2,
+      FK_Equipment: 1,
+    };
+
+    station.forEach((pluviometer) => {
+      expect(pluviometer).toMatchObject(stationInDatabase);
+    });
+    pluviometer.forEach((pluviometer) => {
+      expect(pluviometer).toMatchObject(pluviometerInDatabase);
+    });
   });
-  test.todo("Should be able to get stations by codes");
-  test.todo("Should be able to get pluviometers by codes");
-  test.todo("Should be able to save equipments");
+
+  test.todo(
+    "When has stations measures in funceme stations files, should create log with success and save stations with measures"
+  );
+  test.todo(
+    "When has pluviometers measures in funceme pluviometers files, should create log with success and save stations with measures"
+  );
+  test.todo(
+    "When stations codes not exists in funceme stations files, should create log with error and save stations without measures"
+  );
+  test.todo(
+    "When pluviometers codes not exists in funceme pluviometer files, should create log with error and save stations without measures"
+  );
 });

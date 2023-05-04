@@ -14,17 +14,14 @@ export class MetereologicalEquipmentInMemory {
   }
 
   async getFuncemeEquipmentByType(nameType) {
-    const equipment = this.#MetereologicalEquipment.filter(
+    return this.#MetereologicalEquipment.filter(
       (eqp) => eqp.Type.Name == nameType && eqp.Organ.Name === "FUNCEME"
     );
-
-    return equipment;
   }
 
   async getInmetEquipmentByType(nameType) {
-    const equipment = this.#MetereologicalEquipment.filter(
+    return this.#MetereologicalEquipment.filter(
       (eqp) => eqp.Type.Name == nameType && eqp.Organ.Name === "INMET"
     );
-    return equipment;
   }
 }

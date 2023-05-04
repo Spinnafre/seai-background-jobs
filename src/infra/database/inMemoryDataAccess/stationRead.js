@@ -5,30 +5,33 @@ export class StationRead {
 
   async create(reads = []) {
     const toPersistency = reads.map((data) => {
-      const { idEquipment, organ, measures, idOrgan } = data;
+      const { IdEquipment, measures, IdOrgan, IdTime } = data;
 
       const TotalRadiation = Reflect.has(measures, "radiation")
         ? measures.radiation
         : null;
+
       const RelativeHumidity = Reflect.has(measures, "humidity")
         ? measures.humidity
         : null;
+
       const AtmosphericTemperature = Reflect.has(measures, "temperature")
         ? measures.temperature
         : null;
-      const WindVelocity = Reflect.has(measures, "radiation")
-        ? measures.radiation
+
+      const WindVelocity = Reflect.has(measures, "windSpeed")
+        ? measures.windSpeed
         : null;
 
       return {
-        IdRead: null,
+        IdRead: Math.round(Math.random() * 1000),
         TotalRadiation,
         RelativeHumidity,
         AtmosphericTemperature,
         WindVelocity,
-        FK_Time: "",
-        FK_Organ: idOrgan,
-        FK_Equipment: idEquipment,
+        FK_Time: IdTime,
+        FK_Organ: IdOrgan,
+        FK_Equipment: IdEquipment,
       };
     });
 

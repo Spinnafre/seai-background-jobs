@@ -4,7 +4,7 @@ import {
   convertCompressedFileStream,
 } from "../../../utils/index.js";
 
-import dataMinerConfig from '../../../config/funcemeDataMiner.js'
+import dataMinerConfig from "../../../config/funcemeDataMiner.js";
 
 import { FuncemeMap } from "../../../core/mappers/funceme/funcemeMap.js";
 
@@ -40,18 +40,17 @@ class FuncemeGateway {
   }
 
   async getStationsByCodesAndDate(codes = [], date) {
-    
     const rawList = await this.extractCsvFromFile(
       dataMinerConfig.directories.station.folder,
       dataMinerConfig.directories.station.fileName
     );
 
     if (!rawList) {
-      return null;
+      return [];
     }
+    const stations = [];
 
     const parsedStations = await StationParser.parse(rawList);
-    const stations = [];
 
     for (const parsedStation of parsedStations) {
       if (codes.includes(parsedStation.code)) {
@@ -66,10 +65,8 @@ class FuncemeGateway {
           code,
           name,
           organ: "FUNCEME",
-          latitude,
-          longitude,
-          altitude,
-          measures: stationMeasures,
+          altitude: null,
+          measures: stationMeasures || {},
         });
 
         stations.push(station);
@@ -86,7 +83,7 @@ class FuncemeGateway {
     );
 
     if (!rawList) {
-      return null;
+      return [];
     }
 
     const parsedPluviometers = await PluviometerParser.parse(rawList);
@@ -107,7 +104,7 @@ class FuncemeGateway {
           organ: "FUNCEME",
           latitude,
           longitude,
-          measures: pluviometerMeasures,
+          measures: pluviometerMeasures || {},
         });
 
         pluviometers.push(pluviometer);

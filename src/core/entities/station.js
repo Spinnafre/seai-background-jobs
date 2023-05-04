@@ -23,6 +23,9 @@ class Station extends EntityProtocol {
   get altitude() {
     return this.#altitude;
   }
+  setAltitude(altitude) {
+    this.#altitude = altitude;
+  }
 }
 
 export { Station };

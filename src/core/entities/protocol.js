@@ -28,7 +28,7 @@ class EntityProtocol {
     this.#idEquipment = id;
   }
 
-  get idEquipment() {
+  get IdEquipment() {
     return this.#idEquipment;
   }
 
@@ -52,15 +52,15 @@ class EntityProtocol {
     this.#idTime = idTime;
   }
 
-  get idType() {
+  get IdType() {
     return this.#idType;
   }
 
-  get idOrgan() {
+  get IdOrgan() {
     return this.#idOrgan;
   }
 
-  get idTime() {
+  get IdTime() {
     return this.#idTime;
   }
 

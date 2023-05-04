@@ -22,7 +22,7 @@ export class FuncemeMap {
   }
 
   static stationToDomain(raw) {
-    const { code, name, organ, latitude, longitude, altitude, measures } = raw;
+    const { code, name, organ, altitude, measures } = raw;
 
     const formatedMeasures = FuncemeMap.stationMeasuresMap(measures);
 
@@ -30,15 +30,13 @@ export class FuncemeMap {
       code,
       name,
       organ,
-      latitude,
-      longitude,
       altitude,
       measures: formatedMeasures,
     });
   }
 
   static pluviometerToDomain(raw) {
-    const { code, name, organ, latitude, longitude, measures } = raw;
+    const { code, name, organ, measures } = raw;
 
     const formatedMeasures = FuncemeMap.PluviometerMeasuresMap(measures);
 
@@ -46,8 +44,6 @@ export class FuncemeMap {
       code,
       name,
       organ,
-      latitude,
-      longitude,
       measures: formatedMeasures,
     });
   }

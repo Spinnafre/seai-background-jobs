@@ -3,19 +3,34 @@ import { Result } from "../utils/Result.js";
 import { setTimeout } from "node:timers/promises";
 
 import scrapperConfig from "../config/scrapper.js";
-import { formatDate } from "../utils/date.js";
-class InmetDataMinerService {
+import { formatDateToForwardSlash } from "../utils/date.js";
+class InmetDataMiner {
   #attemptsResults = [];
   #currentAttempt = 0;
 
   constructor(inmetScrapper, metereologicalEquipmentDao, stationReadDao) {
-    this.#inmetScrapper = inmetScrapper;
-    this.#metereologicalEquipmentDao = metereologicalEquipmentDao;
-    this.#stationReadDao = stationReadDao;
+    this.inmetScrapper = inmetScrapper;
+    this.metereologicalEquipmentDao = metereologicalEquipmentDao;
+    this.stationReadDao = stationReadDao;
   }
 
-  async execute() {
+  async execute(date = { IdTime: null, Time: "" }) {
+    const stationsEquipments =
+      await this.metereologicalEquipmentDao.getInmetEquipmentByType("station");
+
+    if (!stationsEquipments.length) {
+      console.log("Não há estações do INMET cadastradas");
+
+      return;
+    }
+
+    const STATIONS_CODES = stationsEquipments.map(
+      (station) => station.IdEquipmentExternal
+    );
+
     let inmetStations = [];
+
+    const formatedDate = formatDateToForwardSlash(date.Time);
 
     try {
       do {
@@ -64,22 +79,53 @@ class InmetDataMinerService {
         )
       );
 
-      if (inmetStations.length) {
-        const CODES = ["A305"];
+      let stations = [];
 
-        console.log(
-          inmetStations.filter((station) => {
-            return CODES.includes(station.date);
-          })
-        );
+      if (inmetStations.length) {
+        for (const station of inmetStations) {
+          if (
+            STATIONS_CODES.includes(station.code) &&
+            station.date === formatedDate
+          ) {
+            const equipment = stationsEquipments.find(
+              (equipment) => equipment.IdEquipmentExternal === station.code
+            );
+
+            if (!!equipment === true) {
+              const { temperature, windSpeed, humidity } = station;
+
+              stations.push({
+                IdEquipment: equipment.IdEquipment,
+                IdOrgan: equipment.Organ.FK_Organ,
+                IdTime: date.IdTime,
+                measures: {
+                  temperature,
+                  windSpeed,
+                  humidity,
+                },
+              });
+            }
+          }
+        }
+      } else {
+        stations = stationsEquipments.map((equipment) => {
+          return {
+            IdEquipment: equipment.IdEquipment,
+            IdOrgan: equipment.Organ.FK_Organ,
+            IdTime: date.IdTime,
+            measures: {},
+          };
+        });
       }
+
+      await this.stationReadDao.create(stations);
     } catch (error) {
       // append to error logs
     }
   }
 
   async getStations() {
-    const scrapper = await this.#inmetScrapper.build({
+    const scrapper = await this.inmetScrapper.build({
       ...scrapperConfig.page,
       ...scrapperConfig.launchConfig,
     });
@@ -108,6 +154,8 @@ class InmetDataMinerService {
         timeoutPromise,
       ]);
 
+      console.log(stationsWithMeasures);
+
       if (stationsWithMeasures.length) {
         console.log(
           "[✅] Sucesso ao obter dados concatenados de estações com medições"
@@ -126,4 +174,4 @@ class InmetDataMinerService {
   }
 }
 
-export { InmetDataMinerService };
+export { InmetDataMiner };
