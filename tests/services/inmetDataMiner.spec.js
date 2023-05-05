@@ -13,7 +13,7 @@ import {
 
 import { InmetScrapper } from "../../src/infra/scrapper/inmet-scrapper.js";
 
-import { InmetDataMiner } from "../../src/services/inmetDataMiner.js";
+import { InmetDataMiner } from "../../src/commands/inmetDataMiner.js";
 
 import { MetereologicalEquipmentInMemory } from "../../src/infra/database/inMemoryDataAccess/metereologicalEquipment.js";
 
@@ -66,21 +66,10 @@ describe("#Extrat station from inmet service", () => {
   test("When stations equipments not exists, shouldn't be able to get stations from INMET page", async function () {
     const yesterdayDate = getYesterdayTimestamp();
     // Irá ser responsabilidade de um serviço principal
-    let lastDate = await readTimeDao.getLastDate();
-
-    // Evitar salvar dados no banco com datas repetidas
-    if (
-      !lastDate ||
-      formatDateToForwardSlash(lastDate.Time) !==
-        formatDateToForwardSlash(yesterdayDate)
-    ) {
-      const id = await readTimeDao.create(yesterdayDate);
-
-      lastDate = {
-        IdTime: id,
-        Time: yesterdayDate,
-      };
-    }
+    const lastDate = {
+      IdTime: 1,
+      Time: yesterdayDate,
+    };
 
     const getStationsSpy = jest.spyOn(inmetDataMiner, "getStations");
     const saveStationsReadsSpy = jest.spyOn(stationReadDao, "create");
@@ -114,22 +103,11 @@ describe("#Extrat station from inmet service", () => {
     await metereologicalEquipmentDao.createMetereologicalEquipment(equipments);
 
     const yesterdayDate = getYesterdayTimestamp();
-    // Irá ser responsabilidade de um serviço principal
-    let lastDate = await readTimeDao.getLastDate();
 
-    // Evitar salvar dados no banco com datas repetidas
-    if (
-      !lastDate ||
-      formatDateToForwardSlash(lastDate.Time) !==
-        formatDateToForwardSlash(yesterdayDate)
-    ) {
-      const id = await readTimeDao.create(yesterdayDate);
-
-      lastDate = {
-        IdTime: id,
-        Time: yesterdayDate,
-      };
-    }
+    const lastDate = {
+      IdTime: 1,
+      Time: yesterdayDate,
+    };
 
     await inmetDataMiner.execute(lastDate);
 
