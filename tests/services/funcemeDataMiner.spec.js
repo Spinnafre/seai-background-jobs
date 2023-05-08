@@ -12,7 +12,7 @@ import {
 
 import { FTPClientAdapterMock } from "../mock/funceme/ftp/connection.js";
 import { FuncemeGateway } from "../../src/infra/ftp/gateway/funceme.js";
-import { FuncemeDataMiner } from "../../src/services/funcemeDataMiner.js";
+import { FuncemeDataMiner } from "../../src/commands/funcemeDataMiner.js";
 
 import { StationRead } from "../../src/infra/database/inMemoryDataAccess/stationRead.js";
 
@@ -108,21 +108,10 @@ describe("#FuncemeDataMiner", () => {
     const yesterdayDate = getYesterdayTimestamp();
 
     // Irá ser responsabilidade de um serviço principal
-    let lastDate = await readTimeDao.getLastDate();
-
-    // Evitar salvar dados no banco com datas repetidas
-    if (
-      !lastDate ||
-      formatDateToForwardSlash(lastDate.Time) !==
-        formatDateToForwardSlash(yesterdayDate)
-    ) {
-      const id = await readTimeDao.create(yesterdayDate);
-
-      lastDate = {
-        IdTime: id,
-        Time: yesterdayDate,
-      };
-    }
+    const lastDate = {
+      IdTime: 1,
+      Time: yesterdayDate,
+    };
 
     await funcemeDataMiner.execute(lastDate);
 

@@ -13,7 +13,7 @@ import { Validator } from "../../utils/Validator.js";
 import { Result } from "../../utils/Result.js";
 import { getYesterdayDateFormatted } from "../../utils/date.js";
 
-class InmetScrapper {
+export class InmetScrapper {
   #browserHandler = {};
 
   #pageHandler = {};
@@ -365,7 +365,7 @@ class InmetScrapper {
     return paramsOrError;
   }
 
-  async getStationsWithMeasures() {
+  async getStationsByCodesAndDate(codes = [], date) {
     await this.#openPage();
 
     await setTimeout(1000);
@@ -409,8 +409,8 @@ class InmetScrapper {
 
     await this.closeBrowser();
 
-    return stationsWithMeasures;
+    return stationsWithMeasures.filter(
+      (station) => codes.includes(station.code) && station.date === date
+    );
   }
 }
-
-export { InmetScrapper };

@@ -5,26 +5,21 @@ class Station extends EntityProtocol {
 
   constructor(
     props = {
-      code: "",
+      code,
       name: "",
-      organ: "",
-      altitude: null,
-      latitude: null,
-      longitude: null,
-      measures: {},
+      organ,
+      type,
     },
-    id
+    id,
+    altitude
   ) {
     super(props, id);
 
-    this.#altitude = props.altitude;
+    this.#altitude = altitude || null;
   }
 
   get altitude() {
     return this.#altitude;
-  }
-  setAltitude(altitude) {
-    this.#altitude = altitude;
   }
 }
 
