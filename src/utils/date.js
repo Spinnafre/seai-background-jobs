@@ -1,29 +1,24 @@
-function formatDate(date, options, locale) {
-  return new Intl.DateTimeFormat(locale, options).format(date);
-}
+export class FormatDate {
+  static formatDate(date, options, locale) {
+    return new Intl.DateTimeFormat(locale, options).format(date);
+  }
+  static timestampToDate(timestamp, { separator } = { separator: "/" }) {
+    const dateFormat = new Date(timestamp * 1000);
 
-function formatDateToYYMMDD(date = new Date()) {
-  let month = date.getUTCMonth() + 1;
-  let day = date.getDate();
-  if (month < 10) month = `0${month}`;
-  if (day < 10) day = `0${day}`;
-  return `${date.getFullYear()}-${month}-${day}`;
-}
-function getYesterday() {
-  const date = new Date();
-  const previous = new Date(date.getTime());
-  previous.setDate(date.getDate() - 1);
-  return previous;
-}
-function getYesterdayDateFormatted({ locale, formatOptions }) {
-  const previous = getYesterday();
+    let month = dateFormat.getMonth() + 1;
+    let day = dateFormat.getDate();
+    if (month < 10) month = `0${month}`;
+    if (day < 10) day = `0${day}`;
+    return `${dateFormat.getFullYear()}${separator}${month}${separator}${day}`;
+  }
 
-  return formatDate(previous, formatOptions, locale);
-}
+  static getYesterdayTimestamp() {
+    const date = new Date();
+    const previous = new Date(date.getTime());
 
-export {
-  getYesterdayDateFormatted,
-  formatDate,
-  formatDateToYYMMDD,
-  getYesterday,
-};
+    previous.setDate(date.getDate() - 1);
+    previous.setMonth(date.getMonth() + 1);
+
+    return Number((previous.valueOf() / 1000).toPrecision(10));
+  }
+}

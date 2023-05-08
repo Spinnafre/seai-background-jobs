@@ -1,19 +1,12 @@
-"use strict";
-
-import puppeteer from "puppeteer";
-
 import { setTimeout } from "node:timers/promises";
-
-import { Readable, Transform, Writable } from "node:stream";
-import { pipeline } from "node:stream/promises";
-
-import { dataAsStream } from "../../utils/generator.js";
 
 import { Validator } from "../../utils/Validator.js";
 import { Result } from "../../utils/Result.js";
 import { getYesterdayDateFormatted } from "../../utils/date.js";
+import { Readable } from "node:stream";
+import { dataAsStream } from "../../../src/utils/generator.js";
 
-export class InmetScrapper {
+class InmetScrapper {
   #browserHandler = {};
 
   #pageHandler = {};
@@ -46,20 +39,7 @@ export class InmetScrapper {
       },
     }
   ) {
-    const browserHandler = await puppeteer.launch(scrapperConfig.launch);
-
-    const pageHandler = await browserHandler.newPage();
-
-    pageHandler.on("load", () => console.log("Página carregada com sucesso"));
-    pageHandler.on("error", (err) => console.log("ERROR ", err));
-
-    await pageHandler.setBypassCSP(true);
-
-    if (!scrapperConfig.launch.headless) {
-      await pageHandler.setViewport({ width: 500, height: 500 });
-    }
-
-    await pageHandler.setUserAgent(scrapperConfig.userAgent);
+    const browserHandler = {};
 
     const scrapper = new InmetScrapper(
       scrapperConfig.url,
@@ -72,10 +52,7 @@ export class InmetScrapper {
 
   async closeBrowser() {
     console.log("Closing page...");
-    await this.#pageHandler.close();
-
     console.log("Closing browser...");
-    await this.#browserHandler.close();
   }
 
   get props() {
@@ -176,45 +153,9 @@ export class InmetScrapper {
   async #openPage() {
     console.log(`Acessando URL: ${this.#pageUrl}.`);
 
-    await this.#pageHandler.goto(this.#pageUrl, {
-      waitUntil: "domcontentloaded",
-      timeout: this.#pageTimeout,
-    });
-
-    const pageTitle = await this.#pageHandler.title();
-
-    console.log("Sucesso ao acessar página ", pageTitle);
+    console.log("Sucesso ao acessar página ");
   }
 
-  // Get codes from params specified by users
-  async #getCodesFromStationsParams(userParams) {
-    const codes = await this.#pageHandler.evaluate((params) => {
-      const options = document.querySelector("#estacao-parametro").children;
-
-      return Array.from(options)
-        .filter((option) => params.includes(option.innerHTML))
-        .map((option) => option.value);
-    }, userParams);
-
-    return codes;
-  }
-
-  async #fetchMeasures() {
-    //Promise para esperar pela a resposta da requisição AJAX
-    //Que não seja a requisição do tipo OPTIONS (preflight)
-    const xmr = this.#pageHandler.waitForResponse(
-      (r) =>
-        r.request().url().includes("apimapas.inmet.gov.br/dados") &&
-        r.request().method() != "OPTIONS"
-    );
-
-    //Esperar pela a resposta das requisiçõe ajax específicas
-    const ajaxResponse = await xmr;
-
-    const measures = await ajaxResponse.json();
-
-    return measures;
-  }
   #translateMeasureName(measureName) {
     const measures = {
       temperatura: "temperature",
@@ -312,49 +253,6 @@ export class InmetScrapper {
     });
   }
 
-  async #getMeasuresFromParameters(parameters) {
-    const stations = new Map();
-
-    for (const parameter of parameters) {
-      //Selecionar medição
-      const selectMeasureTypeBtn = await this.#pageHandler.$(
-        "#estacao-parametro"
-      );
-      await selectMeasureTypeBtn.select(parameter);
-
-      await this.#pageHandler.$eval("#btn-estacao-BUSCAR", (btn) => {
-        btn.click();
-      });
-
-      console.log(`[🔍] Buscando dados da medição ${parameter}`);
-
-      const measures = await this.#fetchMeasures();
-
-      if (measures) {
-        console.log("[✅] Sucesso ao obter dados de medição ");
-
-        const { estacoes } = measures;
-
-        const readableStream = Readable.from(dataAsStream(estacoes));
-
-        const measureName = this.#translateMeasureName(parameter.split("-")[0]);
-
-        // const writable = createWriteStream(
-        //   resolve(__dirname, "..", "data", "test.ndjson")
-        // );
-
-        await pipeline(
-          readableStream,
-          this.#formatMeasures(),
-          this.#filterMeasuresByState(),
-          this.#concatenateMeasures(stations, measureName)
-        );
-      }
-    }
-
-    return [...stations.values()];
-  }
-
   setParams(params) {
     const paramsOrError = this.#validateParams(params);
 
@@ -365,52 +263,7 @@ export class InmetScrapper {
     return paramsOrError;
   }
 
-  async getStationsByCodesAndDate(codes = [], date) {
-    await this.#openPage();
-
-    await setTimeout(1000);
-
-    await this.#pageHandler.waitForSelector(".sidebar", {
-      timeout: 20000,
-    });
-
-    await setTimeout(1000);
-
-    const formInputsSelectors = [
-      { value: this.#props.country, selector: "#estacao-regiao" },
-      { value: this.#props.stations_type, selector: "#estacao-tipo" },
-      { value: this.#props.date_type, selector: "#estacao-tipo-dados" },
-    ];
-
-    for (const { value, selector } of formInputsSelectors) {
-      const input = await this.#pageHandler.$(selector);
-      await input.select(value);
-    }
-
-    await setTimeout(300);
-
-    const parametersCodes = await this.#getCodesFromStationsParams(
-      this.#props.params
-    );
-
-    if (!parametersCodes.length) {
-      // await this.closeBrowser();
-
-      throw new Error(
-        "Não foi possível obter identificadores dos parâmetros das medições das estações"
-      );
-    }
-
-    await this.#pageHandler.waitForSelector(".btn-green");
-
-    const stationsWithMeasures = await this.#getMeasuresFromParameters(
-      parametersCodes
-    );
-
-    await this.closeBrowser();
-
-    return stationsWithMeasures.filter(
-      (station) => codes.includes(station.code) && station.date === date
-    );
-  }
+  async getStationsWithMeasures() {}
 }
+
+export { InmetScrapper };
