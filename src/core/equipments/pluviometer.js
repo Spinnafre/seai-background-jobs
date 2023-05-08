@@ -5,10 +5,7 @@ class Pluviometer extends EntityProtocol {
     props = {
       code: "",
       name: "",
-      organ: "",
-      latitude: 0,
-      longitude: 0,
-      measures: {},
+      organ,
     },
     id
   ) {

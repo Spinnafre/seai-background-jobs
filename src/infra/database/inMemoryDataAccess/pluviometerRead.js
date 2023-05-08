@@ -1,39 +1,22 @@
+import { Mapper } from "../../../core/mapper/map.js";
+
 export class PluviometerRead {
-  #PluviometerRead = [
-    {
-      IdRead: "",
-      Value: "",
-      FK_Time: "",
-      FK_Organ: "",
-      FK_Equipment: "",
-    },
-  ];
+  #PluviometerRead = [];
 
-  #ReadTime = [];
+  async create(pluviometers, measures, idTime) {
+    const data = Mapper.pluviometerToPersistency(
+      pluviometers,
+      measures,
+      idTime
+    ).map((read) => ({
+      IdRead: Math.round(Math.random() * 1000),
+      ...read,
+    }));
 
-  async create(reads = []) {
-    const toPersistency = reads.map((data) => {
-      const { IdEquipment, measures, IdOrgan, IdTime } = data;
-
-      const Value = Reflect.has(measures, "pluviometer")
-        ? measures.pluviometer
-        : null;
-
-      return {
-        IdRead: Math.round(Math.random() * 1000),
-        Value,
-        FK_Time: IdTime,
-        FK_Organ: IdOrgan,
-        FK_Equipment: IdEquipment,
-      };
-    });
-
-    this.#PluviometerRead = [...toPersistency];
+    this.#ReadStations = [...data];
   }
 
   async list() {
-    return this.#PluviometerRead;
+    return Mapper.pluviometersToDomain(this.#PluviometerRead);
   }
-
-  async update(reads = []) {}
 }
