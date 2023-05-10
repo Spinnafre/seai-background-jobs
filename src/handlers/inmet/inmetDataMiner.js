@@ -2,14 +2,17 @@ import { setTimeout } from "node:timers/promises";
 import scrapperConfig from "../../config/scrapper.js";
 
 export class InmetDataMiner {
-  constructor(inmetScrapper, metereologicalEquipmentDao, stationReadDao) {
+  constructor(inmetScrapper, metereologicalEquipmentDao, stationReadDao,readTimeDao) {
     this.inmetScrapper = inmetScrapper;
     this.metereologicalEquipmentDao = metereologicalEquipmentDao;
     this.stationReadDao = stationReadDao;
+    this.readTime = readTimeDao;
   }
 
-  async execute(params) {
+  async execute() {
     try {
+      const time = await this.readTime()
+
       const stations = await this.metereologicalEquipmentDao.getInmetStations();
 
       if (!stations.length) {

@@ -24,6 +24,7 @@ export class CreateReadTime {
         timestamp: yesterdayDate,
       };
     }
+    
     return date;
   }
 }

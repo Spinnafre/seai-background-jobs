@@ -100,25 +100,9 @@ export class InmetScrapper {
     ]);
 
     if (hasNullOrUndefined.isFailure) {
-      return Result.error(hasNullOrUndefined.error);
+      throw new Error(hasNullOrUndefined.error)
     }
 
-    const validMeasures = [
-      "Precipitação Total (mm)",
-      "Vel. do Vento Média (m/s)",
-      "Raj. do Vento Máxima (m/s)",
-      "Temp. Média (°C)",
-      "Temp. Máxima (°C)",
-      "Temp. Mínima (°C)",
-      "Umi. Média (%)",
-      "Umi. Mínima (%)",
-    ];
-
-    const validCountries = ["BRAZIL", "N", "NE", "CO", "SE", "S"];
-
-    const validStationsTypes = ["todas", "automaticas", "convencionais"];
-
-    const validDates = ["diario", "horario", "mensal", "prec", "extremos"];
 
     const hasValidMeasures = Validator.checkIfRawArrayHasValidValues(
       params.params,
@@ -126,7 +110,7 @@ export class InmetScrapper {
     );
 
     if (hasValidMeasures.isFailure) {
-      return Result.error(hasValidMeasures.error);
+      throw new Error(hasValidMeasures.error)
     }
 
     const attrs = [
@@ -157,11 +141,11 @@ export class InmetScrapper {
       );
 
       if (hasValidAttr.isFailure) {
-        return Result.error(hasValidAttr.error);
+        throw new Error(hasValidAttr.error);
       }
     }
 
-    return Result.success(params);
+    return true
   }
 
   #setPageUrl(url) {

@@ -26,4 +26,17 @@ export default {
       "Vel. do Vento Média (m/s)",
     ],
   },
+  validMeasures:[
+    "Precipitação Total (mm)",
+    "Vel. do Vento Média (m/s)",
+    "Raj. do Vento Máxima (m/s)",
+    "Temp. Média (°C)",
+    "Temp. Máxima (°C)",
+    "Temp. Mínima (°C)",
+    "Umi. Média (%)",
+    "Umi. Mínima (%)",
+  ],
+  validCountries : ["BRAZIL", "N", "NE", "CO", "SE", "S"],
+  validStationsTypes :["todas", "automaticas", "convencionais"],
+  validDates :["diario", "horario", "mensal", "prec", "extremos"]
 };
