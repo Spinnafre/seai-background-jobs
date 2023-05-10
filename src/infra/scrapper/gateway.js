@@ -2,8 +2,6 @@
 
 import { setTimeout } from "node:timers/promises";
 
-import { Validator } from "../../utils/Validator.js";
-import { Result } from "../../utils/Result.js";
 import { mapMeasureNameToDomain } from "../../core/mappers/inmet/stationMap.js";
 
 import scrapperConfig from '../../config/scrapper.js'
@@ -13,81 +11,23 @@ export class ScrapperGateway {
   constructor(scrapper) {
     this.#scrapper = scrapper;
   }
-  #concatenateMeasures(stations, measureName) {
-    return new Writable({
-      objectMode: true,
-      write(chunk, enc, next) {
-        const { date, name, code, state, country, latitude, longitude, value } =
-          chunk;
 
-        if (!stations.has(code)) {
-          stations.set(code, {
-            date,
-            code,
-            name,
-            state,
-            country,
-          });
-        }
+  async getStationsWithMeasures(measuresCodesToQuery,stationsCodesToQuery=[],state) {
+    
+    const stationsWithMeasures = new Map();
 
-        stations.set(
-          code,
-          Object.assign(stations.get(code), {
-            [measureName]: value,
-          })
-        );
-
-        next();
-      },
-    });
-  }
-
-  #filterMeasuresByState() {
-    return new Transform({
-      objectMode: true,
-      transform(chunk, enc, cb) {
-        const { state } = chunk;
-        if (filter) {
-          if (filter == state) return cb(null, chunk);
-          else return cb(null);
-        } else {
-          cb(null, chunk);
-        }
-      },
-    });
-  }
-  #formatStations(stations = []) {
-    return stations.map((station) => {
-      const { codigo, nome, estado, regiao, latitude, longitude, valor } =
-        station;
-
-      return {
-        name: nome,
-        code: codigo,
-        state: estado,
-        country: regiao,
-        latitude,
-        longitude,
-        value: valor,
-      }
-    })
-  }
-
-  async #getMeasures(measuresCodes) {
-    const stations = new Map();
-
-    for (const measureCode of measuresCodes) {
+    for (const measureToQueryCode of measuresCodesToQuery) {
       //Selecionar medição
       const selectMeasureTypeButton = await this.#scrapper.getElementHandler(
         "#estacao-parametro"
       );
-      await selectMeasureTypeButton.select(measureCode);
+      await selectMeasureTypeButton.select(measureToQueryCode);
 
       await this.#scrapper.elementEvaluate("#btn-estacao-BUSCAR", (btn) => {
         btn.click();
       });
 
-      console.log(`[🔍] Buscando dados da medição ${measureCode}`);
+      console.log(`[🔍] Buscando dados da medição ${measureToQueryCode}`);
 
       const data = await this.#scrapper.getJSONResponseFromRequest(scrapperConfig.page.url, "OPTIONS");
 
@@ -96,32 +36,39 @@ export class ScrapperGateway {
 
         const { estacoes } = data;
 
-        const filteredStationsByState = estacoes.filter((station) => station.estado == state)
-
-        const measureName = mapMeasureNameToDomain(measureCode.split("-")[0])
-
-        const stations = this.#formatStations(estacoes)
-
-        await pipeline(
-          this.#formatMeasures(),
-          this.#filterMeasuresByState(),
-          this.#concatenateMeasures(stations, measureName)
+        const stations = estacoes.filter(
+          (station) => station.estado === state && stationsCodesToQuery.includes(station.code)
         );
+
+        const measureName = mapMeasureNameToDomain(measureToQueryCode.split("-")[0])
+
+        stations.forEach((station) => {
+          const { codigo, nome, estado, regiao,valor } =
+            station;
+
+            if (!stationsWithMeasures.has(codigo)) {
+              stationsWithMeasures.set(codigo, {
+                code:codigo,
+                name:nome,
+                state:estado,
+                country:regiao,
+              });
+            }
+    
+            stationsWithMeasures.set(
+              codigo,
+              Object.assign(stationsWithMeasures.get(codigo), {
+                [measureName]: valor,
+              })
+            );
+        })
+
       }
     }
 
-    return [...stations.values()];
+    return [...stationsWithMeasures.values()];
   }
 
-  setParams(params) {
-    const paramsOrError = this.#validateParams(params);
-
-    if (paramsOrError.isSuccess) {
-      this.#props = params;
-    }
-
-    return paramsOrError;
-  }
 
   async getStations(params = {
     country: "",
@@ -176,12 +123,12 @@ export class ScrapperGateway {
 
     await this.#scrapper.waitForElement(".btn-green");
 
-    const stationsWithMeasures = await this.#getMeasuresFromParameters(
+    const stationsWithMeasures = await this.getStationsWithMeasures(
       measuresCodes
     );
 
     await this.closeBrowser();
 
-    return stationsWithMeasures;
+    return stationsWithMeasures
   }
 }
