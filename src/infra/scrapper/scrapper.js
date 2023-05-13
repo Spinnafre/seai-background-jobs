@@ -1,5 +1,7 @@
 import puppeteer from "puppeteer";
 
+import { setTimeout } from "node:timers/promises";
+
 export class Scrapper {
     #pageHandler = null
 
@@ -42,6 +44,8 @@ export class Scrapper {
         this.#pageHandler = await this.#browserInstance.newPage();
 
         await this.#pageHandler.setBypassCSP(this.#scrapperConfig.bypass);
+
+        await setTimeout(300);
 
         this.#pageHandler.on("load", () => console.log("Página carregada com sucesso"));
         this.#pageHandler.on("error", (err) => console.log("Erro ao  ", err));
@@ -103,8 +107,9 @@ export class Scrapper {
         return data;
     }
 
-    async selectDropdown(elementHandler, value) {
-        await elementHandler.select(value);
+    async selectInputValue(selector,value) {
+        const input = await this.getElementHandler(selector);
+        await input.select(value);
     }
 
     async waitForElement(selector, timeout) {

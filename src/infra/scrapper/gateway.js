@@ -1,22 +1,63 @@
 "use strict";
 
-import { setTimeout } from "node:timers/promises";
-
 import { mapMeasureNameToDomain } from "../../core/mappers/inmet/stationMap.js";
 
 import scrapperConfig from '../../config/scrapper.js'
 
-export class ScrapperGateway {
+export class InmetDataMiner {
   #scrapper
   constructor(scrapper) {
     this.#scrapper = scrapper;
   }
+  async getStations(params = {
+    country: "",
+    stations_type: "",
+    stations_codes:[],
+    state: "",
+    date_type: "",
+    measures_names: [],
+  }) {
+    const { country, stations_type,stations_codes, state,
+      date_type, measures_names } = params
 
-  async getStationsWithMeasures(measuresCodesToQuery,stationsCodesToQuery=[],state) {
-    
+    await this.#scrapper.openNewTab()
+
+    await this.#scrapper.navigateToUrl(scrapperConfig.page.url,scrapperConfig.page.timeout)
+
+    await this.#scrapper.waitForElement(".sidebar", scrapperConfig.page.timeout)
+  
+
+    for(const {value,selector} of [
+      { value: country, selector: "#estacao-regiao" },
+      { value: stations_type, selector: "#estacao-tipo" },
+      { value: date_type, selector: "#estacao-tipo-dados" }
+    ]){
+      await this.#scrapper.selectInputsValues(selector,value)
+    }
+
+    await this.#scrapper.waitForElement(".btn-green");
+
+    // Get measures codes from measures names
+    const measuresCodes = await this.#scrapper.pageEvaluate(measures_names, (params) => {
+      const options = document.querySelector("#estacao-parametro").children;
+
+      return Array.from(options)
+        .filter((option) => params.includes(option.innerHTML))
+        .map((option) => option.value);
+    })
+
+
+    if (!measuresCodes.length) {
+      await this.#scrapper.closeBrowser();
+
+      throw new Error(
+        "Não foi possível obter identificadores dos parâmetros das medições das estações"
+      );
+    }
+
     const stationsWithMeasures = new Map();
 
-    for (const measureToQueryCode of measuresCodesToQuery) {
+    for (const measureToQueryCode of measuresCodes) {
       //Selecionar medição
       const selectMeasureTypeButton = await this.#scrapper.getElementHandler(
         "#estacao-parametro"
@@ -37,7 +78,7 @@ export class ScrapperGateway {
         const { estacoes } = data;
 
         const stations = estacoes.filter(
-          (station) => station.estado === state && stationsCodesToQuery.includes(station.code)
+          (station) => station.estado === state && stations_codes.includes(station.code)
         );
 
         const measureName = mapMeasureNameToDomain(measureToQueryCode.split("-")[0])
@@ -45,7 +86,7 @@ export class ScrapperGateway {
         stations.forEach((station) => {
           const { codigo, nome, estado, regiao,valor } =
             station;
-
+            
             if (!stationsWithMeasures.has(codigo)) {
               stationsWithMeasures.set(codigo, {
                 code:codigo,
@@ -54,7 +95,6 @@ export class ScrapperGateway {
                 country:regiao,
               });
             }
-    
             stationsWithMeasures.set(
               codigo,
               Object.assign(stationsWithMeasures.get(codigo), {
@@ -66,69 +106,8 @@ export class ScrapperGateway {
       }
     }
 
-    return [...stationsWithMeasures.values()];
-  }
-
-
-  async getStations(params = {
-    country: "",
-    stations_type: "",
-    state: "",
-    date_type: "",
-    date: "",
-    measures: [],
-  }) {
-    const { country, stations_type, state,
-      date_type, measures } = params
-
-    await this.#scrapper.openNewTab()
-
-    await setTimeout(500);
-
-    await this.#scrapper.waitForElement(".sidebar", 20000)
-
-    await setTimeout(500);
-
-    const formInputsSelectors = [
-      { value: country, selector: "#estacao-regiao" },
-      { value: stations_type, selector: "#estacao-tipo" },
-      { value: date_type, selector: "#estacao-tipo-dados" },
-    ];
-
-    //Select items from form dropdowns
-    for (const { value, selector } of formInputsSelectors) {
-      const input = await this.#scrapper.getElementHandler(selector);
-      await input.select(value);
-    }
-
-    await setTimeout(100);
-
-    // Get measures codes from page
-    const measuresCodes = await this.#scrapper.pageEvaluate(measures, (params) => {
-      const options = document.querySelector("#estacao-parametro").children;
-
-      return Array.from(options)
-        .filter((option) => params.includes(option.innerHTML))
-        .map((option) => option.value);
-    })
-
-
-    if (!measuresCodes.length) {
-      await this.closeBrowser();
-
-      throw new Error(
-        "Não foi possível obter identificadores dos parâmetros das medições das estações"
-      );
-    }
-
-    await this.#scrapper.waitForElement(".btn-green");
-
-    const stationsWithMeasures = await this.getStationsWithMeasures(
-      measuresCodes
-    );
-
     await this.closeBrowser();
 
-    return stationsWithMeasures
+    return [...stationsWithMeasures.values()]
   }
 }
