@@ -120,6 +120,6 @@ export class InmetDataMiner {
 
     await this.closeBrowser();
 
-    return [...stationsWithMeasures.values()];
+    return stationsWithMeasures;
   }
 }

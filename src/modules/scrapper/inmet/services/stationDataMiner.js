@@ -46,11 +46,11 @@ export class StationDataMiner extends Command {
       timeoutPromise,
     ]);
 
-    if (measures.length === false) {
-      this.logs.addErrorLog("Falha ao obter dados das medições do INMET");
+    // if (measures.length === false) {
+    //   this.logs.addErrorLog("Falha ao obter dados das medições do INMET");
 
-      return;
-    }
+    //   return;
+    // }
 
     this.logs.addInfoLog("Sucesso ao obter dados das medições do INMET");
 
