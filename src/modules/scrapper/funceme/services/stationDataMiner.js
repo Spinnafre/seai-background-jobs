@@ -8,28 +8,22 @@ export class ExtractStationsFromFunceme extends Command {
   }
 
   async execute(params) {
-    try {
-      const stations =
-        await this.metereologicalEquipmentDao.getFuncemeStations();
+    const stations = await this.metereologicalEquipmentDao.getFuncemeStations();
 
-      if (!stations.length) {
-        this.logs.addWarningLog("Não há estações da FUNCEME cadastradas");
-        return;
-      }
-
-      const codes = stations.map((station) => station.code);
-
-      const measures = await this.dataMiner.getStationsByCodesAndDate(
-        codes,
-        params.getDate()
-      );
-
-      await this.stationReadDao.create(stations, measures, params.idTimestamp);
-
-      this.logs.addInfoLog("Sucesso ao salvar leituras de estações da FUNCEME");
-    } catch (error) {
-      console.error(error);
-      this.logs.addInfoLog(error.message);
+    if (!stations.length) {
+      this.logs.addWarningLog("Não há estações da FUNCEME cadastradas");
+      return;
     }
+
+    const codes = stations.map((station) => station.code);
+
+    const measures = await this.dataMiner.getStationsByCodesAndDate(
+      codes,
+      params.getDate()
+    );
+
+    await this.stationReadDao.create(stations, measures, params.idTimestamp);
+
+    this.logs.addInfoLog("Sucesso ao salvar leituras de estações da FUNCEME");
   }
 }
