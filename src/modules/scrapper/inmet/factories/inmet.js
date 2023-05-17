@@ -10,33 +10,41 @@ import { StationReadDao } from "../../infra/database/postgreSQL/entities/station
 
 import { StationDataMiner } from "../services/stationDataMiner.js";
 import scrapperConfig from "../../config/scrapper.js";
+export class InmetFactory {
+  constructor() {
+    this.#scrapper = null;
+  }
 
-export default () => {
-  const scrapper = new Scrapper({
-    bypass: scrapperConfig.launchConfig.bypass,
-    launch: scrapperConfig.launchConfig.launch,
-    timeout: scrapperConfig.page.timeout,
-    userAgent: scrapperConfig.launchConfig.userAgent,
-  });
+  buildConnection() {
+    this.#scrapper = new Scrapper({
+      bypass: scrapperConfig.launchConfig.bypass,
+      launch: scrapperConfig.launchConfig.launch,
+      timeout: scrapperConfig.page.timeout,
+      userAgent: scrapperConfig.launchConfig.userAgent,
+    });
+  }
 
-  const dataMiner = new InmetDataMiner(scrapper);
+  buildLogs() {
+    return new InmetLog();
+  }
 
-  const metereologicalEquipment = new MetereologicalEquipmentDao();
+  buildServices() {
+    const dataMiner = new InmetDataMiner(this.#scrapper);
 
-  const stationDao = new StationReadDao();
-  const pluviometerDao = new PluviometerReadDao();
+    const metereologicalEquipment = new MetereologicalEquipmentDao();
 
-  const stationDataMiner = new StationDataMiner(
-    dataMiner,
-    metereologicalEquipment,
-    stationDao,
-    pluviometerDao
-  );
+    const stationDao = new StationReadDao();
+    const pluviometerDao = new PluviometerReadDao();
 
-  const logDao = new InmetLog();
+    const stationDataMiner = new StationDataMiner(
+      dataMiner,
+      metereologicalEquipment,
+      stationDao,
+      pluviometerDao
+    );
 
-  return {
-    stationDataMiner,
-    logs: logDao,
-  };
-};
+    return {
+      service: stationDataMiner,
+    };
+  }
+}

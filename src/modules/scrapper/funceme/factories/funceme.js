@@ -8,32 +8,44 @@ import { PluviometerReadDao } from "../../infra/database/postgreSQL/entities/plu
 
 import { ExtractPluviometersFromFunceme } from "../services/pluviometerDataMiner.js";
 import { ExtractStationsFromFunceme } from "../services/stationDataMiner.js";
+import { FTPClientAdapter } from "../../infra/scrapper/ftp/connection/ftp.js";
+export class FuncemeFactory {
+  constructor() {
+    this.#ftpClient = null;
+  }
 
-export default (client) => {
-  const funcemeDataMiner = new FuncemeDataMiner(client);
+  buildConnection() {
+    this.#ftpClient = FTPClientAdapter.create();
+    return this.#ftpClient;
+  }
 
-  const metereologicalEquipment = new MetereologicalEquipmentDao();
+  buildLogs() {
+    return new FuncemeLog();
+  }
 
-  const stationDao = new StationReadDao();
-  const pluviometerDao = new PluviometerReadDao();
+  buildServices() {
+    const funcemeDataMiner = new FuncemeDataMiner(this.#ftpClient);
 
-  const pluviomerDataMiner = new ExtractPluviometersFromFunceme(
-    funcemeDataMiner,
-    metereologicalEquipment,
-    pluviometerDao
-  );
+    const metereologicalEquipment = new MetereologicalEquipmentDao();
 
-  const stationDataMiner = new ExtractStationsFromFunceme(
-    funcemeDataMiner,
-    metereologicalEquipment,
-    stationDao
-  );
+    const stationDao = new StationReadDao();
+    const pluviometerDao = new PluviometerReadDao();
 
-  const logDao = new FuncemeLog();
+    const pluviometerDataMiner = new ExtractPluviometersFromFunceme(
+      funcemeDataMiner,
+      metereologicalEquipment,
+      pluviometerDao
+    );
 
-  return {
-    pluviomerDataMiner,
-    stationDataMiner,
-    logs: logDao,
-  };
-};
+    const stationDataMiner = new ExtractStationsFromFunceme(
+      funcemeDataMiner,
+      metereologicalEquipment,
+      stationDao
+    );
+
+    return {
+      stationService: stationDataMiner,
+      pluviometerService: pluviometerDataMiner,
+    };
+  }
+}

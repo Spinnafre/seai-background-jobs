@@ -2,7 +2,7 @@ import { setTimeout } from "node:timers/promises";
 
 import scrapperConfig from "../../config/scrapper.js";
 
-import { Command } from "../../../scrapper/core/commands/command.js";
+import { Command } from "../../core/commands/command.js";
 
 export class StationDataMiner extends Command {
   constructor(
@@ -46,11 +46,14 @@ export class StationDataMiner extends Command {
       timeoutPromise,
     ]);
 
-    // if (measures.length === false) {
-    //   this.logs.addErrorLog("Falha ao obter dados das medições do INMET");
+    const pluviometers = equipments.filter(
+      (eqp) => eqp.Type.Name === "pluviometer"
+    );
 
-    //   return;
-    // }
+    const stations = equipments.filter((eqp) => eqp.Type.Name === "station");
+
+    //TO-DO => Buscar medições de pluviÔmetros vindo de measures
+    //TO-DO => Buscar medições de estações vindo de measures
 
     this.logs.addInfoLog("Sucesso ao obter dados das medições do INMET");
 

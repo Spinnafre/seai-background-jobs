@@ -81,8 +81,6 @@ class FTPClientAdapter {
     });
   }
 
-  async;
-
   async getFile(folder, file) {
     console.log(`[🔍] Getting stream from path ${folder}/${file}`);
     return new Promise((resolve, reject) => {

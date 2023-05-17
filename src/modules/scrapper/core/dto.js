@@ -1,4 +1,4 @@
-import { FormatDate } from "../../../shared/index.js";
+import { FormatDate } from "../../shared/index.js";
 
 class DTO {
   timestamp;
