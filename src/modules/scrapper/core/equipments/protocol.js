@@ -3,6 +3,7 @@ class EntityProtocol {
     code: "",
     name: "",
     organ: {},
+    type: "",
   };
 
   #id;
@@ -34,6 +35,10 @@ class EntityProtocol {
 
   get organ() {
     return this.#props.organ;
+  }
+
+  get type() {
+    return this.#props.type;
   }
 }
 

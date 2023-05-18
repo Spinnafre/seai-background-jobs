@@ -2,6 +2,7 @@ import { Command } from "../../../scrapper/core/commands/command.js";
 
 export class ExtractPluviometersFromFunceme extends Command {
   constructor(dataMiner, metereologicalEquipmentDao, pluviometerReadDao) {
+    super();
     this.dataMiner = dataMiner;
     this.metereologicalEquipmentDao = metereologicalEquipmentDao;
     this.pluviometerReadDao = pluviometerReadDao;

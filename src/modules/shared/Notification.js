@@ -30,6 +30,6 @@ export class Notification {
   }
 
   getLogs() {
-    this.#notifications;
+    return this.#notifications;
   }
 }

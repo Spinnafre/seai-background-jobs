@@ -1,7 +1,7 @@
 export default {
   page: {
     url: "https://mapas.inmet.gov.br",
-    timeout: 40000,
+    timeout: 70000,
   },
   toleranceTime: 60000,
   maxAttempts: 3,
@@ -20,13 +20,13 @@ export default {
     stations_type: "automaticas",
     state: "CE",
     date_type: "diario",
-    measures_names: [
-      "Precipitação Total (mm)",
-      "Temp. Média (°C)",
-      "Umi. Média (%)",
-      "Vel. do Vento Média (m/s)",
-    ],
   },
+  stations_measures: [
+    "Temp. Média (°C)",
+    "Umi. Média (%)",
+    "Vel. do Vento Média (m/s)",
+  ],
+  pluviometers_measures: ["Precipitação Total (mm)"],
   validMeasures: [
     "Precipitação Total (mm)",
     "Vel. do Vento Média (m/s)",

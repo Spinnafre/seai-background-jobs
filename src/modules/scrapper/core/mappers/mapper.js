@@ -1,6 +1,24 @@
 import { Equipment } from "../equipments/equipment.js";
 
 export class Mapper {
+  static mapMeasuresNamesToDomain(rawMeasures = []) {
+    return rawMeasures.map((measure) => {
+      return mapMeasureNameToDomain(measure);
+    });
+  }
+
+  static mapMeasureNameToDomain(rawMeasure) {
+    const measuresNames = {
+      temperatura: "temperature",
+      ventovel: "windSpeed",
+      umidade: "humidity",
+      precipitacao: "precipitation",
+    };
+
+    const measureName = rawMeasure;
+    return measuresNames[measureName];
+  }
+
   static stationMeasures(measures) {
     const [date, temperature, humidity, radiation] = Object.values(measures);
 
@@ -26,6 +44,7 @@ export class Mapper {
       IdEquipmentExternal,
       IdEquipment,
       Name,
+      Type,
       FK_Organ,
       Organ,
       Altitude,
@@ -39,6 +58,7 @@ export class Mapper {
           id: FK_Organ,
           name: Organ,
         },
+        type: Type.Name,
       },
       IdEquipment,
       Altitude
@@ -49,7 +69,7 @@ export class Mapper {
     return rawList.map((raw) => Mapper.equipmentToDomain(raw));
   }
 
-  static stationsToPersistency(stations = [], measures = [], idTime) {
+  static stationsToPersistency(stations = [], measures = []) {
     return stations.map((station) => {
       const measure =
         measures && measures.find((item) => item.code === station.code);
@@ -60,7 +80,7 @@ export class Mapper {
           RelativeHumidity: null,
           AtmosphericTemperature: null,
           WindVelocity: null,
-          FK_Time: idTime,
+          FK_Time: null,
           FK_Organ: station.organ.id,
           FK_Equipment: station.id,
         };
@@ -73,14 +93,14 @@ export class Mapper {
         RelativeHumidity: humidity,
         AtmosphericTemperature: temperature,
         WindVelocity: windSpeed,
-        FK_Time: idTime,
+        FK_Time: null,
         FK_Organ: station.organ.id,
         FK_Equipment: station.id,
       };
     });
   }
 
-  static pluviometerToPersistency(pluviometers = [], measures = [], idTime) {
+  static pluviometerToPersistency(pluviometers = [], measures = []) {
     return pluviometers.map((pluviometer) => {
       const measure =
         measures && measures.find((item) => item.code === pluviometer.code);
@@ -88,17 +108,17 @@ export class Mapper {
       if (!measure) {
         return {
           Value: null,
-          FK_Time: idTime,
+          FK_Time: null,
           FK_Organ: pluviometer.organ.id,
           FK_Equipment: pluviometer.id,
         };
       }
 
-      const { pluviometer } = measure;
+      // const { pluviometer } = measure;
 
       return {
-        Value: pluviometer,
-        FK_Time: idTime,
+        Value: measure.pluviometer,
+        FK_Time: null,
         FK_Organ: pluviometer.organ.id,
         FK_Equipment: pluviometer.id,
       };

@@ -1,14 +1,13 @@
-import { Notification } from "../../utils/index.js";
+import { Notification } from "../../../shared/Notification.js";
 
 export class Command {
-  #logs;
+  logs;
   constructor() {
-    this.#params = null;
-    this.#logs = new Notification();
+    this.logs = new Notification();
   }
 
   getLogs() {
-    return this.#logs.getLogs();
+    return this.logs.getLogs();
   }
 
   async execute(params) {

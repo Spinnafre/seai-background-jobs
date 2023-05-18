@@ -1,49 +1,32 @@
 "use strict";
 
-import { Mapper } from "../../../core/mappers/mapper.js";
+import { Mapper } from "../../../../src/modules/scrapper/core/mappers/mapper.js";
 
-import scrapperConfig from "../../../config/scrapper.js";
+import scrapperConfig from "../../../../src/modules/scrapper/config/scrapper.js";
 
 import { setTimeout } from "timers/promises";
+
 export class InmetDataMiner {
   #scrapper;
   constructor(scrapper) {
     this.#scrapper = scrapper;
   }
+
   async getMeasuresCodes(measures_names) {
-    const codes = await this.#scrapper.pageEvaluate(measures_names, (param) => {
+    return await this.#scrapper.pageEvaluate(measures_names, (param) => {
       const options = document.querySelector("#estacao-parametro").children;
 
       return Array.from(options)
         .filter((option) => param.includes(option.innerHTML))
         .map((option) => option.value);
     });
-    console.log("codes ", codes);
-    // Selecionar o botão de buscar estações
-    await this.#scrapper.waitForElement(".btn-green");
-
-    return codes;
   }
 
-  async fetchMeasuresData(measureCode, eqpCodes, location) {
-    //Selecionar medição
-    const selectMeasureTypeButton = await this.#scrapper.getElementHandler(
-      "#estacao-parametro"
-    );
-
-    await selectMeasureTypeButton.select(measureCode);
-
-    await this.#scrapper.elementEvaluate("#btn-estacao-BUSCAR", (btn) => {
-      btn.click();
-    });
-
-    console.log(`[🔍] Buscando dados da medição ${measureCode}`);
-
+  async fetchMeasuresData(codes, location) {
     const response = await this.#scrapper.getJSONResponseFromRequest(
       "apimapas.inmet.gov.br/dados",
       "OPTIONS"
     );
-    console.log(response);
 
     if (response) {
       console.log("[✅] Sucesso ao obter dados de medição ");
@@ -52,7 +35,7 @@ export class InmetDataMiner {
 
       const measures = estacoes.filter(
         (station) =>
-          station.estado === location && eqpCodes.includes(station.codigo)
+          station.estado === location && codes.includes(station.codigo)
       );
 
       return measures;
@@ -70,7 +53,7 @@ export class InmetDataMiner {
 
     if (!measuresCodes.length) {
       console.log(
-        "Não foi possível obter identificadores dos parâmetros das medições"
+        "Não foi possível obter identificadores dos parâmetros das medições das estações"
       );
       return;
     }
@@ -79,7 +62,6 @@ export class InmetDataMiner {
 
     for (const measureToQueryCode of measuresCodes) {
       const measures = await this.fetchMeasuresData(
-        measureToQueryCode,
         equipments_codes,
         location_state
       );
@@ -143,7 +125,7 @@ export class InmetDataMiner {
       scrapperConfig.page.timeout
     );
 
-    await setTimeout(1000);
+    await setTimeout(500);
 
     //Esperar o menu com os filtros do mapa de estações serem carregados
     await this.#scrapper.waitForElement(
@@ -159,33 +141,32 @@ export class InmetDataMiner {
       await this.#scrapper.selectInputValue(selector, value);
     }
 
-    await setTimeout(1000);
-
     /*
       [] - TODO-SELECIONAR O CAMPO DE DATA CASO FOR PASSADO ALGUMA DATA
     */
 
-    const stationsMeasures =
-      equipments_codes.stations.length &&
-      (await this.getEquipmentWithMeasures(
-        scrapperConfig.stations_measures,
-        equipments_codes.stations,
-        state
-      ));
+    // Selecionar o botão de buscar estações
+    await this.#scrapper.waitForElement(".btn-green");
 
-    const pluviometersMeasures =
-      equipments_codes.pluviometers.length &&
-      (await this.getEquipmentWithMeasures(
-        scrapperConfig.pluviometers_measures,
-        equipments_codes.pluviometers,
-        state
-      ));
+    await setTimeout(200);
+
+    const stations = await this.getEquipmentWithMeasures(
+      scrapperConfig.stations_measures,
+      equipments_codes.stations,
+      state
+    );
+
+    const pluviometers = await this.getEquipmentWithMeasures(
+      scrapperConfig.pluviometers_measures,
+      equipments_codes.pluviometers,
+      state
+    );
 
     await this.#scrapper.closeBrowser();
 
     return {
-      stationsMeasures,
-      pluviometersMeasures,
+      stations,
+      pluviometers,
     };
   }
 }

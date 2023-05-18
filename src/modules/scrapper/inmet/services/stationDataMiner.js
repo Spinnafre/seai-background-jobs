@@ -11,6 +11,7 @@ export class StationDataMiner extends Command {
     stationReadDao,
     pluviometerReadDao
   ) {
+    super();
     this.dataMiner = dataMiner;
     this.metereologicalEquipmentDao = metereologicalEquipmentDao;
     this.stationReadDao = stationReadDao;
@@ -18,6 +19,7 @@ export class StationDataMiner extends Command {
   }
 
   async execute(params) {
+    // Futura melhoria = buscar dados das estações passando uma DATA
     const equipments =
       await this.metereologicalEquipmentDao.getInmetEquipments();
 
@@ -26,7 +28,13 @@ export class StationDataMiner extends Command {
       return;
     }
 
-    const eqpCodes = equipments.map((eqp) => eqp.code);
+    const pluviometersEqp = equipments.filter(
+      (eqp) => eqp.type === "pluviometer"
+    );
+    const pluviometersEqpCodes = pluviometersEqp.map((eqp) => eqp.code);
+
+    const stationsEqp = equipments.filter((eqp) => eqp.type === "station");
+    const stationsEqpCodes = stationsEqp.map((eqp) => eqp.code);
 
     const timeoutPromise = new Promise((resolve, reject) => {
       setTimeout(
@@ -40,23 +48,33 @@ export class StationDataMiner extends Command {
 
     const measures = await Promise.race([
       this.dataMiner.getMeasures({
-        codes: eqpCodes,
+        equipments_codes: {
+          stations: stationsEqpCodes,
+          pluviometers: pluviometersEqpCodes,
+        },
         ...scrapperConfig.params,
       }),
       timeoutPromise,
     ]);
 
-    const pluviometers = equipments.filter(
-      (eqp) => eqp.Type.Name === "pluviometer"
-    );
+    const { stationsMeasures, pluviometersMeasures } = measures;
 
-    const stations = equipments.filter((eqp) => eqp.Type.Name === "station");
+    if (stationsEqp.length) {
+      await this.stationReadDao.create(stationsEqp, stationsMeasures);
 
-    //TO-DO => Buscar medições de pluviÔmetros vindo de measures
-    //TO-DO => Buscar medições de estações vindo de measures
+      this.logs.addInfoLog(
+        "Sucesso ao salvar dados das medições de estação do INMET"
+      );
+    }
 
-    this.logs.addInfoLog("Sucesso ao obter dados das medições do INMET");
-
-    await this.stationReadDao.create(stations, measures, params.idTimestamp);
+    if (pluviometersEqp.length) {
+      // await this.pluviometerReadDao.create(
+      //   pluviometersEqp,
+      //   pluviometersMeasures
+      // );
+      // this.logs.addInfoLog(
+      //   "Sucesso ao salvar dados das medições de pluviômetros do INMET"
+      // );
+    }
   }
 }

@@ -11,19 +11,21 @@ import {
   afterAll,
 } from "@jest/globals";
 
-import { InmetScrapper } from "../../src/infra/scrapper/inmet-scrapper.js";
+import { Scrapper } from "../../src/modules/scrapper/infra/scrapper/webScrapper/adapters/puppeteer.js";
+import { InmetDataMiner } from "../../src/modules/scrapper/infra/scrapper/webScrapper/InmetDataMiner.js";
 
-import { InmetDataMiner } from "../../src/commands/inmetDataMiner.js";
+import { StationDataMiner } from "../../src/modules/scrapper/inmet/services/stationDataMiner.js";
 
-import { MetereologicalEquipmentInMemory } from "../../src/infra/database/inMemoryDataAccess/metereologicalEquipment.js";
+import { MetereologicalEquipmentInMemory } from "../../src/modules/scrapper/infra/database/inMemory/entities/metereologicalEquipment.js";
 
-import { StationRead } from "../../src/infra/database/inMemoryDataAccess/stationRead.js";
+import { StationRead } from "../../src/modules/scrapper/infra/database/inMemory/entities/stationRead.js";
 
-import { ReadTimeInMemory } from "../../src/infra/database/inMemoryDataAccess/readTime.js";
-import {
-  formatDateToForwardSlash,
-  getYesterdayTimestamp,
-} from "../../src/utils/date.js";
+// import { ReadTimeInMemory } from "../../src/infra/database/inMemoryDataAccess/readTime.js";
+
+// import {
+//   formatDateToForwardSlash,
+//   getYesterdayTimestamp,
+// } from "../../src/utils/date.js";
 
 jest.setTimeout(60000);
 
@@ -42,7 +44,9 @@ let params = {
 
 let metereologicalEquipmentDao = null;
 let stationReadDao = null;
-let inmetDataMiner = null;
+let service = null;
+let dataMiner = null;
+let scrapper = null;
 
 describe("#Extrat station from inmet service", () => {
   afterEach(() => {
@@ -50,33 +54,41 @@ describe("#Extrat station from inmet service", () => {
   });
 
   beforeEach(() => {
+    scrapper = new Scrapper({
+      bypass: true,
+      launch: {
+        headless: true,
+        args: ["--no-sandbox"],
+      },
+      timeout: 60000,
+      userAgent:
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36",
+    });
+    dataMiner = new InmetDataMiner(scrapper);
     metereologicalEquipmentDao = new MetereologicalEquipmentInMemory();
-    inmetScrapper = InmetScrapper;
     stationReadDao = new StationRead();
 
-    inmetDataMiner = new InmetDataMiner(
-      inmetScrapper,
+    service = new StationDataMiner(
+      dataMiner,
       metereologicalEquipmentDao,
       stationReadDao
     );
-
-    readTimeDao = new ReadTimeInMemory();
   });
 
   test("When stations equipments not exists, shouldn't be able to get stations from INMET page", async function () {
-    const yesterdayDate = getYesterdayTimestamp();
+    // const yesterdayDate = getYesterdayTimestamp();
     // Irá ser responsabilidade de um serviço principal
-    const lastDate = {
-      IdTime: 1,
-      Time: yesterdayDate,
-    };
+    // const lastDate = {
+    //   IdTime: 1,
+    //   Time: yesterdayDate,
+    // };
 
-    const getStationsSpy = jest.spyOn(inmetDataMiner, "getStations");
+    // const getStationsSpy = jest.spyOn(inmetDataMiner, "getStations");
     const saveStationsReadsSpy = jest.spyOn(stationReadDao, "create");
 
-    await inmetDataMiner.execute(lastDate);
+    await service.execute();
 
-    expect(getStationsSpy).not.toBeCalled();
+    // expect(getStationsSpy).not.toBeCalled();
     expect(saveStationsReadsSpy).not.toBeCalled();
   });
 
@@ -100,23 +112,24 @@ describe("#Extrat station from inmet service", () => {
       },
     ];
 
+    const fn = jest.mo;
+
     await metereologicalEquipmentDao.createMetereologicalEquipment(equipments);
 
-    const yesterdayDate = getYesterdayTimestamp();
+    // const yesterdayDate = getYesterdayTimestamp();
 
-    const lastDate = {
-      IdTime: 1,
-      Time: yesterdayDate,
-    };
+    // const lastDate = {
+    //   IdTime: 1,
+    //   Time: yesterdayDate,
+    // };
 
-    await inmetDataMiner.execute(lastDate);
+    await service.execute();
 
     const station = await stationReadDao.list();
 
     console.log(station);
   });
 
-  jest.retryTimes(3);
   test("Shouldn't be able to get station from INMET when timeout is equal to tolerance time ", async function () {
     // const service = new ExtractStationsFromInmet(InmetScrapper);
     // const timeout = 2000;
