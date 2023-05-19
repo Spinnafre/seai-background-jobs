@@ -22,15 +22,8 @@ export class Mapper {
   }
 
   static equipmentToDomain(raw) {
-    const {
-      IdEquipmentExternal,
-      IdEquipment,
-      Name,
-      Type,
-      FK_Organ,
-      Organ,
-      Altitude,
-    } = raw;
+    const { IdEquipmentExternal, IdEquipment, Name, Type, FK_Organ, Altitude } =
+      raw;
 
     return new Equipment(
       {
@@ -38,7 +31,6 @@ export class Mapper {
         name: Name,
         organ: {
           id: FK_Organ,
-          name: Organ,
         },
         type: Type.Name,
       },

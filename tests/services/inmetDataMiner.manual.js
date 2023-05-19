@@ -7,19 +7,6 @@ import { MetereologicalEquipmentInMemory } from "../../src/modules/scrapper/infr
 
 import { StationRead } from "../../src/modules/scrapper/infra/database/inMemory/entities/stationRead.js";
 
-let params = {
-  country: "NE",
-  stations_type: "automaticas",
-  state: "CE",
-  date_type: "diario",
-  params: [
-    "Precipitação Total (mm)",
-    "Temp. Média (°C)",
-    "Umi. Média (%)",
-    "Vel. do Vento Média (m/s)",
-  ],
-};
-
 let metereologicalEquipmentDao = null;
 let stationReadDao = null;
 let service = null;

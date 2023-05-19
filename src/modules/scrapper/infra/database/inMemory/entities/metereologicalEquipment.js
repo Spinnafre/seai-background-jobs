@@ -9,7 +9,7 @@ export class MetereologicalEquipmentInMemory {
 
   async getFuncemeStations() {
     const stations = this.#MetereologicalEquipment.filter(
-      (eqp) => eqp.Type.Name == "station" && eqp.Organ.Name === "FUNCEME"
+      (eqp) => eqp.Type == "station" && eqp.Organ === "FUNCEME"
     );
 
     return Mapper.equipmentsToDomain(stations);
@@ -17,15 +17,38 @@ export class MetereologicalEquipmentInMemory {
 
   async getFuncemePluviometers() {
     const pluviometers = this.#MetereologicalEquipment.filter(
-      (eqp) => eqp.Type.Name == "pluviometer" && eqp.Organ.Name === "FUNCEME"
+      (eqp) => eqp.Type == "pluviometer" && eqp.Organ === "FUNCEME"
     );
 
     return Mapper.equipmentsToDomain(pluviometers);
   }
-  async getInmetEquipments() {
+
+  async getInmetStations() {
     const data = this.#MetereologicalEquipment.filter(
-      (eqp) => eqp.Organ.Name === "INMET"
+      (eqp) => eqp.Type == "station" && eqp.Organ === "INMET"
     );
-    return Mapper.equipmentsToDomain(data);
+
+    const equipments = Mapper.equipmentsToDomain(data);
+
+    const codes = equipments.map((eqp) => eqp.code);
+
+    return {
+      equipments,
+      codes,
+    };
+  }
+
+  async getInmetPluviometers() {
+    const data = this.#MetereologicalEquipment.filter(
+      (eqp) => eqp.Type == "pluviometer" && eqp.Organ === "INMET"
+    );
+    const equipments = Mapper.equipmentsToDomain(data);
+
+    const codes = equipments.map((eqp) => eqp.code);
+
+    return {
+      equipments,
+      codes,
+    };
   }
 }

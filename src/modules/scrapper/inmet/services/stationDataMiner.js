@@ -3,6 +3,7 @@ import { setTimeout } from "node:timers/promises";
 import scrapperConfig from "../../config/scrapper.js";
 
 import { Command } from "../../core/commands/command.js";
+import { Mapper } from "../../core/mappers/mapper.js";
 
 export class StationDataMiner extends Command {
   constructor(
@@ -20,21 +21,10 @@ export class StationDataMiner extends Command {
 
   async execute(params) {
     // Futura melhoria = buscar dados das estações passando uma DATA
-    const equipments =
-      await this.metereologicalEquipmentDao.getInmetEquipments();
+    const stations = await this.metereologicalEquipmentDao.getInmetStations();
 
-    if (!equipments.length) {
-      this.logs.addWarningLog("Não há equipamentos do INMET cadastradas");
-      return;
-    }
-
-    const pluviometersEqp = equipments.filter(
-      (eqp) => eqp.type === "pluviometer"
-    );
-    const pluviometersEqpCodes = pluviometersEqp.map((eqp) => eqp.code);
-
-    const stationsEqp = equipments.filter((eqp) => eqp.type === "station");
-    const stationsEqpCodes = stationsEqp.map((eqp) => eqp.code);
+    const pluviometers =
+      await this.metereologicalEquipmentDao.getInmetPluviometers();
 
     const timeoutPromise = new Promise((resolve, reject) => {
       setTimeout(
@@ -49,8 +39,8 @@ export class StationDataMiner extends Command {
     const measures = await Promise.race([
       this.dataMiner.getMeasures({
         equipments_codes: {
-          stations: stationsEqpCodes,
-          pluviometers: pluviometersEqpCodes,
+          stations: stations.codes,
+          pluviometers: pluviometers.codes,
         },
         ...scrapperConfig.params,
       }),
@@ -59,23 +49,24 @@ export class StationDataMiner extends Command {
 
     const { stationsMeasures, pluviometersMeasures } = measures;
 
-    if (stationsEqp.length) {
-      console.log(stationsMeasures);
-      await this.stationReadDao.create(stationsEqp, stationsMeasures);
-
-      this.logs.addInfoLog(
-        "Sucesso ao salvar dados das medições de estação do INMET"
+    if (stations.equipments.length) {
+      await this.stationReadDao.create(
+        Mapper.stationsToPersistency(stations.equipments, stationsMeasures)
       );
+
+      this.logs.addInfoLog("Sucesso ao salvar dados das medições de estação");
     }
 
-    if (pluviometersEqp.length) {
-      // await this.pluviometerReadDao.create(
-      //   pluviometersEqp,
-      //   pluviometersMeasures
-      // );
-      // this.logs.addInfoLog(
-      //   "Sucesso ao salvar dados das medições de pluviômetros do INMET"
-      // );
+    if (pluviometers.equipments.length) {
+      await this.pluviometerReadDao.create(
+        Mapper.pluviometerToPersistency(
+          pluviometers.equipments,
+          pluviometersMeasures
+        )
+      );
+      this.logs.addInfoLog(
+        "Sucesso ao salvar dados das medições de pluviômetros do INMET"
+      );
     }
   }
 }

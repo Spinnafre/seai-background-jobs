@@ -1,7 +1,5 @@
 "use strict";
 
-import { Mapper } from "../../../core/mappers/mapper.js";
-
 import scrapperConfig from "../../../config/scrapper.js";
 
 import { setTimeout } from "timers/promises";
@@ -38,25 +36,25 @@ export class InmetDataMiner {
     return null;
   }
 
-  async #getAverageTemperature() {
+  async getAverageTemperature() {
     return await this.#fetchMeasureData("temperatura-I104:0000");
   }
-  async #getAverageHumidity() {
+  async getAverageHumidity() {
     return await this.#fetchMeasureData("umidade-I120:0000");
   }
 
-  async #getAverageWindVelocity() {
+  async getAverageWindVelocity() {
     return await this.#fetchMeasureData("ventovel-I009:0000");
   }
 
-  async #getPrecipitation() {
+  async getPrecipitation() {
     return await this.#fetchMeasureData("precipitacao-I006:1200");
   }
 
   async getStations(stations_codes = [], location_state) {
-    const averageTemperature = await this.#getAverageTemperature();
-    const averageWindVelocity = await this.#getAverageWindVelocity();
-    const averageHumidity = await this.#getAverageHumidity();
+    const averageTemperature = await this.getAverageTemperature();
+    const averageWindVelocity = await this.getAverageWindVelocity();
+    const averageHumidity = await this.getAverageHumidity();
 
     const measures = {
       temperature: averageTemperature,
@@ -102,7 +100,7 @@ export class InmetDataMiner {
   }
 
   async getPluviometers(pluviometers_codes = [], location_state) {
-    const precipitations = await this.#getPrecipitation();
+    const precipitations = await this.getPrecipitation();
 
     let measures = [];
 

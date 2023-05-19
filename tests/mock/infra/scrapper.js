@@ -1,5 +1,3 @@
-import { setTimeout } from "node:timers/promises";
-
 export class ScrapperMock {
   #pageHandler = null;
 
