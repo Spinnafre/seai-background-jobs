@@ -1,24 +1,6 @@
 import { Equipment } from "../equipments/equipment.js";
 
 export class Mapper {
-  static mapMeasuresNamesToDomain(rawMeasures = []) {
-    return rawMeasures.map((measure) => {
-      return mapMeasureNameToDomain(measure);
-    });
-  }
-
-  static mapMeasureNameToDomain(rawMeasure) {
-    const measuresNames = {
-      temperatura: "temperature",
-      ventovel: "windSpeed",
-      umidade: "humidity",
-      precipitacao: "precipitation",
-    };
-
-    const measureName = rawMeasure;
-    return measuresNames[measureName];
-  }
-
   static stationMeasures(measures) {
     const [date, temperature, humidity, radiation] = Object.values(measures);
 
@@ -86,13 +68,13 @@ export class Mapper {
         };
       }
 
-      const { radiation, humidity, temperature, windSpeed } = measure;
+      const { radiation, humidity, temperature, windVelocity } = measure;
 
       return {
-        TotalRadiation: radiation,
-        RelativeHumidity: humidity,
-        AtmosphericTemperature: temperature,
-        WindVelocity: windSpeed,
+        TotalRadiation: radiation || null,
+        RelativeHumidity: humidity || null,
+        AtmosphericTemperature: temperature || null,
+        WindVelocity: windVelocity || null,
         FK_Time: null,
         FK_Organ: station.organ.id,
         FK_Equipment: station.id,

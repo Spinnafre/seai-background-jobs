@@ -10,29 +10,12 @@ export class InmetDataMiner {
   constructor(scrapper) {
     this.#scrapper = scrapper;
   }
-  async getMeasuresCodes(measures_names) {
-    const codes = await this.#scrapper.pageEvaluate(measures_names, (param) => {
-      const options = document.querySelector("#estacao-parametro").children;
 
-      return Array.from(options)
-        .filter((option) => param.includes(option.innerHTML))
-        .map((option) => option.value);
-    });
-    console.log("codes ", codes);
-    // Selecionar o botão de buscar estações
-    await this.#scrapper.waitForElement(".btn-green");
-
-    return codes;
-  }
-
-  async fetchMeasuresData(measureCode, eqpCodes, location) {
+  async #fetchMeasureData(measureCode) {
     //Selecionar medição
-    const selectMeasureTypeButton = await this.#scrapper.getElementHandler(
-      "#estacao-parametro"
-    );
+    await this.#scrapper.selectInputValue("#estacao-parametro", measureCode);
 
-    await selectMeasureTypeButton.select(measureCode);
-
+    //Submit
     await this.#scrapper.elementEvaluate("#btn-estacao-BUSCAR", (btn) => {
       btn.click();
     });
@@ -43,59 +26,61 @@ export class InmetDataMiner {
       "apimapas.inmet.gov.br/dados",
       "OPTIONS"
     );
-    console.log(response);
 
     if (response) {
       console.log("[✅] Sucesso ao obter dados de medição ");
 
       const { estacoes } = response;
 
-      const measures = estacoes.filter(
-        (station) =>
-          station.estado === location && eqpCodes.includes(station.codigo)
-      );
-
-      return measures;
+      return estacoes;
     }
 
     return null;
   }
 
-  async getEquipmentWithMeasures(
-    measures_names,
-    equipments_codes,
-    location_state
-  ) {
-    const measuresCodes = await this.getMeasuresCodes(measures_names);
+  async #getAverageTemperature() {
+    return await this.#fetchMeasureData("temperatura-I104:0000");
+  }
+  async #getAverageHumidity() {
+    return await this.#fetchMeasureData("umidade-I120:0000");
+  }
 
-    if (!measuresCodes.length) {
-      console.log(
-        "Não foi possível obter identificadores dos parâmetros das medições"
-      );
-      return;
-    }
+  async #getAverageWindVelocity() {
+    return await this.#fetchMeasureData("ventovel-I009:0000");
+  }
 
-    const equipments = new Map();
+  async #getPrecipitation() {
+    return await this.#fetchMeasureData("precipitacao-I006:1200");
+  }
 
-    for (const measureToQueryCode of measuresCodes) {
-      const measures = await this.fetchMeasuresData(
-        measureToQueryCode,
-        equipments_codes,
-        location_state
-      );
+  async getStations(stations_codes = [], location_state) {
+    const averageTemperature = await this.#getAverageTemperature();
+    const averageWindVelocity = await this.#getAverageWindVelocity();
+    const averageHumidity = await this.#getAverageHumidity();
 
-      if (measures.length) {
-        const measureName = Mapper.mapMeasureNameToDomain(
-          measureToQueryCode.split("-")[0]
+    const measures = {
+      temperature: averageTemperature,
+      windVelocity: averageWindVelocity,
+      humidity: averageHumidity,
+    };
+
+    const station = new Map();
+
+    for (const [measureName, data] of Object.entries(measures)) {
+      if (data) {
+        const measures = data.filter(
+          (measure) =>
+            measure.estado === location_state &&
+            stations_codes.includes(measure.codigo)
         );
 
         measures.forEach((measure) => {
           const { codigo, nome, estado, regiao, valor } = measure;
 
-          const EquipmentCodeNotExists = equipments.has(codigo) === false;
+          const EquipmentCodeNotExists = station.has(codigo) === false;
 
           if (EquipmentCodeNotExists) {
-            equipments.set(codigo, {
+            station.set(codigo, {
               code: codigo,
               name: nome,
               state: estado,
@@ -103,9 +88,9 @@ export class InmetDataMiner {
             });
           }
 
-          equipments.set(
+          station.set(
             codigo,
-            Object.assign(equipments.get(codigo), {
+            Object.assign(station.get(codigo), {
               [measureName]: valor,
             })
           );
@@ -113,7 +98,35 @@ export class InmetDataMiner {
       }
     }
 
-    return [...equipments.values()];
+    return [...station.values()];
+  }
+
+  async getPluviometers(pluviometers_codes = [], location_state) {
+    const precipitations = await this.#getPrecipitation();
+
+    let measures = [];
+
+    if (precipitations) {
+      measures = precipitations
+        .filter(
+          (measure) =>
+            measure.estado === location_state &&
+            pluviometers_codes.includes(measure.codigo)
+        )
+        .map((measure) => {
+          const { codigo, nome, estado, regiao, valor } = measure;
+
+          return {
+            code: codigo,
+            name: nome,
+            state: estado,
+            country: regiao,
+            pluviometer: valor,
+          };
+        });
+    }
+
+    return measures;
   }
 
   async getMeasures(
@@ -167,19 +180,11 @@ export class InmetDataMiner {
 
     const stationsMeasures =
       equipments_codes.stations.length &&
-      (await this.getEquipmentWithMeasures(
-        scrapperConfig.stations_measures,
-        equipments_codes.stations,
-        state
-      ));
+      (await this.getStations(equipments_codes.stations, state));
 
     const pluviometersMeasures =
       equipments_codes.pluviometers.length &&
-      (await this.getEquipmentWithMeasures(
-        scrapperConfig.pluviometers_measures,
-        equipments_codes.pluviometers,
-        state
-      ));
+      (await this.getPluviometers(equipments_codes.pluviometers, state));
 
     await this.#scrapper.closeBrowser();
 

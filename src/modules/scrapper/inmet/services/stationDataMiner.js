@@ -60,6 +60,7 @@ export class StationDataMiner extends Command {
     const { stationsMeasures, pluviometersMeasures } = measures;
 
     if (stationsEqp.length) {
+      console.log(stationsMeasures);
       await this.stationReadDao.create(stationsEqp, stationsMeasures);
 
       this.logs.addInfoLog(
