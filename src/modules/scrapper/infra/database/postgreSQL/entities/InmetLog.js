@@ -1,5 +1,9 @@
-import { Mapper } from "../../../../core/mappers/mapper.js";
-
 export class InmetLog {
-  async create(logs = []) {}
+  #connection;
+  constructor(connection){
+    this.#connection = connection
+  }
+  async create(logs = []) {
+    await this.#connection("Inmet_Data_Miner").insert(logs)
+  }
 }

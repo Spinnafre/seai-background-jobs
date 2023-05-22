@@ -5,7 +5,6 @@ import {
 } from "../../../utils/index.js";
 
 import dataMinerConfig from "../../../config/dataMiner.js";
-
 export class FuncemeDataMiner {
   ftpConnection;
 

@@ -1,7 +1,10 @@
-import { Mapper } from "../../../../core/mappers/mapper.js";
-
 export class PluviometerReadDao {
-  async create(pluviometers, measures, idTime) {}
-
-  async list() {}
+  #connection
+  constructor(connection){
+    this.#connection = connection
+  }
+  
+  async create(measures=[]) {
+    await this.#connection("ReadPluviometers").insert(measures)
+  }
 }

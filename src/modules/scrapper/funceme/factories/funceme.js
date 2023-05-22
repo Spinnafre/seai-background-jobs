@@ -1,6 +1,6 @@
 import { FuncemeDataMiner } from "../../infra/scrapper/ftp/dataMiner.js";
 
-import { MetereologicalEquipmentDao } from "../../infra/database/postgreSQL/entities/Equipment.js";
+import { MetereologicalEquipmentDao } from "../../infra/database/postgreSQL/entities/Equipments.js";
 
 import { StationReadDao } from "../../infra/database/postgreSQL/entities/station.js";
 import { FuncemeLog } from "../../infra/database/postgreSQL/entities/FuncemeLog.js";

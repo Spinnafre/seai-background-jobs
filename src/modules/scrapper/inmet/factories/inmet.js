@@ -1,7 +1,7 @@
 import { Scrapper } from "../../infra/scrapper/webScrapper/adapters/puppeteer.js";
 import { InmetDataMiner } from "../../infra/scrapper/webScrapper/InmetDataMiner.js";
 
-import { MetereologicalEquipmentDao } from "../../infra/database/postgreSQL/entities/Equipment.js";
+import { MetereologicalEquipmentDao } from "../../infra/database/postgreSQL/entities/Equipments.js";
 
 import { InmetLog } from "../../infra/database/postgreSQL/entities/InmetLog.js";
 
@@ -10,7 +10,10 @@ import { StationReadDao } from "../../infra/database/postgreSQL/entities/station
 
 import { StationDataMiner } from "../services/stationDataMiner.js";
 import scrapperConfig from "../../config/scrapper.js";
+
+import {equipmentsConnection} from '../../infra/database/postgreSQL/connection.js'
 export class InmetFactory {
+  #scrapper
   constructor() {
     this.#scrapper = null;
   }
@@ -31,10 +34,10 @@ export class InmetFactory {
   buildServices() {
     const dataMiner = new InmetDataMiner(this.#scrapper);
 
-    const metereologicalEquipment = new MetereologicalEquipmentDao();
+    const metereologicalEquipment = new MetereologicalEquipmentDao(equipmentsConnection);
 
-    const stationDao = new StationReadDao();
-    const pluviometerDao = new PluviometerReadDao();
+    const stationDao = new StationReadDao(equipmentsConnection);
+    const pluviometerDao = new PluviometerReadDao(equipmentsConnection);
 
     const stationDataMiner = new StationDataMiner(
       dataMiner,

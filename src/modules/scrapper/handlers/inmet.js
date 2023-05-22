@@ -18,6 +18,7 @@ export class InmetDataMinerHandler {
     const dto = new InmetDataMinerDTO(timestamp);
 
     await service.execute(dto);
+    
     await logs.create(service.getLogs());
   }
 }

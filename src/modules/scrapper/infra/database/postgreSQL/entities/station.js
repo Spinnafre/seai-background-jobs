@@ -1,7 +1,9 @@
-import { Mapper } from "../../../../core/mappers/mapper.js";
-
 export class StationReadDao {
-  async create(stations, measures, idTime) {}
-
-  async list() {}
+  #connection
+  constructor(connection){
+    this.#connection = connection
+  }
+  async create(measures=[]) {
+    await this.#connection("ReadStations").insert(measures)
+  }
 }

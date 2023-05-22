@@ -1,5 +1,10 @@
-import { Mapper } from "../../../../core/mappers/mapper.js";
-
 export class FuncemeLog {
-  async create(logs = []) {}
+  #connection;
+  constructor(connection){
+    this.#connection = connection
+  }
+
+  async create(logs = []) {
+    await this.#connection("Funceme_Data_Miner").insert(logs)
+  }
 }
