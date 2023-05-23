@@ -1,10 +1,10 @@
 export class PluviometerReadDao {
-  #connection
-  constructor(connection){
-    this.#connection = connection
+  #connection;
+  constructor(connection) {
+    this.#connection = connection;
   }
-  
-  async create(measures=[]) {
-    await this.#connection("ReadPluviometers").insert(measures)
+
+  async create(measures = []) {
+    await this.#connection.insert(measures).into("ReadPluviometers");
   }
 }
