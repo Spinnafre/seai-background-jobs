@@ -1,5 +1,7 @@
 import { Command } from "../../../scrapper/core/commands/command.js";
 
+import { Mapper } from "../../core/mappers/mapper.js";
+
 export class ExtractPluviometersFromFunceme extends Command {
   constructor(dataMiner, metereologicalEquipmentDao, pluviometerReadDao) {
     super();
@@ -12,23 +14,19 @@ export class ExtractPluviometersFromFunceme extends Command {
     const pluviometers =
       await this.metereologicalEquipmentDao.getFuncemePluviometers();
 
-    if (!pluviometers.length) {
+    if (!pluviometers.equipments.length) {
       this.logs.addWarningLog("Não há pluviômetros da FUNCEME cadastrados");
 
       return;
     }
 
-    const codes = pluviometers.map((station) => station.code);
-
     const measures = await this.dataMiner.getPluviometersByCodesAndDate(
-      codes,
+      pluviometers.codes,
       params.getDate()
     );
 
     await this.pluviometerReadDao.create(
-      pluviometers,
-      measures,
-      params.idTimestamp
+      Mapper.stationsToPersistency(pluviometers.equipments, measures)
     );
 
     this.logs.addInfoLog(

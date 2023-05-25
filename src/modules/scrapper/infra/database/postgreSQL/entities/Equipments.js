@@ -7,33 +7,81 @@ export class MetereologicalEquipmentDao {
   }
 
   async getFuncemeStations() {
-    const pluviometers = await this.#connection
-      .select()
-      .where({
-        Type: "station",
-        Organ: "FUNCEME",
-      })
+    const stations = await this.#connection
+      .select(
+        "MetereologicalEquipment.Name as Name",
+        "EquipmentType.Name as Type",
+        "MetereologicalEquipment.IdEquipment",
+        "MetereologicalEquipment.IdEquipmentExternal",
+        "MetereologicalEquipment.Altitude",
+        "MetereologicalEquipment.CreatedAt",
+        "MetereologicalEquipment.UpdatedAt",
+        "MetereologicalEquipment.FK_Organ",
+        "MetereologicalOrgan.Name as Organ"
+      )
       .from("MetereologicalEquipment")
       .innerJoin(
         "EquipmentType",
         "MetereologicalEquipment.FK_Type",
         "=",
         "EquipmentType.IdType"
+      )
+      .innerJoin(
+        "MetereologicalOrgan",
+        "MetereologicalOrgan.IdOrgan",
+        "=",
+        "MetereologicalEquipment.FK_Organ"
       );
 
-    return Mapper.equipmentsToDomain(pluviometers);
+    const items = stations.filter(
+      (eqp) => eqp.Type === "station" && eqp.Organ === "FUNCEME"
+    );
+    console.log("ITEMS =", items);
+    const codes = items.map((eqp) => eqp.IdEquipmentExternal);
+
+    return {
+      equipments: Mapper.equipmentsToDomain(items),
+      codes,
+    };
   }
 
   async getFuncemePluviometers() {
-    const pluviometers = await this.#connection
-      .select()
-      .where({
-        Type: "station",
-        Organ: "FUNCEME",
-      })
-      .from("MetereologicalEquipment");
+    const stations = await this.#connection
+      .select(
+        "MetereologicalEquipment.Name as Name",
+        "EquipmentType.Name as Type",
+        "MetereologicalEquipment.IdEquipment",
+        "MetereologicalEquipment.IdEquipmentExternal",
+        "MetereologicalEquipment.Altitude",
+        "MetereologicalEquipment.CreatedAt",
+        "MetereologicalEquipment.UpdatedAt",
+        "MetereologicalEquipment.FK_Organ",
+        "MetereologicalOrgan.Name as Organ"
+      )
+      .from("MetereologicalEquipment")
+      .innerJoin(
+        "EquipmentType",
+        "MetereologicalEquipment.FK_Type",
+        "=",
+        "EquipmentType.IdType"
+      )
+      .innerJoin(
+        "MetereologicalOrgan",
+        "MetereologicalOrgan.IdOrgan",
+        "=",
+        "MetereologicalEquipment.FK_Organ"
+      );
 
-    return Mapper.equipmentsToDomain(pluviometers);
+    const items = stations.filter(
+      (eqp) => eqp.Type === "pluviometer" && eqp.Organ === "FUNCEME"
+    );
+
+    const codes = items.map((eqp) => eqp.IdEquipmentExternal);
+
+    return {
+      equipments: Mapper.equipmentsToDomain(items),
+      codes,
+    };
   }
 
   async getInmetPluviometers() {

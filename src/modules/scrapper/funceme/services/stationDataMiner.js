@@ -1,5 +1,7 @@
 import { Command } from "../../../scrapper/core/commands/command.js";
 
+import { Mapper } from "../../core/mappers/mapper.js";
+
 export class ExtractStationsFromFunceme extends Command {
   constructor(dataMiner, metereologicalEquipmentDao, stationReadDao) {
     super();
@@ -11,19 +13,21 @@ export class ExtractStationsFromFunceme extends Command {
   async execute(params) {
     const stations = await this.metereologicalEquipmentDao.getFuncemeStations();
 
-    if (!stations.length) {
+    if (!stations.equipments.length) {
       this.logs.addWarningLog("Não há estações da FUNCEME cadastradas");
       return;
     }
 
-    const codes = stations.map((station) => station.code);
-
     const measures = await this.dataMiner.getStationsByCodesAndDate(
-      codes,
+      stations.codes,
       params.getDate()
     );
 
-    await this.stationReadDao.create(stations, measures, params.idTimestamp);
+    console.log("measures", measures);
+
+    await this.stationReadDao.create(
+      Mapper.stationsToPersistency(stations.equipments, measures)
+    );
 
     this.logs.addInfoLog("Sucesso ao salvar leituras de estações da FUNCEME");
   }

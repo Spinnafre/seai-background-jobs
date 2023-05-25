@@ -2,9 +2,10 @@ import {
   StationParser,
   PluviometerParser,
   convertCompressedFileStream,
-} from "../../../utils/index.js";
+} from "./utils/index.js";
 
 import dataMinerConfig from "../../../config/dataMiner.js";
+import { Mapper } from "../../../core/mappers/mapper.js";
 export class FuncemeDataMiner {
   ftpConnection;
 
@@ -40,9 +41,7 @@ export class FuncemeDataMiner {
 
         data.push({
           code,
-          name,
-          organ: "FUNCEME",
-          measures: measure,
+          ...Mapper.stationMeasures(measure),
         });
       }
     });
@@ -68,9 +67,7 @@ export class FuncemeDataMiner {
 
         data.push({
           code,
-          name,
-          organ: "FUNCEME",
-          measures: measure,
+          ...Mapper.pluviometerMeasures(measure),
         });
       }
     });
