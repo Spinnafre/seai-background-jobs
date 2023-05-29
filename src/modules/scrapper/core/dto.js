@@ -1,10 +1,10 @@
 import { FormatDate } from "../../shared/index.js";
 
 class DTO {
-  timestamp;
+  date;
 
-  constructor(timestamp) {
-    this.timestamp = timestamp;
+  constructor(payload) {
+    this.date = payload;
   }
 
   getDate() {
@@ -13,21 +13,23 @@ class DTO {
 }
 
 export class InmetDataMinerDTO extends DTO {
-  constructor(timestamp) {
-    super(timestamp);
+  constructor(date) {
+    super(date);
   }
 
   getDate() {
-    return FormatDate.timestampToDate(this.timestamp, { separator: "/" });
+    // dd-mm-yyyy
+    return this.date.split("/").join("-");
   }
 }
 
 export class FuncemeDataMinerDTO extends DTO {
-  constructor(timestamp) {
-    super(timestamp);
+  constructor(date) {
+    super(date);
   }
 
+  // dd/mm/yyyy
   getDate() {
-    return FormatDate.timestampToDate(this.timestamp, { separator: "-" });
+    return this.date;
   }
 }

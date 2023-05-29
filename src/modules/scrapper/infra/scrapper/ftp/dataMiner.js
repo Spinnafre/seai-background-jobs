@@ -39,10 +39,12 @@ export class FuncemeDataMiner {
 
         const measure = measures.find((measure) => measure.data == date);
 
-        data.push({
-          code,
-          ...Mapper.stationMeasures(measure),
-        });
+        if (measure) {
+          data.push({
+            code,
+            ...Mapper.stationMeasures(measure),
+          });
+        }
       }
     });
 
@@ -65,10 +67,12 @@ export class FuncemeDataMiner {
 
         const measure = measures.find((measure) => measure.data == date);
 
-        data.push({
-          code,
-          ...Mapper.pluviometerMeasures(measure),
-        });
+        if (measure) {
+          data.push({
+            code,
+            ...Mapper.pluviometerMeasures(measure),
+          });
+        }
       }
     });
 

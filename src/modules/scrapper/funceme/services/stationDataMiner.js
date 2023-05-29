@@ -18,6 +18,8 @@ export class ExtractStationsFromFunceme extends Command {
       return;
     }
 
+    console.log("DATA - > ", params.getDate());
+
     const measures = await this.dataMiner.getStationsByCodesAndDate(
       stations.codes,
       params.getDate()

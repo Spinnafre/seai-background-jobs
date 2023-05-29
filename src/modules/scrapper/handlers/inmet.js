@@ -8,17 +8,17 @@ export class InmetDataMinerHandler {
     this.#factory = new InmetFactory();
   }
 
-  async run(timestamp) {
+  async run(request) {
     this.#factory.buildConnection();
 
     const logs = this.#factory.buildLogs();
 
     const { service } = this.#factory.buildServices();
 
-    const dto = new InmetDataMinerDTO(timestamp);
+    const dto = new InmetDataMinerDTO(request.date);
 
     await service.execute(dto);
-    
+
     await logs.create(service.getLogs());
   }
 }

@@ -8,7 +8,7 @@ export class FuncemeDataMinerHandler {
     this.#factory = new FuncemeFactory();
   }
 
-  async run(timestamp) {
+  async run(request) {
     const ftpClient = this.#factory.buildConnection();
     const logs = this.#factory.buildLogs();
 
@@ -17,13 +17,14 @@ export class FuncemeDataMinerHandler {
     // Deu erro na conexão, então nem executa nada e sai do ciclo
     if (ftpConnectionOrError.connected === false) {
       await logs.create(ftpConnectionOrError.message);
+      await ftpClient.close();
       throw new Error(ftpConnectionOrError.message);
     }
 
     const { stationService, pluviometerService } =
       this.#factory.buildServices();
 
-    const dto = new FuncemeDataMinerDTO(timestamp);
+    const dto = new FuncemeDataMinerDTO(request.date);
 
     await stationService.execute(dto);
     await logs.create(stationService.getLogs());

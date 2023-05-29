@@ -4,7 +4,7 @@ import knex from "knex";
 import path from "node:path";
 
 dotenv.config({
-  path: path.resolve("..", "..", ".env"),
+  path: path.resolve("..", "..", "inmetscrapper", ".env"),
 });
 
 const equipmentsConnection = knex({

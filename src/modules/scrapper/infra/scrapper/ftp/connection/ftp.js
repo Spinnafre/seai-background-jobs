@@ -1,5 +1,12 @@
 import Client from "ftp";
 
+import dotenv from "dotenv";
+
+import path from "node:path";
+dotenv.config({
+  path: path.resolve("..", "..", "inmetscrapper", ".env"),
+});
+
 class FTPClientAdapter {
   connection;
 
@@ -8,6 +15,7 @@ class FTPClientAdapter {
 
   static create() {
     if (!FTPClientAdapter.instance) {
+      console.log("CRIANDO CONEXÃO");
       FTPClientAdapter.instance = new FTPClientAdapter();
     }
     return FTPClientAdapter.instance;
@@ -41,6 +49,7 @@ class FTPClientAdapter {
   }
 
   async connect() {
+    // console.log(process.env);
     return new Promise((resolve, reject) => {
       this.connection.connect({
         host: process.env.FTP_FUNCEME_HOST,
