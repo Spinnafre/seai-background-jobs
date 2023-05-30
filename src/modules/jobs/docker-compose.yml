@@ -1,0 +1,27 @@
+version: '3'
+services:
+  jobs_database:
+    image: postgres
+    container_name: "seai-jobs"
+    user: postgres
+    secrets:
+      - db-password
+    volumes:
+      - ./db/ddl.sql:/docker-entrypoint-initdb.d/ddl-jobs.sql
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+volumes:
+  db-data: {}
+
+secrets:
+  db-password:
+    file: db/password.txt

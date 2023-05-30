@@ -15,10 +15,10 @@ import { InmetDataMiner } from "../../src/modules/scrapper/infra/scrapper/webScr
 
 import { StationDataMiner } from "../../src/modules/scrapper/inmet/services/stationDataMiner.js";
 
-import { MetereologicalEquipmentInMemory } from "../../src/modules/scrapper/infra/database/inMemory/entities/metereologicalEquipment.js";
+import { MetereologicalEquipmentInMemory } from "../../infra/database/inMemory/entities/metereologicalEquipment.js";
 
-import { StationRead } from "../../src/modules/scrapper/infra/database/inMemory/entities/stationRead.js";
-import { PluviometerRead } from "../../src/modules/scrapper/infra/database/inMemory/entities/pluviometerRead.js";
+import { StationRead } from "../../infra/database/inMemory/entities/stationRead.js";
+import { PluviometerRead } from "../../infra/database/inMemory/entities/pluviometerRead.js";
 
 import humidityMock from "../mock/inmet/data/automatic_stations/humidity.json";
 import pluviometerMock from "../mock/inmet/data/automatic_stations/pluviometers.json";

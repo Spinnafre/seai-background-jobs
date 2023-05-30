@@ -1,6 +1,6 @@
-import { InmetDataMinerDTO } from "../../core/dto.js";
+import { InmetDataMinerDTO } from "../../../../core/dto.js";
 
-import { InmetFactory } from "../../services/factories/inmet.js";
+import { InmetFactory } from "../../../../services/factories/inmet.js";
 
 export async function InmetHandler(request) {
   const factory = new InmetFactory();
