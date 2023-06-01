@@ -1,0 +1,6 @@
+node_modules
+.gitignore
+doc
+.nvmrc
+.env
+.env.sample
