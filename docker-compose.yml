@@ -1,17 +1,29 @@
 version: '3'
 services:
+  jobs:
+    build: ./workers
+    container_name: "server"
+    volumes:
+      - ./workers:/usr/src/app
+      - nodemodules:/usr/src/app/node_modules
+    depends_on:
+      - jobs_database
+    restart: on-failure
+    networks:
+      - back-tier
+      - custom-proxy
+
   jobs_database:
-    image: postgres
+    image: postgres:14.2
     container_name: "seai-jobs-database"
     user: postgres
     secrets:
       - db-password
     volumes:
-      - ./src/modules/jobs/src/data/commands/ddl.sql:/docker-entrypoint-initdb.d/ddl-jobs.sql
       - db-data:/var/lib/postgresql/data
     ports:
       - "5433:5432"
-    restart: always
+    restart: on-failure
     environment:
       - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
     healthcheck:
@@ -19,12 +31,19 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
-  jobs:
+    networks:
+      - back-tier
 
 volumes:
   db-data: {}
+  nodemodules: {}
 
 secrets:
   db-password:
-    file: src/modules/jobs/src/data/password.txt
+    file: password.txt
+
+networks:
+  back-tier:
+  custom-proxy:
+    external: true
+    name: testonly
