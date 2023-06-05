@@ -2,10 +2,23 @@ version: '3'
 services:
   jobs:
     build: ./workers
-    container_name: "server"
+    container_name: "jobs_workers"
     volumes:
       - ./workers:/usr/src/app
       - nodemodules:/usr/src/app/node_modules
+    depends_on:
+      - jobs_database
+    restart: on-failure
+    networks:
+      - back-tier
+      - custom-proxy
+
+  jobs-api:
+    build: ./server
+    container_name: "jobs_server"
+    volumes:
+      - ./server:/usr/src/app
+      - nodemodules_api:/usr/src/app/node_modules
     depends_on:
       - jobs_database
     restart: on-failure
@@ -37,6 +50,7 @@ services:
 volumes:
   db-data: {}
   nodemodules: {}
+  nodemodules_api: {}
 
 secrets:
   db-password:

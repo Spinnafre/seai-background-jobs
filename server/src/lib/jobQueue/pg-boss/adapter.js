@@ -26,7 +26,7 @@ export class PgBossAdapter {
 
       console.log("[🕥] Iniciando monitoramento de jobs");
       // Prepares the target database and begins job monitoring.
-      await this._boss.start();
+      await connection.start();
 
       PgBossAdapter.instance = new PgBossAdapter(connection);
     }
