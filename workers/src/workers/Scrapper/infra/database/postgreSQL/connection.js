@@ -1,7 +1,6 @@
 import knex from "knex";
 
 function equipments() {
-  console.log("CONEXÃO ==== ", process.env);
   const equipments = knex({
     client: "pg",
     connection: {
