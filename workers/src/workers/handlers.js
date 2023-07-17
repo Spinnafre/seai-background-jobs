@@ -1,3 +1,1 @@
-export * from "./DailyScheduler/handler.js";
-export * from "./Scrapper/handlers/funceme.js";
-export * from "./Et0/handler.js";
+export * from "./Scrapper/funceme/cli/factories/commands/funceme-scrapper-command-factory.js";

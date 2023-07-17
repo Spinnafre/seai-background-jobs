@@ -4,6 +4,6 @@ process.on("uncaughtException", function (err) {
   console.log("Caught exception: " + err);
 });
 
-app.listen(80, function () {
-  console.log("Server listening on port " + 80);
+app.listen(3000, function () {
+  console.log("Server listening on port " + 3000);
 });

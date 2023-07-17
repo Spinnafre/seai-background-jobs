@@ -18,7 +18,14 @@ export class PgBossAdapter {
       const { default: pg } = await import("pg-boss");
 
       console.log("[⚙️] Criando conexão com o banco de dados de jobs");
-      const connection = new pg("postgres://postgres:iaes@jobs_database:5432");
+      // const connection = new pg("postgres://postgres:iaes@jobs_database:5432");
+      const connection = new pg({
+        database: "postgres",
+        port: 5433,
+        host: "localhost",
+        password: "iaes",
+        user: "postgres",
+      });
 
       connection.on("error", (error) => {
         console.error(

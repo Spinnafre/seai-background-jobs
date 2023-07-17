@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import { QueueManager } from "./lib/jobQueue/manager.js";
 
+import dotenv from "dotenv";
+
 QueueManager.getConnection().then(() =>
   console.log("Connected to Jobs Queue...")
 );
