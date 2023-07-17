@@ -1,0 +1,65 @@
+version: '3'
+services:
+  jobs:
+    build: ./workers
+    container_name: "jobs_workers"
+    volumes:
+      - ./workers:/usr/src/app
+      - nodemodules:/usr/src/app/node_modules
+    depends_on:
+      - jobs_database
+    restart: on-failure
+    networks:
+      - back-tier
+      - custom-proxy
+
+  # jobs-api:
+  #   build: ./server
+  #   container_name: "jobs_server"
+  #   volumes:
+  #     - ./server:/usr/src/app
+  #     - nodemodules_api:/usr/src/app/node_modules
+  #   depends_on:
+  #     - jobs_database
+  #   ports:
+  #     - "3333:80"
+  #   restart: on-failure
+  #   networks:
+  #     - back-tier
+  #     - custom-proxy
+
+  jobs_database:
+    image: postgres:14.2
+    container_name: "seai-jobs-database"
+    user: postgres
+    secrets:
+      - db-password
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    restart: on-failure
+    environment:
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - back-tier
+
+volumes:
+  db-data: {}
+  nodemodules: {}
+  nodemodules_api: {}
+
+secrets:
+  db-password:
+    file: password.txt
+
+networks:
+  back-tier:
+  custom-proxy:
+    external: true
+    name: testonly
