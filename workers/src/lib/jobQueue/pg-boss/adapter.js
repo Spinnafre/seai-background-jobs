@@ -21,8 +21,8 @@ export class PgBossAdapter {
       // const connection = new pg("postgres://postgres:iaes@jobs_database:5432");
       const connection = new pg({
         database: "postgres",
-        port: 5433,
-        host: "localhost",
+        port: 5432,
+        host: "jobs_database",
         password: "iaes",
         user: "postgres",
       });

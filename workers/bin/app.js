@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import { resolve } from "node:path";
 
 dotenv.config({
-  path: resolve("..", ".env"),
+  path: resolve( ".env"),
 });
 
 console.log(process.env);

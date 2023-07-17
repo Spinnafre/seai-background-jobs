@@ -1,4 +1,4 @@
-import { EntityProtocol } from "./entity";
+import { EntityProtocol } from "./entity.js";
 
 export class Equipment extends EntityProtocol {
   #altitude;

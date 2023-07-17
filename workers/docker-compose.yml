@@ -1,13 +1,14 @@
 version: '3'
 services:
   jobs:
-    build: ./workers
+    build: .
     container_name: "jobs_workers"
     volumes:
-      - ./workers:/usr/src/app
+      - .:/usr/src/app
       - nodemodules:/usr/src/app/node_modules
     depends_on:
-      - jobs_database
+      jobs_database:
+        condition: service_healthy
     restart: on-failure
     networks:
       - back-tier
@@ -62,4 +63,4 @@ networks:
   back-tier:
   custom-proxy:
     external: true
-    name: testonly
+    name: background-jobs

@@ -1,4 +1,4 @@
-import { FuncemeDataMinerDTO } from "../../protocols/dto.js";
+import { FuncemeDataMinerDTO } from "./input-boundary.js";
 
 export class FuncemeScrapperCommand {
   static name_queue = "funceme-scrapper";
@@ -9,6 +9,7 @@ export class FuncemeScrapperCommand {
     this.pluviometerDataMiner = pluviometerDataMiner;
     this.ftpClient = ftpClient;
     this.logs = logs;
+    this.name_queue = "funceme-scrapper"
   }
 
   async runAllServices(dto) {

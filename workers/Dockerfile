@@ -1,11 +1,11 @@
 # syntax=docker/dockerfile:1.4
 
-FROM node:18 AS development
+FROM node:18-bullseye-slim AS development
 
 ARG NODE_ENV=production
 ENV NODE_ENV $NODE_ENV
 
-RUN apt-get update && apt-get install -y --no-install-recommends git && apt-get install ftp
+RUN apt-get update && apt-get install -y --no-install-recommends ftp
 
 # RUN <<EOF
 # useradd -s /bin/bash -m vscode
@@ -28,5 +28,5 @@ COPY [".env","/usr/src/app/"]
 # HEALTHCHECK --interval=30s \
 #     CMD node healthcheck.js
 
-ENTRYPOINT node ./bin/workers.js
+ENTRYPOINT node ./bin/app.js
 

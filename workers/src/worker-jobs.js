@@ -16,8 +16,9 @@ async function processAllWorkers() {
 
   const tasks = Object.values(handlers).map((Handler) => {
     const worker_handler = Handler();
+    console.log("worker handler = = = = = ",worker_handler)
     return {
-      queue_name: Handler.name_queue,
+      queue_name: worker_handler.name_queue,
       workers: [
         {
           name: worker_handler.constructor.name,

@@ -1,4 +1,4 @@
-import { logs_connection } from "../logs-connection";
+import { logs_connection } from "../logs-connection.js";
 
 export class LogRepository {
   async addFuncemeLogs(logs) {
