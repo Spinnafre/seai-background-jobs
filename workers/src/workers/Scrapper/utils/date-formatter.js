@@ -4,7 +4,7 @@ export class FormatDate {
   }
   static timestampToDate(timestamp, { separator } = { separator: "/" }) {
     const dateFormat = new Date(timestamp * 1000);
-
+    console.log("FormatDate ", dateFormat);
     let month = dateFormat.getMonth() + 1;
     let day = dateFormat.getDate();
     if (month < 10) month = `0${month}`;
@@ -17,7 +17,7 @@ export class FormatDate {
     const previous = new Date(date.getTime());
 
     previous.setDate(date.getDate() - 1);
-    previous.setMonth(date.getMonth() + 1);
+    // previous.setMonth(date.getMonth() + 1);
 
     return Number((previous.valueOf() / 1000).toPrecision(10));
   }

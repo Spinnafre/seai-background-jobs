@@ -49,9 +49,7 @@ export class FetchFuncemeData {
     parsedData.forEach((pluviometer) => {
       if (codes.includes(pluviometer.code)) {
         const { code, name, measures } = pluviometer;
-        console.log("Measure Data = ", measure.data, " filter date = ", date);
         const measure = measures.find((measure) => measure.data == date);
-
         if (measure) {
           data.push({
             code,

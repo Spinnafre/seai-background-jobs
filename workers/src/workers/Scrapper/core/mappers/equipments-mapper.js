@@ -2,8 +2,15 @@ import { Equipment } from "../equipments/equipment.js";
 
 export class EquipmentMapper {
   static equipmentToDomain(raw) {
-    const { IdEquipmentExternal, IdEquipment, Name, Type, FK_Organ, Altitude } =
-      raw;
+    const {
+      IdEquipmentExternal,
+      IdEquipment,
+      Name,
+      Type,
+      FK_Organ,
+      Altitude,
+      Organ,
+    } = raw;
 
     return new Equipment(
       {
@@ -11,8 +18,9 @@ export class EquipmentMapper {
         name: Name,
         organ: {
           id: FK_Organ,
+          name: Organ,
         },
-        type: Type.Name,
+        type: Type,
       },
       IdEquipment,
       Altitude

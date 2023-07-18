@@ -20,8 +20,6 @@ export class ExtractStationsFromFunceme extends Command {
       return;
     }
 
-    console.log("DATA - > ", params.getDate());
-
     this.logs.addInfoLog(
       "Iniciando busca de dados de medições das estações da FUNCEME"
     );
@@ -30,8 +28,6 @@ export class ExtractStationsFromFunceme extends Command {
       stations.codes,
       params.getDate()
     );
-
-    console.log("measures", measures);
 
     const result = stations.equipments.map((station) => {
       const measure =
