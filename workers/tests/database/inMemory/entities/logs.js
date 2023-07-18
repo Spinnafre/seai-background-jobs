@@ -1,6 +1,5 @@
-import { logs_connection } from "../logs-connection.js";
-
-export class LogRepository {
+export class logsRepository {
+  logs = [];
   async create(logs) {
     let data;
 
@@ -10,6 +9,7 @@ export class LogRepository {
         Operation: "",
         Status: logs.type,
       };
+      this.logs.push(data);
     } else {
       data = logs.map((log) => {
         return {
@@ -18,8 +18,7 @@ export class LogRepository {
           Status: log.type,
         };
       });
+      this.logs = [...this.logs, ...data];
     }
-
-    await logs_connection.insert(data).into("Funceme_Data_Miner");
   }
 }

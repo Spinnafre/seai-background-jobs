@@ -1,14 +1,14 @@
 import { QueueManager } from "./lib/jobQueue/manager.js";
 
 const seeds = [
-  // {
-  //   queue: "daily-scheduler",
-  //   cron: "* * * * *",
-  //   data: null,
-  //   options: {
-  //     tz: "America/Chicago",
-  //   },
-  // },
+  {
+    queue: "daily-scheduler",
+    cron: "* * * * *",
+    data: null,
+    options: {
+      tz: "America/Chicago",
+    },
+  },
 ];
 
 async function processAllWorkers() {
@@ -16,7 +16,6 @@ async function processAllWorkers() {
 
   const tasks = Object.values(handlers).map((Handler) => {
     const worker_handler = Handler();
-    console.log("worker handler = = = = = ",worker_handler)
     return {
       queue_name: worker_handler.name_queue,
       workers: [
@@ -41,6 +40,7 @@ async function processAllWorkers() {
 
 async function registerSeed() {
   console.log("Registrando seeds...");
+
   for (const seed of seeds) {
     const { cron, data, options, queue } = seed;
     await QueueManager.scheduleJob(queue, cron, data, options);

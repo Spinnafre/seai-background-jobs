@@ -1,7 +1,11 @@
 import { EquipmentMapper } from "../../../../src/workers/Scrapper/core/mappers/equipments-mapper.js";
 
 export class MetereologicalEquipmentInMemory {
-  #MetereologicalEquipment = [];
+  #MetereologicalEquipment;
+
+  constructor(data = []) {
+    this.#MetereologicalEquipment = data.length ? data : [];
+  }
 
   async createMetereologicalEquipment(data) {
     this.#MetereologicalEquipment.push(data);

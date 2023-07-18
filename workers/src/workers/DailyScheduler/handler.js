@@ -17,8 +17,9 @@ export class DailyScheduler {
 
     current_date.setHours(23, 0, 0);
 
-    console.log(current_date.getTime(), ":::", yesterday.getTime());
+    console.log(current_date.getTime(), ":::", yesterday);
 
+    //DD/MM/YYYY
     const date = Intl.DateTimeFormat("pt-BR").format(yesterday);
 
     // Agenda todos os dias para executar a busca de dados da
@@ -34,17 +35,5 @@ export class DailyScheduler {
         retryDelay: 15,
       }
     );
-
-    // await QueueManager.createJob(
-    //   InmetScrapper.name_queue,
-    //   { date },
-    //   {
-    //     singletonKey: "2",
-    //     useSingletonQueue: true,
-    //     startAfter: today,
-    //     retryLimit: 1,
-    //     retryDelay: 15,
-    //   }
-    // );
   }
 }

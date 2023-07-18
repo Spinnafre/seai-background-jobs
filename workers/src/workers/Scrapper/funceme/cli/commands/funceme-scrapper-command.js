@@ -9,7 +9,7 @@ export class FuncemeScrapperCommand {
     this.pluviometerDataMiner = pluviometerDataMiner;
     this.ftpClient = ftpClient;
     this.logs = logs;
-    this.name_queue = "funceme-scrapper"
+    this.name_queue = "funceme-scrapper";
   }
 
   async runAllServices(dto) {
@@ -39,6 +39,8 @@ export class FuncemeScrapperCommand {
     const { id, data } = payload;
 
     const time = data.date;
+
+    console.log("TIME = ", time);
 
     const dto = new FuncemeDataMinerDTO(time);
 
