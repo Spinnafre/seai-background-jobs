@@ -1,12 +1,12 @@
 import { QueueManager } from "../src/lib/jobQueue/manager.js";
-import { FuncemeScrapper } from "../src/workers/handlers.js";
+import { FuncemeScrapperCommand } from "../src/workers/Scrapper/funceme/cli/commands/funceme-scrapper-command.js";
 
 import dotenv from "dotenv";
 
 import { resolve } from "node:path";
 
 dotenv.config({
-  path: resolve("..", "..", ".env"),
+  path: resolve(".env"),
 });
 
 console.log(process.env);
@@ -24,7 +24,7 @@ async function register() {
   await QueueManager.start();
 
   await QueueManager.createJob(
-    FuncemeScrapper.name_queue,
+    FuncemeScrapperCommand.name_queue,
     { date },
     {
       singletonKey: "1",
@@ -46,7 +46,7 @@ async function register() {
   //     retryDelay: 15,
   //   }
   // );
-  //   process.exit(0);
+  process.exit(0);
 }
 
 register();

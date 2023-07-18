@@ -11,8 +11,16 @@ export const dbConfig = {
     client: "pg",
     host: process.env.DB_LOGS_HOST,
     port: process.env.DB_LOGS_PORT,
-    user: process.env.DB_LOGS_USER,
+    user: process.env.DB_LOGS_USER_NAME,
     password: process.env.DB_LOGS_PASSWORD,
     database: "logs",
+  },
+  jobs: {
+    // client: "pg",
+    host: process.env.DB_JOB_HOST,
+    port: process.env.DB_JOB_PORT,
+    user: process.env.DB_JOB_USER_NAME,
+    password: process.env.DB_JOB_PASSWORD,
+    database: "postgres",
   },
 };

@@ -1,5 +1,5 @@
 import { PluviometerMapper } from "../../../../core/mappers/pluviometer-mapper.js";
-import scrapperConfig from "../../../config/scrapper-directories.js";
+import scrapperConfig from "../../../../../../config/scrapper-directories.js";
 import { MetereologicalEquipmentDao } from "../../../external/database/postgreSQL/data/equipments.js";
 import { PluviometerReadDao } from "../../../external/database/postgreSQL/data/pluviometer.js";
 import { PluviometerParser } from "../../../helpers/parser/pluviometer-parser.js";

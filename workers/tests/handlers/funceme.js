@@ -1,18 +1,22 @@
-import { FuncemeScrapper } from "../../src/workers/handlers.js";
-
 import dotenv from "dotenv";
 
 import { resolve } from "node:path";
+import { FuncemeScrapperCommand } from "../../src/workers/Scrapper/funceme/cli/commands/funceme-scrapper-command.js";
 
 dotenv.config({
-  path: resolve("..", "..", ".env"),
+  path: resolve(".env"),
 });
 
 async function run() {
   console.log(process.env);
-  const handler = new FuncemeScrapper();
+  const handler = new FuncemeScrapperCommand(
+    stationDataMinerFactory(),
+    pluviometerDataMinerFactory(),
+    FtpClientAdapter,
+    buildFuncemeDataMinerLogs()
+  )();
 
-  await handler.handler({ id: 0, data: { date: "05/06/2023" } });
+  await handler.handler({ id: 0, data: { date: "18/07/2023" } });
 }
 
 run();

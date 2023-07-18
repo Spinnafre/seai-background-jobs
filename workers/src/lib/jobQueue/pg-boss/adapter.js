@@ -1,3 +1,5 @@
+import { dbConfig } from "../../../config/database.js";
+
 export class PgBossAdapter {
   _boss;
 

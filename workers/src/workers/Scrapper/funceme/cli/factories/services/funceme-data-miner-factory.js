@@ -1,5 +1,5 @@
 import { StationMapper } from "../../../../core/mappers/station-mapper.js";
-import scrapperConfig from "../../../config/scrapper-directories.js";
+import scrapperConfig from "../../../../../../config/scrapper-directories.js";
 import { MetereologicalEquipmentDao } from "../../../external/database/postgreSQL/data/equipments.js";
 import { StationReadDao } from "../../../external/database/postgreSQL/data/station.js";
 import { StationParser } from "../../../helpers/parser/station-parser.js";

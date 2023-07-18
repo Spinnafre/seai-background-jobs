@@ -1,5 +1,5 @@
 import Client from "ftp";
-import { ftpConfig } from "../../../../config/ftp.js";
+import { ftpConfig } from "../../../../../../../config/ftp.js";
 
 export class FTPClientAdapter {
   connection;

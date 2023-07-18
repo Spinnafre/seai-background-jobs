@@ -1,10 +1,10 @@
 version: '3'
 services:
   jobs:
-    build: .
+    build: ./workers
     container_name: "jobs_workers"
     volumes:
-      - .:/usr/src/app
+      - ./workers:/usr/src/app
       - nodemodules:/usr/src/app/node_modules
     depends_on:
       jobs_database:

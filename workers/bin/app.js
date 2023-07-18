@@ -1,11 +1,11 @@
-import * as worker from "../src/worker-jobs.js";
+import * as worker from "../src/main.js";
 
 import dotenv from "dotenv";
 
 import { resolve } from "node:path";
 
 dotenv.config({
-  path: resolve( ".env"),
+  path: resolve(".env"),
 });
 
 console.log(process.env);
