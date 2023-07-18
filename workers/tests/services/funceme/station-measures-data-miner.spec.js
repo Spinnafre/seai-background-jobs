@@ -37,10 +37,6 @@ describe("# Station-Measures-Data-Miner", () => {
     // jest.setSystemTime(new Date(2023, 3, 2));
   });
 
-  afterAll(() => {
-    jest.useRealTimers();
-  });
-
   afterEach(() => {
     jest.useRealTimers();
   });

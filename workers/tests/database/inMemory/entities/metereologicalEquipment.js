@@ -22,6 +22,11 @@ export class MetereologicalEquipmentInMemory {
       (eqp) => eqp.Type == "pluviometer" && eqp.Organ === "FUNCEME"
     );
 
-    return EquipmentMapper.equipmentsToDomain(pluviometers);
+    const codes = pluviometers.map((eqp) => eqp.IdEquipmentExternal);
+
+    return {
+      equipments: EquipmentMapper.equipmentsToDomain(pluviometers),
+      codes,
+    };
   }
 }

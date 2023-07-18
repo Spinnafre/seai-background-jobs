@@ -32,7 +32,7 @@ export class PluviometerMapper {
     };
   }
 
-  static pluviometerToPersistency(pluviometers = [], measures = []) {
+  static pluviometersToPersistency(pluviometers = [], measures = []) {
     return pluviometers.map((pluviometer) => {
       const measure =
         measures && measures.find((item) => item.code === pluviometer.code);

@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">77.77% </span>
+                <span class="strong">75% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>21/27</span>
+                <span class='fraction'>24/32</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>6/6</span>
+                <span class='fraction'>5/5</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">77.77% </span>
+                <span class="strong">75% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>21/27</span>
+                <span class='fraction'>24/32</span>
             </div>
         
             
@@ -90,22 +90,17 @@
 <a name='L25'></a><a href='#L25'>25</a>
 <a name='L26'></a><a href='#L26'>26</a>
 <a name='L27'></a><a href='#L27'>27</a>
-<a name='L28'></a><a href='#L28'>28</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
@@ -116,6 +111,21 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { EquipmentMapper } from "../../../../src/workers/Scrapper/core/mappers/equipments-mapper.js";
 &nbsp;
@@ -126,23 +136,28 @@ export class MetereologicalEquipmentInMemory {
     this.#MetereologicalEquipment.push(data);
   }
 &nbsp;
-  async getFuncemeStations() {
-    const stations = this.#MetereologicalEquipment.filter(
-      (eqp) =&gt; eqp.Type == "station" &amp;&amp; eqp.Organ === "FUNCEME"
-    );
-&nbsp;
-    const codes = stations.map((eqp) =&gt; eqp.IdEquipmentExternal);
-&nbsp;
-    return { equipments: EquipmentMapper.equipmentsToDomain(stations), codes };
-  }
-&nbsp;
-<span class="fstat-no" title="function not covered" >  async getFuncemePluviometers() {</span>
-<span class="cstat-no" title="statement not covered" >    const pluviometers = this.#MetereologicalEquipment.filter(</span>
-<span class="cstat-no" title="statement not covered" >      (eqp) =&gt; eqp.Type == "pluviometer" &amp;&amp; eqp.Organ === "FUNCEME"</span>
+<span class="fstat-no" title="function not covered" >  async getFuncemeStations() {</span>
+<span class="cstat-no" title="statement not covered" >    const stations = this.#MetereologicalEquipment.filter(</span>
+<span class="cstat-no" title="statement not covered" >      (eqp) =&gt; eqp.Type == "station" &amp;&amp; eqp.Organ === "FUNCEME"</span>
 <span class="cstat-no" title="statement not covered" >    );</span>
 <span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >    return EquipmentMapper.equipmentsToDomain(pluviometers);</span>
+<span class="cstat-no" title="statement not covered" >    const codes = stations.map((eqp) =&gt; eqp.IdEquipmentExternal);</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >    return { equipments: EquipmentMapper.equipmentsToDomain(stations), codes };</span>
 <span class="cstat-no" title="statement not covered" >  }</span>
+&nbsp;
+  async getFuncemePluviometers() {
+    const pluviometers = this.#MetereologicalEquipment.filter(
+      (eqp) =&gt; eqp.Type == "pluviometer" &amp;&amp; eqp.Organ === "FUNCEME"
+    );
+&nbsp;
+    const codes = pluviometers.map((eqp) =&gt; eqp.IdEquipmentExternal);
+&nbsp;
+    return {
+      equipments: EquipmentMapper.equipmentsToDomain(pluviometers),
+      codes,
+    };
+  }
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -151,7 +166,7 @@ export class MetereologicalEquipmentInMemory {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-07-18T15:33:37.416Z
+                at 2023-07-18T17:35:20.797Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
