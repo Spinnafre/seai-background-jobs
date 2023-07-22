@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email</title>
+    <link rel="import" href="axios">
+    <!-- <link rel="stylesheet" href="./styles.css"> -->
+    <style>
+        * {
+            overflow: hidden;
+            box-sizing: border-box;
+            font-family: Helvetica, sans-serif;
+        }
+
+        body {
+            max-width: 500px;
+            margin: 0 auto;
+            height: 100vh;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        ul {
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            padding: 0;
+            margin: 0;
+        }
+
+        .Container-Mail {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            width: 100%;
+            padding: 1rem 2rem;
+            border-radius: 0.8rem;
+        }
+
+        .Container-Mail img {
+            max-width: 15rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .Container-Content {
+            padding: 1rem 2rem;
+            border-radius: 0.8rem;
+            background-color: rgb(255, 255, 255);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Container-Mail">
+        <div class="Container-Content">
+            <h1>Criação de conta</h1>
+            <p>Você está recebendo esta mensagem por que você (ou alguém) criou uma conta no <b>SEAI</b> associada a
+                esse e-mail.<br>
+                Por favor, clique no link abaixo ou copie e cole no seu navegador para realizar o cadastro da sua conta
+                de
+                acesso:</p><br><br>
+            <ul>
+                <li>
+                    <a href="http://seai.com/create-user-account?action=verify&token={{token}}"
+                        rel="noopener noreferrer">http://seai.com/create-user-account?action=verify&token={{token}}</a>
+                </li>
+            </ul>
+            <p>Se houver algum questionamento você pode entrar em contato com <b>suporteseai@email.com</p>
+
+            <p>Se não reconhece a conta do SEAI <a href="mailto:{{email}}">{{email}}</a> , você pode <a
+                    href="https://www.google.com/">clicar aqui</a> para remover seu endereço de email dessa conta.</p>
+            <br><br>
+
+            <p>Obrigado</p> <br>
+            <p>Equipe SEAI</p>
+        </div>
+    </div>
+</body>
+<!-- <script src="./permission.js"></script> -->
+
+</html>

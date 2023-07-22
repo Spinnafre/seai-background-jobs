@@ -25,5 +25,5 @@ COPY [".env","/usr/src/app/"]
 # HEALTHCHECK --interval=30s \
 #     CMD node healthcheck.js
 
-ENTRYPOINT node ./src/server.js
+ENTRYPOINT node ./src/queueWorkers.js
 

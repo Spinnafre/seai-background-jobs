@@ -4,7 +4,7 @@ services:
     build: ./workers
     container_name: "jobs_workers"
     volumes:
-      - ./workers:/usr/src/app
+      - .:/usr/src/app
       - nodemodules:/usr/src/app/node_modules
     depends_on:
       jobs_database:

@@ -1,0 +1,16 @@
+{
+  "verbose": true,
+  "ignore": [
+    ".git",
+    "node_modules/**/node_modules",
+    "build"
+  ],
+  "exec":"node ./src/server.js",
+  "watch": [
+    "./src"
+  ],
+  "env":{
+    "NODE_ENV":"development"
+  },
+  "ext":"js,ts,json"
+}

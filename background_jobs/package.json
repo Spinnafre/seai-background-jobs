@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start:dev": "cross-env NODE_ENV=development nodemon",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
@@ -19,11 +20,17 @@
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
+    "csvtojson": "^2.0.10",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "ftp": "^0.3.10",
+    "knex": "^2.4.2",
+    "nodemailer": "^6.9.4",
+    "nodemailer-express-handlebars": "^6.1.0",
     "nodemon": "^3.0.1",
     "pg": "^8.11.0",
-    "pg-boss": "^9.0.3"
+    "pg-boss": "^9.0.1",
+    "tar-stream": "^3.0.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.5.0",
