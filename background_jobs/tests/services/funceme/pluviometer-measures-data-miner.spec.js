@@ -10,17 +10,17 @@ import {
 
 import { FTPClientAdapterMock } from "../../mock/funceme/ftp/connection.js";
 
-import { PluviometerMapper } from "../../../src/workers/Scrapper/core/mappers/pluviometer-mapper.js";
+import { PluviometerMapper } from "../../../src/jobs/scrapper/core/mappers/pluviometer-mapper.js";
 
 import { PluviometerRead } from "../../database/inMemory/entities/pluviometerRead.js";
 import { ReadTimeInMemory } from "../../database/inMemory/entities/readTime.js";
 import { MetereologicalEquipmentInMemory } from "../../database/inMemory/entities/metereologicalEquipment.js";
 
-import { FormatDate } from "../../../src/workers/Scrapper/utils/date-formatter.js";
-import { FetchFuncemeData } from "../../../src/workers/Scrapper/funceme/services/fetch-data/fetch-data.js";
-import { ExtractPluviometersFromFunceme } from "../../../src/workers/Scrapper/funceme/services/pluviometers-measures/pluviometers-measures-data-miner.js";
-import { PluviometerParser } from "../../../src/workers/Scrapper/funceme/helpers/parser/pluviometer-parser.js";
-import { FuncemeDataMinerDTO } from "../../../src/workers/Scrapper/funceme/cli/commands/input-boundary.js";
+import { FormatDate } from "../../../src/jobs/scrapper/utils/date-formatter.js";
+import { FetchFuncemeData } from "../../../src/jobs/scrapper/funceme/helpers/fetch-data/fetch-data.js";
+import { ExtractPluviometersFromFunceme } from "../../../src/jobs/scrapper/funceme/services/pluviometers-measures/pluviometers-measures-data-miner.js";
+import { PluviometerParser } from "../../../src/jobs/scrapper/funceme/helpers/parser/pluviometer-parser.js";
+import { FuncemeDataMinerDTO } from "../../../src/jobs/scrapper/funceme/command-handler/input-boundary.js";
 
 let ftpAdapterMock = null;
 let metereologicalEquipmentDao = null;
@@ -111,7 +111,7 @@ describe("# Pluviometer-Measures-Data-Miner", () => {
   });
 
   test("When has pluviometer measures in funceme files, should create log with success and save data with measures", async function () {
-    jest.setSystemTime(new Date(2023, 3, 2));
+    // jest.setSystemTime(new Date(2023, 3, 2));
 
     const equipments = [
       {

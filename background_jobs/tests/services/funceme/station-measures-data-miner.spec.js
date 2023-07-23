@@ -10,17 +10,17 @@ import {
 
 import { FTPClientAdapterMock } from "../../mock/funceme/ftp/connection.js";
 
-import { StationMapper } from "../../../src/workers/Scrapper/core/mappers/station-mapper.js";
+import { StationMapper } from "../../../src/jobs/scrapper/core/mappers/station-mapper.js";
 
 import { StationRead } from "../../database/inMemory/entities/stationRead.js";
 import { ReadTimeInMemory } from "../../database/inMemory/entities/readTime.js";
 import { MetereologicalEquipmentInMemory } from "../../database/inMemory/entities/metereologicalEquipment.js";
 
-import { FormatDate } from "../../../src/workers/Scrapper/utils/date-formatter.js";
-import { FetchFuncemeData } from "../../../src/workers/Scrapper/funceme/services/fetch-data/fetch-data.js";
-import { ExtractStationsFromFunceme } from "../../../src/workers/Scrapper/funceme/services/stations-measures/stations-measures-data-miner.js";
-import { StationParser } from "../../../src/workers/Scrapper/funceme/helpers/parser/station-parser.js";
-import { FuncemeDataMinerDTO } from "../../../src/workers/Scrapper/funceme/cli/commands/input-boundary.js";
+import { FormatDate } from "../../../src/jobs/scrapper/utils/date-formatter.js";
+import { FetchFuncemeData } from "../../../src/jobs/scrapper/funceme/helpers/fetch-data/fetch-data.js";
+import { ExtractStationsFromFunceme } from "../../../src/jobs/scrapper/funceme/services/stations-measures/stations-measures-data-miner.js";
+import { StationParser } from "../../../src/jobs/scrapper/funceme/helpers/parser/station-parser.js";
+import { FuncemeDataMinerDTO } from "../../../src/jobs/scrapper/funceme/command-handler/input-boundary.js";
 
 let ftpAdapterMock = null;
 let metereologicalEquipmentDao = null;

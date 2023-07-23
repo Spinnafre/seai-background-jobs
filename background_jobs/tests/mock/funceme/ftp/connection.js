@@ -1,5 +1,6 @@
 import { createReadStream } from "fs";
 import { resolve } from "path";
+import { pathToFileURL } from "url";
 
 class FTPClientAdapterMock {
   constructor() {
@@ -26,8 +27,10 @@ class FTPClientAdapterMock {
   }
 
   getFile(folder, file) {
+    console.log("path: ", pathToFileURL(import.meta.url).pathname);
     console.log(`[🔍] Getting stream from path ${folder}/${file}`);
     return createReadStream(
+      // "background_jobs",
       resolve("tests", "mock", "funceme", "data", folder, file)
     );
   }

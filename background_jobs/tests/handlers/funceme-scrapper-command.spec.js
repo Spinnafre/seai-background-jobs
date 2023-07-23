@@ -12,7 +12,7 @@ import pluviometerDataMinerFactory from "../factories/funceme/pluviometer-measur
 import stationDataMinerFactory from "../factories/funceme/stations-measures-data-miner-service.js";
 import { FTPClientAdapterMock } from "../mock/funceme/ftp/connection.js";
 import { logsRepository } from "../database/inMemory/entities/logs.js";
-import { FuncemeScrapperCommand } from "../../src/workers/Scrapper/funceme/cli/commands/funceme-scrapper-command.js";
+import { FuncemeScrapperCommand } from "../../src/jobs/scrapper/funceme/command-handler/funceme-scrapper-command.js";
 import { MetereologicalEquipmentInMemory } from "../database/inMemory/entities/metereologicalEquipment.js";
 
 let stationDataMinerService = null;
@@ -21,59 +21,47 @@ let ftpClientAdapterMock = null;
 let commandLogs = null;
 let commandHandler = null;
 
+const equipmetsDao = new MetereologicalEquipmentInMemory([
+  {
+    IdEquipment: 1,
+    IdEquipmentExternal: "A325",
+    Name: "Fortaleza",
+    Altitude: 35,
+    FK_Organ: 2,
+    Organ: "FUNCEME",
+    Type: "station",
+    CreatedAt: new Date(),
+    UpdatedAt: null,
+  },
+  {
+    IdEquipment: 2,
+    IdEquipmentExternal: "24330",
+    Name: "Teste",
+    Altitude: null,
+    FK_Organ: 2,
+    Organ: "FUNCEME",
+    Type: "pluviometer",
+    CreatedAt: new Date(),
+    UpdatedAt: null,
+  },
+]);
+
+stationDataMinerService = stationDataMinerFactory(equipmetsDao);
+
+pluviometerDataMinerService = pluviometerDataMinerFactory(equipmetsDao);
+
+ftpClientAdapterMock = new FTPClientAdapterMock();
+
+commandLogs = new logsRepository();
+
+commandHandler = new FuncemeScrapperCommand(
+  stationDataMinerService,
+  pluviometerDataMinerService,
+  ftpClientAdapterMock,
+  commandLogs
+);
+
 describe("# Funceme Handler", () => {
-  beforeEach(() => {
-    jest.useFakeTimers("modern");
-    // jest.setSystemTime(new Date(2023, 3, 2));
-  });
-
-  afterEach(() => {
-    jest.useRealTimers();
-  });
-
-  beforeEach(() => {
-    jest.setSystemTime(new Date(2023, 3, 2));
-    const equipmetsDao = new MetereologicalEquipmentInMemory([
-      {
-        IdEquipment: 1,
-        IdEquipmentExternal: "A325",
-        Name: "Fortaleza",
-        Altitude: 35,
-        FK_Organ: 2,
-        Organ: "FUNCEME",
-        Type: "station",
-        CreatedAt: new Date(),
-        UpdatedAt: null,
-      },
-      {
-        IdEquipment: 2,
-        IdEquipmentExternal: "24330",
-        Name: "Teste",
-        Altitude: null,
-        FK_Organ: 2,
-        Organ: "FUNCEME",
-        Type: "pluviometer",
-        CreatedAt: new Date(),
-        UpdatedAt: null,
-      },
-    ]);
-
-    stationDataMinerService = stationDataMinerFactory(equipmetsDao);
-
-    pluviometerDataMinerService = pluviometerDataMinerFactory(equipmetsDao);
-
-    ftpClientAdapterMock = new FTPClientAdapterMock();
-
-    commandLogs = new logsRepository();
-
-    commandHandler = new FuncemeScrapperCommand(
-      stationDataMinerService,
-      pluviometerDataMinerService,
-      ftpClientAdapterMock,
-      commandLogs
-    );
-  });
-
   test("When has equipments, should be able to save pluviometers and stations measures", async function () {
     const logsSpy = jest.spyOn(commandLogs, "create");
 

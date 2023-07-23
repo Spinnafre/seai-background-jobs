@@ -1,6 +1,6 @@
-import { FuncemeScrapperCommandFactory } from "./scrapper/funceme/factories/command-handler/funceme-scrapper-command-factory.js";
-import { MailerFactory } from "./mailer/factories/send-notification-factory.js";
-import { DailyScheduleFactory } from "./scheduler/factories/scheduler-command-handler-factory.js";
+import { FuncemeScrapperCommandFactory } from "./jobs/scrapper/funceme/factories/command-handler/funceme-scrapper-command-factory.js";
+import { MailerFactory } from "./jobs/mailer/factories/send-notification-factory.js";
+import { DailyScheduleFactory } from "./jobs/scheduler/factories/scheduler-command-handler-factory.js";
 
 const funcemeScrapper = FuncemeScrapperCommandFactory();
 const mailer = MailerFactory();

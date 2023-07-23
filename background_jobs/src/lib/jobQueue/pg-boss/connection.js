@@ -1,6 +1,6 @@
 import { dbConfig } from "../../../config/database.js";
 
-export class PgBoss {
+export class PgBossAdapter {
   _boss;
 
   static instance = null;
@@ -10,13 +10,12 @@ export class PgBoss {
   }
 
   async startMonitoring() {
-    console.log("[🕥] Iniciando monitoramento de jobs");
     // Prepares the target database and begins job monitoring.
     await this._boss.start();
   }
 
   static async create() {
-    if (!PgBoss.isInitialized()) {
+    if (!PgBossAdapter.isInitialized()) {
       const { default: pg } = await import("pg-boss");
 
       console.log("[⚙️] Criando conexão com o banco de dados de jobs");
@@ -39,14 +38,14 @@ export class PgBoss {
 
       console.log("[✅] Conexão iniciada com sucesso");
 
-      PgBoss.instance = new PgBoss(connection);
+      PgBossAdapter.instance = new PgBossAdapter(connection);
     }
 
-    return PgBoss.instance;
+    return PgBossAdapter.instance;
   }
 
   static isInitialized() {
-    return PgBoss.instance !== null;
+    return PgBossAdapter.instance !== null;
   }
 
   // async start() {

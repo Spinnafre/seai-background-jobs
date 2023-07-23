@@ -1,10 +1,10 @@
-import { QueueManager } from "./lib/jobQueue/background-jobs-manager.js";
+import { BackgroundJobsManager } from "./lib/jobQueue/background-jobs-manager.js";
+
+import queue_jobs from "./queue_workers.js";
 
 import "dotenv/config.js";
 
-console.log(process.env);
-
-const seeds = [
+const cronJobs = [
   {
     queue: "daily-scheduler",
     cron: "* * * * *",
@@ -15,11 +15,13 @@ const seeds = [
   },
 ];
 
-await QueueManager.connect();
+await BackgroundJobsManager.connectToQueue();
 
-await QueueManager.start();
+await BackgroundJobsManager.startQueueMonitoring();
 
-await QueueManager.processAllWorkers();
+await BackgroundJobsManager.scheduleCronJobs(cronJobs);
+
+await BackgroundJobsManager.registerAllWorkers(queue_jobs);
 
 process.on("uncaughtException", (error) => {
   console.error(`[WORKERS] - Erro na execução. ${error}`);

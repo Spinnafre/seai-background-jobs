@@ -2,9 +2,8 @@ import { QueueManager } from "../../../lib/jobQueue/background-jobs-manager.js";
 
 import { FuncemeScrapperCommand } from "../../scrapper/funceme/command-handler/funceme-scrapper-command.js";
 
+// agendar outros jobs
 export class DailyScheduler {
-  static name_queue = "daily-scheduler";
-
   constructor() {
     this.name_queue = "daily-scheduler";
   }

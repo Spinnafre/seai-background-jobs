@@ -1,7 +1,7 @@
 import mailerConfig from "../../config/nodemailer.js";
 
 export class SendNotification {
-  static name_queue = "SendNotification";
+  static name_queue = "mailer";
 
   static queue_options = {
     limiter: {
@@ -11,7 +11,7 @@ export class SendNotification {
   };
 
   constructor(mailerService) {
-    this.name_queue = "mailer";
+    this.name_queue = SendNotification.name_queue;
     this.mailerService = mailerService;
   }
 
