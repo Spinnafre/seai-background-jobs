@@ -3,6 +3,7 @@ import { MailerFactory } from "./jobs/mailer/factories/send-notification-factory
 import { DailyScheduleFactory } from "./jobs/scheduler/factories/scheduler-command-handler-factory.js";
 
 const funcemeScrapper = FuncemeScrapperCommandFactory();
+
 const mailer = MailerFactory();
 const dailyScheduler = DailyScheduleFactory();
 
@@ -12,7 +13,7 @@ export default [
     workers: [
       {
         name: funcemeScrapper.constructor.name,
-        process: funcemeScrapper.handler,
+        process: (command) => funcemeScrapper.handler(command),
       },
     ],
   },
@@ -21,7 +22,7 @@ export default [
     workers: [
       {
         name: mailer.constructor.name,
-        process: mailer.handler,
+        process: (command) => mailer.handler(command),
       },
     ],
   },
@@ -30,7 +31,7 @@ export default [
     workers: [
       {
         name: dailyScheduler.constructor.name,
-        process: dailyScheduler.handler,
+        process: (command) => dailyScheduler.handler(command),
       },
     ],
   },

@@ -1,4 +1,4 @@
-import mailerConfig from "../../config/nodemailer.js";
+import mailerConfig from "../../../config/nodemailer.js";
 
 export class SendNotification {
   static name_queue = "mailer";
@@ -19,6 +19,18 @@ export class SendNotification {
     const {
       data: { to, templateName, subject, context },
     } = data;
+
+    console.log("enviando email para ", {
+      port: mailerConfig.port,
+      host: mailerConfig.host,
+      username: mailerConfig.auth.username,
+      password: mailerConfig.auth.password,
+      from: "Queue Test <queue@queuetest.com.br>",
+      to,
+      subject,
+      template: templateName,
+      context: { ...context },
+    });
 
     await this.mailerService.send({
       port: mailerConfig.port,

@@ -1,8 +1,11 @@
+import { TimeoutError } from "./errors/TimeoutError.js";
 import { FuncemeDataMinerDTO } from "./input-boundary.js";
 
 export class FuncemeScrapperCommand {
   static name_queue = "funceme-scrapper";
-  static timeout = 30000;
+  static timeout = 2000;
+
+  // ftpClient = null;
 
   constructor(stationDataMiner, pluviometerDataMiner, ftpClient, logs) {
     this.stationDataMiner = stationDataMiner;
@@ -13,7 +16,7 @@ export class FuncemeScrapperCommand {
   }
 
   async runAllServices(dto) {
-    console.log("REQUEST => ", dto);
+    console.log("FuncemeScrapperCommand ::: dto ", dto);
 
     await this.stationDataMiner.execute(dto);
 
@@ -28,9 +31,7 @@ export class FuncemeScrapperCommand {
       setTimeout(
         reject,
         FuncemeScrapperCommand.timeout,
-        new Error(
-          `Exceeded the tolerance time limit ${FuncemeScrapperCommand.timeout}`
-        )
+        new TimeoutError(FuncemeScrapperCommand.timeout)
       );
     });
   }
@@ -41,6 +42,8 @@ export class FuncemeScrapperCommand {
     const time = data.date;
 
     console.log("TIME = ", time);
+
+    console.log("ENV ::: ", process.env);
 
     const dto = new FuncemeDataMinerDTO(time);
 
@@ -54,9 +57,12 @@ export class FuncemeScrapperCommand {
       console.error("[ERROR] - Falha ao executar worker da funceme.");
       console.error(error);
 
-      await this.logs.create(error.message);
-
       await this.ftpClient.close();
+
+      await this.logs.create({
+        message: error.message,
+        type: "error",
+      });
 
       //Essencial para o PG-BOSS entender que ocorreu um erro
       throw error;

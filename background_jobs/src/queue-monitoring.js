@@ -1,8 +1,7 @@
+import "dotenv/config.js";
 import { BackgroundJobsManager } from "./lib/jobQueue/background-jobs-manager.js";
 
 import queue_jobs from "./queue_workers.js";
-
-import "dotenv/config.js";
 
 const cronJobs = [
   {

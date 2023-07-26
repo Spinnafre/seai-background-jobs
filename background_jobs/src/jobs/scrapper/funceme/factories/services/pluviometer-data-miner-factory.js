@@ -5,9 +5,9 @@ import { PluviometerReadDao } from "../../external/database/postgreSQL/data/pluv
 import { PluviometerParser } from "../../helpers/parser/pluviometer-parser.js";
 import { FetchFuncemeData } from "../../helpers/fetch-data/fetch-data.js";
 import { ExtractPluviometersFromFunceme } from "../../services/pluviometers-measures/pluviometers-measures-data-miner.js";
-import FtpClientAdapter from "../adapters/ftp-adapter-factory.js";
+// import FtpClientAdapter from "../adapters/ftp-adapter-factory.js";
 
-export const pluviometerDataMinerFactory = () => {
+export const pluviometerDataMinerFactory = (FtpClientAdapter) => {
   const pluviometerParser = new PluviometerParser();
 
   const fetchFuncemeData = new FetchFuncemeData(

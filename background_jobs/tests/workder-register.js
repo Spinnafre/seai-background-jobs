@@ -1,15 +1,24 @@
-import { QueueManager } from "../src/lib/jobQueue/manager.js";
-import { FuncemeScrapperCommand } from "../src/workers/Scrapper/funceme/cli/commands/funceme-scrapper-command.js";
+import { BackgroundJobsManager } from "../src/lib/jobQueue/background-jobs-manager.js";
+import { FuncemeScrapperCommand } from "../../background_jobs/src/jobs/scrapper/funceme/command-handler/funceme-scrapper-command.js";
 
-import dotenv from "dotenv";
+import "dotenv/config.js";
+
+import queue_jobs from "../src/queue_workers.js";
 
 import { resolve } from "node:path";
 
-dotenv.config({
-  path: resolve(".env"),
-});
-
 console.log(process.env);
+
+const cronJobs = [
+  {
+    queue: "daily-scheduler",
+    cron: "* * * * *",
+    data: null,
+    options: {
+      tz: "America/Chicago",
+    },
+  },
+];
 
 async function register() {
   const today = new Date();
@@ -21,13 +30,19 @@ async function register() {
 
   const date = Intl.DateTimeFormat("pt-BR").format(yesterday);
 
-  await QueueManager.start();
+  await BackgroundJobsManager.connectToQueue();
 
-  await QueueManager.createJob(
+  await BackgroundJobsManager.startQueueMonitoring();
+
+  await BackgroundJobsManager.scheduleCronJobs(cronJobs);
+
+  await BackgroundJobsManager.registerAllWorkers(queue_jobs);
+
+  await BackgroundJobsManager.createJob(
     FuncemeScrapperCommand.name_queue,
     { date },
     {
-      singletonKey: "1",
+      // singletonKey: "1",
       useSingletonQueue: true,
       // startAfter: today,
       retryLimit: 3,

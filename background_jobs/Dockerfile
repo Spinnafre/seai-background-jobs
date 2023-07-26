@@ -2,7 +2,7 @@
 
 FROM node:18-bullseye-slim AS development
 
-ARG NODE_ENV=production
+ARG NODE_ENV=development
 ENV NODE_ENV $NODE_ENV
 
 RUN apt-get update && apt-get install -y --no-install-recommends ftp
@@ -25,5 +25,5 @@ COPY [".env","/usr/src/app/"]
 # HEALTHCHECK --interval=30s \
 #     CMD node healthcheck.js
 
-ENTRYPOINT node ./src/queueWorkers.js
+ENTRYPOINT node ./src/queue-monitoring.js
 

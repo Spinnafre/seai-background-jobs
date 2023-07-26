@@ -5,6 +5,7 @@ export class BackgroundJobsManager {
 
   static async registerAllWorkers(queue_jobs = []) {
     console.log("[⚡] Iniciando workers...");
+    console.log(queue_jobs);
 
     for (const task of queue_jobs) {
       for (const worker of task.workers) {
@@ -60,15 +61,15 @@ export class BackgroundJobsManager {
   }
 
   static async createJob(name_queue, data, options) {
-    const hasWorker = BackgroundJobsManager.handlers.some(
-      (handler) => handler.queue_name === name_queue
-    );
-    if (hasWorker === false) {
-      console.error(
-        `Não há nenhum worker registrado para a fila ${name_queue}`
-      );
-      return;
-    }
+    // const hasWorker = BackgroundJobsManager.handlers.some(
+    //   (handler) => handler.queue_name === name_queue
+    // );
+    // if (hasWorker === false) {
+    //   console.error(
+    //     `Não há nenhum worker registrado para a fila ${name_queue}`
+    //   );
+    //   return;
+    // }
     const id = await BackgroundJobsManager.client.registerJob(
       name_queue,
       data,

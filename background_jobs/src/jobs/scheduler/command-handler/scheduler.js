@@ -1,4 +1,4 @@
-import { QueueManager } from "../../../lib/jobQueue/background-jobs-manager.js";
+import { BackgroundJobsManager } from "../../../lib/jobQueue/background-jobs-manager.js";
 
 import { FuncemeScrapperCommand } from "../../scrapper/funceme/command-handler/funceme-scrapper-command.js";
 
@@ -27,7 +27,7 @@ export class DailyScheduler {
 
     // Agenda todos os dias para executar a busca de dados da
     // funceme no período do dia de execução do worker.
-    await QueueManager.createJob(
+    await BackgroundJobsManager.createJob(
       FuncemeScrapperCommand.name_queue,
       { date },
       {

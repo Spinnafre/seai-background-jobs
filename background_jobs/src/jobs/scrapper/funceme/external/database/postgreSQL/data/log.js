@@ -4,22 +4,28 @@ export class LogRepository {
   async create(logs) {
     let data;
 
-    if (typeof logs === "string") {
+    if (Array.isArray(logs)) {
+      data = logs.length
+        ? logs.map((log) => {
+            return {
+              Message: log.message,
+              Operation: "",
+              Status: log.type,
+            };
+          })
+        : null;
+    } else {
       data = {
         Message: logs.message,
         Operation: "",
         Status: logs.type,
       };
-    } else {
-      data = logs.map((log) => {
-        return {
-          Message: log.message,
-          Operation: "",
-          Status: log.type,
-        };
-      });
     }
 
-    await logs_connection.insert(data).into("Funceme_Data_Miner");
+    console.log(data);
+
+    if (data !== null) {
+      await logs_connection.insert(data).into("Funceme_Data_Miner");
+    }
   }
 }
