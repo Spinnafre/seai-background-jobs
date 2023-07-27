@@ -1,13 +1,9 @@
-import { BackgroundJobsManager } from "../src/lib/jobQueue/background-jobs-manager.js";
-import { FuncemeScrapperCommand } from "../../background_jobs/src/jobs/scrapper/funceme/command-handler/funceme-scrapper-command.js";
+import { BackgroundJobsManager } from "../../src/lib/jobQueue/background-jobs-manager.js";
+import { FuncemeScrapperCommand } from "../../src/jobs/scrapper/funceme/command-handler/funceme-scrapper-command.js";
 
 import "dotenv/config.js";
 
-import queue_jobs from "../src/queue_workers.js";
-
-import { resolve } from "node:path";
-
-console.log(process.env);
+import queue_jobs from "../../src/queue_workers.js";
 
 const cronJobs = [
   {
@@ -61,7 +57,6 @@ async function register() {
   //     retryDelay: 15,
   //   }
   // );
-  process.exit(0);
 }
 
 register();

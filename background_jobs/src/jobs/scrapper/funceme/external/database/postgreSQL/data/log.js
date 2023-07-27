@@ -22,8 +22,6 @@ export class LogRepository {
       };
     }
 
-    console.log(data);
-
     if (data !== null) {
       await logs_connection.insert(data).into("Funceme_Data_Miner");
     }

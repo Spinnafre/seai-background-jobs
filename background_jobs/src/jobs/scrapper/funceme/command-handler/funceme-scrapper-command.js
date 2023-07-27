@@ -16,8 +16,6 @@ export class FuncemeScrapperCommand {
   }
 
   async runAllServices(dto) {
-    console.log("FuncemeScrapperCommand ::: dto ", dto);
-
     await this.stationDataMiner.execute(dto);
 
     await this.pluviometerDataMiner.execute(dto);

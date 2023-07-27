@@ -76,7 +76,6 @@ export class FTPClientAdapter {
           console.log(error);
           return reject(error);
         }
-        console.log(current);
       });
 
       this.connection.status((error, status) => {

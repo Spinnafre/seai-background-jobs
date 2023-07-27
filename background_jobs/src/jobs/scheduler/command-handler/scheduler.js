@@ -4,9 +4,7 @@ import { FuncemeScrapperCommand } from "../../scrapper/funceme/command-handler/f
 
 // agendar outros jobs
 export class DailyScheduler {
-  constructor() {
-    this.name_queue = "daily-scheduler";
-  }
+  static name_queue = "daily-scheduler";
 
   async handler(payload) {
     // data que será agendado o worker para buscar dados
