@@ -2,142 +2,110 @@ import { equipments } from "../connection.js";
 
 export class MetereologicalEquipmentDao {
   #connection;
+  
   constructor() {
     this.#connection = equipments();
   }
 
-  async getFuncemeStations() {
-    const stations = await this.#connection
-      .select(
-        "MetereologicalEquipment.Name as Name",
-        "EquipmentType.Name as Type",
-        "MetereologicalEquipment.IdEquipment",
-        "MetereologicalEquipment.IdEquipmentExternal",
-        "MetereologicalEquipment.Altitude",
-        "MetereologicalEquipment.CreatedAt",
-        "MetereologicalEquipment.UpdatedAt",
-        "MetereologicalEquipment.FK_Organ",
-        "MetereologicalOrgan.Name as Organ"
-      )
-      .from("MetereologicalEquipment")
-      .innerJoin(
-        "EquipmentType",
-        "MetereologicalEquipment.FK_Type",
-        "=",
-        "EquipmentType.IdType"
-      )
-      .innerJoin(
-        "MetereologicalOrgan",
-        "MetereologicalOrgan.IdOrgan",
-        "=",
-        "MetereologicalEquipment.FK_Organ"
-      );
+  async getPluviometers(organName = null) {
+    let pluviometers = []
 
-    const items = stations.filter(
-      (eqp) => eqp.Type === "station" && eqp.Organ === "FUNCEME"
-    );
-    console.log("ITEMS =", items);
+    if (organName) {
+      pluviometers = await this.#connection
+        .raw(`
+        SELECT
+          me."IdEquipment" AS "Id",
+          me."IdEquipmentExternal" AS "code",
+          me."Name" AS "Location",
+          me."Altitude",
+          et."Name" AS "Type",
+          mo."Name" AS "Organ"
+        FROM
+          "MetereologicalEquipment" me
+          INNER JOIN "EquipmentType" et ON et."IdType" = me."FK_Type"
+          INNER JOIN "MetereologicalOrgan" mo ON mo."IdOrgan" = me."FK_Organ"
+        WHERE
+          mo."Name" = ? AND et."Name" = 'pluviometer'
+        `, [organName])
+    } else {
+      pluviometers = await this.#connection
+        .raw(`
+        SELECT
+          me."IdEquipment" AS "Id",
+          me."IdEquipmentExternal" AS "code",
+          me."Name" AS "Location",
+          me."Altitude",
+          et."Name" AS "Type",
+          mo."Name" AS "Organ"
+        FROM
+          "MetereologicalEquipment" me
+          INNER JOIN "EquipmentType" et ON et."IdType" = me."FK_Type"
+          INNER JOIN "MetereologicalOrgan" mo ON mo."IdOrgan" = me."FK_Organ"
+        WHERE
+          et."Name" = 'pluviometer'
+        `)
+    }
 
-    return items;
+    return pluviometers.map((station) => {
+      return {
+        id: station.Id,
+        code: station.Code,
+        location: station.Location,
+        altitude: station.Altitude,
+        type: station.Type,
+        organ: station.Organ
+      }
+    });
   }
 
-  async getFuncemePluviometers() {
-    const stations = await this.#connection
-      .select(
-        "MetereologicalEquipment.Name as Name",
-        "EquipmentType.Name as Type",
-        "MetereologicalEquipment.IdEquipment",
-        "MetereologicalEquipment.IdEquipmentExternal",
-        "MetereologicalEquipment.Altitude",
-        "MetereologicalEquipment.CreatedAt",
-        "MetereologicalEquipment.UpdatedAt",
-        "MetereologicalEquipment.FK_Organ",
-        "MetereologicalOrgan.Name as Organ"
-      )
-      .from("MetereologicalEquipment")
-      .innerJoin(
-        "EquipmentType",
-        "MetereologicalEquipment.FK_Type",
-        "=",
-        "EquipmentType.IdType"
-      )
-      .innerJoin(
-        "MetereologicalOrgan",
-        "MetereologicalOrgan.IdOrgan",
-        "=",
-        "MetereologicalEquipment.FK_Organ"
-      );
+  async getStations(organName = null) {
+    let stations = []
 
-    const items = stations.filter(
-      (eqp) => eqp.Type === "pluviometer" && eqp.Organ === "FUNCEME"
-    );
+    if (organName) {
+      stations = await this.#connection
+        .raw(`
+        SELECT
+          me."IdEquipment" AS "Id",
+          me."IdEquipmentExternal" AS "code",
+          me."Name" AS "Location",
+          me."Altitude",
+          et."Name" AS "Type",
+          mo."Name" AS "Organ"
+        FROM
+          "MetereologicalEquipment" me
+          INNER JOIN "EquipmentType" et ON et."IdType" = me."FK_Type"
+          INNER JOIN "MetereologicalOrgan" mo ON mo."IdOrgan" = me."FK_Organ"
+        WHERE
+          mo."Name" = ? AND et."Name" = 'station'
+        `, [organName])
+    } else {
+      stations = await this.#connection
+        .raw(`
+            SELECT
+              me."IdEquipment" AS "Id",
+              me."IdEquipmentExternal" AS "Code",
+              me."Name" AS "Location",
+              me."Altitude",
+              et."Name" AS "Type",
+              mo."Name" AS "Organ"
+            FROM
+              "MetereologicalEquipment" me
+              INNER JOIN "EquipmentType" et ON et."IdType" = me."FK_Type"
+              INNER JOIN "MetereologicalOrgan" mo ON mo."IdOrgan" = me."FK_Organ"
+            WHERE
+              et."Name" = 'station'`)
+    }
 
-    return items;
-  }
 
-  async getInmetPluviometers() {
-    const pluviometers = await this.#connection
-      .select(
-        "MetereologicalEquipment.Name as Name",
-        "EquipmentType.Name as Type",
-        "MetereologicalEquipment.IdEquipment",
-        "MetereologicalEquipment.IdEquipmentExternal",
-        "MetereologicalEquipment.Altitude",
-        "MetereologicalEquipment.CreatedAt",
-        "MetereologicalEquipment.UpdatedAt",
-        "MetereologicalEquipment.FK_Organ",
-        "MetereologicalOrgan.Name as Organ"
-      )
-      .from("MetereologicalEquipment")
-      .innerJoin(
-        "EquipmentType",
-        "MetereologicalEquipment.FK_Type",
-        "=",
-        "EquipmentType.IdType"
-      )
-      .innerJoin(
-        "MetereologicalOrgan",
-        "MetereologicalOrgan.IdOrgan",
-        "=",
-        "MetereologicalEquipment.FK_Organ"
-      );
-    const items = pluviometers.filter(
-      (eqp) => eqp.Type === "pluviometer" && eqp.Organ === "INMET"
-    );
-
-    return items;
-  }
-  async getInmetStations() {
-    const stations = await this.#connection
-      .select(
-        "MetereologicalEquipment.Name as Name",
-        "EquipmentType.Name as Type",
-        "MetereologicalEquipment.IdEquipment",
-        "MetereologicalEquipment.IdEquipmentExternal",
-        "MetereologicalEquipment.Altitude",
-        "MetereologicalEquipment.CreatedAt",
-        "MetereologicalEquipment.UpdatedAt",
-        "MetereologicalEquipment.FK_Organ",
-        "MetereologicalOrgan.Name as Organ"
-      )
-      .from("MetereologicalEquipment")
-      .innerJoin(
-        "EquipmentType",
-        "MetereologicalEquipment.FK_Type",
-        "=",
-        "EquipmentType.IdType"
-      )
-      .innerJoin(
-        "MetereologicalOrgan",
-        "MetereologicalOrgan.IdOrgan",
-        "=",
-        "MetereologicalEquipment.FK_Organ"
-      );
-
-    const items = stations.filter(
-      (eqp) => eqp.Type === "station" && eqp.Organ === "INMET"
-    );
-
-    return items;
+    return stations.map((station) => {
+      return {
+        id: station.Id,
+        code: station.Code,
+        location: station.Location,
+        altitude: station.Altitude,
+        type: station.Type,
+        organ: station.Organ
+      }
+    });
   }
 }
