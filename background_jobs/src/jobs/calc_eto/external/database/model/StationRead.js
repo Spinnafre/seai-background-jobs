@@ -1,6 +1,6 @@
 import { equipments } from "../connection.js";
 
-export class StationReadDao {
+export class StationReadRepository {
   #connection;
   constructor() {
     this.#connection = equipments();
@@ -14,18 +14,18 @@ export class StationReadDao {
       })
       .from("ReadStations");
 
-    if(!data){
-      return null 
+    if (!data) {
+      return null;
     }
-    
-    return data.map((stationRead)=>{
+
+    return data.map((stationRead) => {
       return {
-        idRead:stationRead.IdRead,
+        idRead: stationRead.IdRead,
         totalRadiation: stationRead.TotalRadiation,
         relativeHumidity: stationRead.RelativeHumidity,
-        atmosphericTemperature : stationRead.AtmosphericTemperature,
-        windVelocity: stationRead.WindVelocity
-      }
+        atmosphericTemperature: stationRead.AtmosphericTemperature,
+        windVelocity: stationRead.WindVelocity,
+      };
     });
   }
 }

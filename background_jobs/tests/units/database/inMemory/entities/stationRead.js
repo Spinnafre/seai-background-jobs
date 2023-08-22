@@ -1,4 +1,4 @@
-export class StationRead {
+export class StationReadRepositoryInMemory {
   #ReadStations = [];
 
   async create(measures = []) {

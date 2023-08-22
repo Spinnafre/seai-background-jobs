@@ -1,18 +1,18 @@
 import { equipments } from "../connection.js";
 
-export class MetereologicalEquipmentDao {
+export class MetereologicalEquipmentRepository {
   #connection;
-  
+
   constructor() {
     this.#connection = equipments();
   }
 
   async getPluviometers(organName = null) {
-    let pluviometers = []
+    let pluviometers = [];
 
     if (organName) {
-      pluviometers = await this.#connection
-        .raw(`
+      pluviometers = await this.#connection.raw(
+        `
         SELECT
           me."IdEquipment" AS "Id",
           me."IdEquipmentExternal" AS "code",
@@ -26,10 +26,11 @@ export class MetereologicalEquipmentDao {
           INNER JOIN "MetereologicalOrgan" mo ON mo."IdOrgan" = me."FK_Organ"
         WHERE
           mo."Name" = ? AND et."Name" = 'pluviometer'
-        `, [organName])
+        `,
+        [organName]
+      );
     } else {
-      pluviometers = await this.#connection
-        .raw(`
+      pluviometers = await this.#connection.raw(`
         SELECT
           me."IdEquipment" AS "Id",
           me."IdEquipmentExternal" AS "code",
@@ -43,7 +44,7 @@ export class MetereologicalEquipmentDao {
           INNER JOIN "MetereologicalOrgan" mo ON mo."IdOrgan" = me."FK_Organ"
         WHERE
           et."Name" = 'pluviometer'
-        `)
+        `);
     }
 
     return pluviometers.map((station) => {
@@ -53,17 +54,17 @@ export class MetereologicalEquipmentDao {
         location: station.Location,
         altitude: station.Altitude,
         type: station.Type,
-        organ: station.Organ
-      }
+        organ: station.Organ,
+      };
     });
   }
 
   async getStations(organName = null) {
-    let stations = []
+    let stations = [];
 
     if (organName) {
-      stations = await this.#connection
-        .raw(`
+      stations = await this.#connection.raw(
+        `
         SELECT
           me."IdEquipment" AS "Id",
           me."IdEquipmentExternal" AS "code",
@@ -77,10 +78,11 @@ export class MetereologicalEquipmentDao {
           INNER JOIN "MetereologicalOrgan" mo ON mo."IdOrgan" = me."FK_Organ"
         WHERE
           mo."Name" = ? AND et."Name" = 'station'
-        `, [organName])
+        `,
+        [organName]
+      );
     } else {
-      stations = await this.#connection
-        .raw(`
+      stations = await this.#connection.raw(`
             SELECT
               me."IdEquipment" AS "Id",
               me."IdEquipmentExternal" AS "Code",
@@ -93,9 +95,8 @@ export class MetereologicalEquipmentDao {
               INNER JOIN "EquipmentType" et ON et."IdType" = me."FK_Type"
               INNER JOIN "MetereologicalOrgan" mo ON mo."IdOrgan" = me."FK_Organ"
             WHERE
-              et."Name" = 'station'`)
+              et."Name" = 'station'`);
     }
-
 
     return stations.map((station) => {
       return {
@@ -104,8 +105,8 @@ export class MetereologicalEquipmentDao {
         location: station.Location,
         altitude: station.Altitude,
         type: station.Type,
-        organ: station.Organ
-      }
+        organ: station.Organ,
+      };
     });
   }
 }
