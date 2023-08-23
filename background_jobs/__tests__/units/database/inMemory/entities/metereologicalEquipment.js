@@ -1,4 +1,4 @@
-import { EquipmentMapper } from "../../../../src/jobs/scrapper/core/mappers/equipments-mapper.js";
+import { EquipmentMapper } from "../../../../../src/jobs/scrapper/core/mappers/equipments-mapper.js";
 
 export class MetereologicalEquipmentInMemory {
   #MetereologicalEquipment;

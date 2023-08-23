@@ -31,7 +31,7 @@ class FTPClientAdapterMock {
     console.log(`[🔍] Getting stream from path ${folder}/${file}`);
     return createReadStream(
       // "background_jobs",
-      resolve("tests", "mock", "funceme", "data", folder, file)
+      resolve("__tests__", "units","mock", "funceme", "data", folder, file)
     );
   }
 }

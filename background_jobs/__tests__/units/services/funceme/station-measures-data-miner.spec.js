@@ -12,8 +12,8 @@ import { FTPClientAdapterMock } from "../../mock/funceme/ftp/connection.js";
 
 import { StationMapper } from "../../../../src/jobs/scrapper/core/mappers/station-mapper.js";
 
-import { StationRead } from "../../database/inMemory/entities/stationRead.js";
-import { ReadTimeInMemory } from "../../database/inMemory/entities/readTime.js";
+import { StationReadRepositoryInMemory } from "../../database/inMemory/entities/stationRead.js";
+// import { ReadTimeInMemory } from "../../database/inMemory/entities/readTime.js";
 import { MetereologicalEquipmentInMemory } from "../../database/inMemory/entities/metereologicalEquipment.js";
 
 import { FormatDate } from "../../../../src/jobs/scrapper/utils/date-formatter.js";
@@ -52,8 +52,8 @@ describe("# Station-Measures-Data-Miner", () => {
     );
 
     metereologicalEquipmentDao = new MetereologicalEquipmentInMemory();
-    stationReadDao = new StationRead();
-    readTimeDao = new ReadTimeInMemory();
+    stationReadDao = new StationReadRepositoryInMemory();
+    // readTimeDao = new ReadTimeInMemory();
 
     stationsMeasuresDataMinerService = new ExtractStationsFromFunceme(
       fetchFuncemeData,
