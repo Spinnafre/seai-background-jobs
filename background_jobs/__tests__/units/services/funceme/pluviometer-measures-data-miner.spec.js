@@ -1,4 +1,4 @@
-// npm run test:dev -i tests/services/funceme/pluviometer-measures-data-miner.spec.js
+// npm run test:dev -i __tests__/units/services/funceme/pluviometer-measures-data-miner.spec.js
 import {
   describe,
   expect,
@@ -24,7 +24,6 @@ import { FuncemeDataMinerDTO } from "../../../../src/jobs/scrapper/funceme/comma
 let ftpAdapterMock = null;
 let metereologicalEquipmentDao = null;
 let pluviometerReadDao = null;
-let readTimeDao = null;
 let fetchFuncemeData = null;
 let service = null;
 

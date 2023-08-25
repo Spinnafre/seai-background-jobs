@@ -21,7 +21,8 @@ export class DailyScheduler {
     console.log(current_date.getTime(), ":::", yesterday);
 
     //DD/MM/YYYY
-    const date = Intl.DateTimeFormat("pt-BR").format(yesterday);
+    // const date = Intl.DateTimeFormat("pt-BR").format(yesterday);
+    const date = yesterday;
 
     // Agenda todos os dias para executar a busca de dados da
     // funceme no período do dia de execução do worker.

@@ -7,6 +7,6 @@ export class FuncemeDataMinerDTO {
 
   // dd/mm/yyyy
   getDate() {
-    return this.date;
+    return Intl.DateTimeFormat("pt-BR").format(this.date);
   }
 }

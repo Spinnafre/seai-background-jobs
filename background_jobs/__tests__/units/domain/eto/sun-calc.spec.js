@@ -1,1 +1,0 @@
-describe("Sun calc", () => {});

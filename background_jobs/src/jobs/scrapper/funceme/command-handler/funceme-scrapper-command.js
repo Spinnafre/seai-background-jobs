@@ -37,11 +37,10 @@ export class FuncemeScrapperCommand {
   async handler(payload) {
     const { id, data } = payload;
 
+    // DD/MM/YYYY
     const time = data.date;
 
     console.log("TIME = ", time);
-
-    console.log("ENV ::: ", process.env);
 
     const dto = new FuncemeDataMinerDTO(time);
 

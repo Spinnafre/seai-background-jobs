@@ -5,12 +5,16 @@ export class CalcEtoDTO {
     this.date = payload;
   }
 
-  getDay() {}
+  getDay() {
+    return new Date(this.date).getDate();
+  }
 
-  getYear() {}
+  getYear() {
+    return new Date(this.date).getFullYear();
+  }
 
   // dd/mm/yyyy
   getDate() {
-    return this.date;
+    return Intl.DateTimeFormat("pt-BR").format(new Date(this.date));
   }
 }

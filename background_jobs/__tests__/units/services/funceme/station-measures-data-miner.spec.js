@@ -1,4 +1,4 @@
-// npm run test:dev -i tests/services/funceme/station-measures-data-miner.spec.js
+// npm run test:dev -i __tests__/units/services/funceme/station-measures-data-miner.spec.js
 import {
   describe,
   expect,

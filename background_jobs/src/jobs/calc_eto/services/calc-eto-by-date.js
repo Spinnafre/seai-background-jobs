@@ -1,9 +1,5 @@
 import { ServiceProtocol } from "../../scrapper/core/service-protocol.js";
-
-import { dataAdjust } from "../helpers/data-adjust.js";
-
-import { etoPrecalc, radCalc, sunCalc } from "../domain";
-
+import { CalcEto } from "../domain/calc-eto.js";
 export class CalcETO extends ServiceProtocol {
   constructor(equipmentRepository, etoRepository, stationReadsRepository) {
     this.equipmentRepository = equipmentRepository;
@@ -13,10 +9,8 @@ export class CalcETO extends ServiceProtocol {
 
   async execute(date) {
     console.log("date ::: ", date);
+
     const stationsEqps = await this.equipmentRepository.getStations();
-    const year = 2023;
-    const day = 17;
-    const julianDay = day - year + 1;
 
     const stationsEto = [];
 
@@ -26,6 +20,9 @@ export class CalcETO extends ServiceProtocol {
         await this.stationReadsRepository.getStationReadsByEquipment(
           station.id
         );
+      // TO-DO : buscar leituras de pluviometros pelo o ID da estação
+
+      // const stationPluviometerReads = await this.pluviometerReadsRepository.getReadByIdAndDate(station.id,date)
 
       // e se não tiver dados de leituras da estação?
       if (stationReads === null) {
@@ -43,88 +40,26 @@ export class CalcETO extends ServiceProtocol {
           relativeHumidity,
         } = stationRead;
 
-        const {
-          pressure,
-          solarRadiation,
-          temperatureAverage,
-          humidityAverage,
-          windVelocity,
-        } = dataAdjust(
-          totalRadiation,
-          atmosphericTemperature,
-          relativeHumidity,
-          altitude
-        );
+        if (totalRadiation === null) {
+          // avisar que está faltando dados de radiação
+        }
 
-        console.log("[LOG] result of [dataAdjust] = ", {
-          pressure,
-          solarRadiation,
-          temperatureAverage,
-          humidityAverage,
-          windVelocity,
+        if (relativeHumidity === null) {
+          // avisar que está faltando dados de humidade
+        }
+
+        if (atmosphericTemperature === null) {
+          // avisar que está faltando dados de temperatura
+        }
+
+        const et0 = CalcEto({
+          date,
+          altitude,
+          atmosphericTemperatureAverage: atmosphericTemperature,
+          relativeHumidityAverage: relativeHumidity,
+          totalRadiationAverage: totalRadiation,
+          sunQuantityHoursInDay: 11,
         });
-
-        const {
-          extraterrestrialRadiation,
-          clearSkyRadiation,
-          nebulosityFactor,
-          maxTemperature,
-          minTemperature,
-        } = sunCalc(julianDay, solarRadiation, altitude, temperatureAverage);
-
-        console.log("[LOG] result of [sunCalc] = ", {
-          extraterrestrialRadiation,
-          clearSkyRadiation,
-          nebulosityFactor,
-          maxTemperature,
-          minTemperature,
-        });
-
-        const {
-          currentSteamPressureValue,
-          delta,
-          gama,
-          saturationSteamPressure,
-        } = etoPrecalc(temperatureAverage, humidityAverage, pressure);
-
-        console.log("[LOG] result of [etoPrecalc] = ", {
-          currentSteamPressureValue,
-          delta,
-          gama,
-          saturationSteamPressure,
-        });
-
-        const { flowDensity, g_asterico, liquidRad } = radCalc(
-          maxTemperature,
-          minTemperature,
-          solarRadiation,
-          nebulosityFactor,
-          currentSteamPressureValue,
-          windVelocity,
-          gama
-        );
-
-        console.log("[LOG] result of [radCalc] = ", {
-          flowDensity,
-          g_asterico,
-          liquidRad,
-        });
-
-        const rad =
-          (0.408 * delta * (liquidRad - flowDensity)) / (delta + g_asterico);
-
-        console.log("[LOG] radiation = ", rad);
-
-        const aero =
-          (gama *
-            (900 / (273 + temperatureAverage)) *
-            windVelocity *
-            (saturationSteamPressure - currentSteamPressureValue)) /
-          (delta + g_asterico);
-
-        console.log("[LOG] aero = ", aero);
-
-        const et0 = rad + aero;
 
         console.log("[LOG] eto = ", et0);
 
