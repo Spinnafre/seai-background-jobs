@@ -11,6 +11,31 @@ export class MetereologicalEquipmentInMemory {
     this.#MetereologicalEquipment.push(data);
   }
 
+  async getStations(organName = "") {
+    let stations = [];
+
+    if (organName) {
+      stations = this.#MetereologicalEquipment.filter(
+        (eqp) => eqp.Type == "station" && eqp.Organ === organName
+      );
+    } else {
+      stations = this.#MetereologicalEquipment.filter(
+        (eqp) => eqp.Type == "station"
+      );
+    }
+
+    return stations.map((station) => {
+      return {
+        id: station.IdEquipment,
+        code: station.IdEquipmentExternal,
+        location: "test",
+        altitude: station.Altitude,
+        type: station.Type,
+        organ: station.Organ,
+      };
+    });
+  }
+
   async getFuncemeStations() {
     const stations = this.#MetereologicalEquipment.filter(
       (eqp) => eqp.Type == "station" && eqp.Organ === "FUNCEME"

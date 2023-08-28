@@ -30,8 +30,7 @@ export function EstimateSolarRadiation(
   const Bs = 0.5;
 
   return (
-    (As + Bs) *
-    (sunQuantityHoursInDay / sunMaxDailyHours) *
+    (As + Bs * (sunQuantityHoursInDay / sunMaxDailyHours)) *
     extraterrestrialRadiation
   );
 }

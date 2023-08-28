@@ -1,23 +1,21 @@
-import { equipments } from "../connection.js";
+import { connections } from "../connection.js";
 
 export class ET0Repository {
   #connection;
   constructor() {
-    this.#connection = equipments();
+    this.#connection = connections.equipments;
   }
 
-  async add(reads=[]) {
-    const toPersistency = reads.map((read)=>{
+  async add(reads = []) {
+    const toPersistency = reads.map((read) => {
       return {
-        Value:read.eto,
-        FK_Station_Read: read.idRead
-      }
-    })
+        Value: read.eto,
+        FK_Station_Read: read.idRead,
+      };
+    });
 
-    console.log("Data to insert = ",toPersistency)
-    
-    await this.#connection
-      .insert(toPersistency)
-      .into("Et0");
+    console.log("Data to insert = ", toPersistency);
+
+    await this.#connection.insert(toPersistency).into("Et0");
   }
 }

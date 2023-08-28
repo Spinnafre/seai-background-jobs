@@ -1,9 +1,9 @@
-import { equipments } from "../connection.js";
+import { connections } from "../connection.js";
 
 export class StationReadRepository {
   #connection;
   constructor() {
-    this.#connection = equipments();
+    this.#connection = connections.equipments;
   }
 
   async getStationReadsByEquipment(idEqp) {

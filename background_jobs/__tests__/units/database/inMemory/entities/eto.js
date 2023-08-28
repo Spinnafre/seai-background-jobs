@@ -1,7 +1,7 @@
 export class EtoRepositoryInMemory {
   Values = [];
 
-  async Add(reads = []) {
+  async add(reads = []) {
     const toPersistency = reads.map((read) => {
       return {
         Value: read.eto,
@@ -10,5 +10,9 @@ export class EtoRepositoryInMemory {
     });
 
     this.Values = [...this.Values, ...toPersistency];
+  }
+
+  async getValuesByStation(idStation) {
+    return this.Values.filter((value) => value.FK_Station_Read === idStation);
   }
 }

@@ -9,7 +9,7 @@ const cronJobs = [
     cron: "* * * * *",
     data: null,
     options: {
-      tz: "America/Chicago",
+      tz: "America/Fortaleza",
     },
   },
 ];

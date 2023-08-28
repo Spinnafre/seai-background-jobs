@@ -1,38 +1,63 @@
 import { ServiceProtocol } from "../../scrapper/core/service-protocol.js";
 import { CalcEto } from "../domain/calc-eto.js";
 export class CalcETO extends ServiceProtocol {
-  constructor(equipmentRepository, etoRepository, stationReadsRepository) {
-    this.equipmentRepository = equipmentRepository;
-    this.stationReadsRepository = stationReadsRepository;
-    this.etoRepository = etoRepository;
+  #equipmentRepository;
+  #stationReadsRepository;
+  #etoRepository;
+  #logRepository;
+  constructor(
+    equipmentRepository,
+    etoRepository,
+    stationReadsRepository,
+    logRepository
+  ) {
+    super();
+    this.#equipmentRepository = equipmentRepository;
+    this.#stationReadsRepository = stationReadsRepository;
+    this.#etoRepository = etoRepository;
+    this.#logRepository = logRepository;
   }
 
+  /**
+   * @param {Object} date Date to calc ET0
+   * @param {number} date.year The year
+   * @param {number} date.day The day
+   */
   async execute(date) {
     console.log("date ::: ", date);
 
-    const stationsEqps = await this.equipmentRepository.getStations();
+    const stationsEqps = await this.#equipmentRepository.getStations();
+
+    console.log("stationsEqps ::: ", stationsEqps);
 
     const stationsEto = [];
+
+    const logs = [];
 
     for (const station of stationsEqps) {
       // buscar leituras da estação usando o Fk_Equipment
       const stationReads =
-        await this.stationReadsRepository.getStationReadsByEquipment(
+        await this.#stationReadsRepository.getStationReadsByEquipment(
           station.id
         );
-      // TO-DO : buscar leituras de pluviometros pelo o ID da estação
 
-      // const stationPluviometerReads = await this.pluviometerReadsRepository.getReadByIdAndDate(station.id,date)
+      console.log("stationReads ::: ", stationReads);
 
       // e se não tiver dados de leituras da estação?
       if (stationReads === null) {
-        console.log("Station is empty");
+        console.log("Estação está sem dados de medições.");
+
+        logs.push({
+          type: "warning",
+          message: `Não há dados de medições da estação ${station.code} de ${station.location}`,
+        });
+
         continue;
       }
 
       const altitude = station.altitude;
 
-      stationReads.forEach((stationRead) => {
+      for (const stationRead of stationReads) {
         const {
           idRead,
           atmosphericTemperature,
@@ -40,19 +65,30 @@ export class CalcETO extends ServiceProtocol {
           relativeHumidity,
         } = stationRead;
 
+        if (atmosphericTemperature === null) {
+          logs.push({
+            type: "warning",
+            message: `Não irá computar os dados de ET0 pois não há dados de temperatura atmosférica média da estação ${station.code} de ${station.location}`,
+          });
+
+          continue;
+        }
+
         if (totalRadiation === null) {
-          // avisar que está faltando dados de radiação
+          logs.push({
+            type: "warning",
+            message: `Não há dados de radiação solar média da estação ${station.code} de ${station.location}, portanto irá ser estimado o valor da radiação solar.`,
+          });
         }
 
         if (relativeHumidity === null) {
-          // avisar que está faltando dados de humidade
+          logs.push({
+            type: "warning",
+            message: `Não há dados de umidade relativa média da estação ${station.code} de ${station.location}, portanto irá ser estimado o valor da umidade média.`,
+          });
         }
 
-        if (atmosphericTemperature === null) {
-          // avisar que está faltando dados de temperatura
-        }
-
-        const et0 = CalcEto({
+        const eto = CalcEto({
           date,
           altitude,
           atmosphericTemperatureAverage: atmosphericTemperature,
@@ -61,16 +97,42 @@ export class CalcETO extends ServiceProtocol {
           sunQuantityHoursInDay: 11,
         });
 
-        console.log("[LOG] eto = ", et0);
+        if ((eto === null) | (eto === undefined)) {
+          logs.push({
+            type: "error",
+            message: `Não foi possível calcular ET0 da estação ${station.code} de ${station.location} pois não há dados de temperatura média.`,
+          });
+          continue;
+        }
+
+        logs.push({
+          type: "success",
+          message: `Sucesso ao calcular dados de ET0 da estação ${station.code} de ${station.location}`,
+        });
 
         stationsEto.push({
           idRead,
           eto,
         });
+      }
+    }
+
+    if (stationsEto.length) {
+      console.log("Salvando dados de ETO...");
+
+      await this.#etoRepository.add(stationsEto);
+
+      logs.push({
+        type: "success",
+        message: `Sucesso ao calcular dados de ET0 do dia.`,
+      });
+    } else {
+      logs.push({
+        type: "warning",
+        message: `Não foi possível calcular ET0 do dia.`,
       });
     }
 
-    console.log("Salvando dados de ETO...");
-    await this.etoRepository.add(stationsEto);
+    await this.#logRepository.create(logs);
   }
 }

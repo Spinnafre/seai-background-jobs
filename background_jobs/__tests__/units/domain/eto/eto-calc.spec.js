@@ -6,9 +6,8 @@ describe("ET0 calc", () => {
   test("Should be able to calc ET0 ", () => {
     const altitude = 35;
     const atmosphericTemperatureAverage = 3;
-    const totalRadiationAverage = null;
+    const totalRadiationAverage = 3;
     const relativeHumidityAverage = 2;
-    // const windVelocity = 4;
 
     const eto = CalcEto({
       date: {
@@ -24,6 +23,6 @@ describe("ET0 calc", () => {
 
     console.log("ETO = ", eto);
 
-    expect(eto).toBe(0.6622928902574112);
+    expect(eto).toBe(1.910041452973779);
   });
 });
