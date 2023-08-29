@@ -19,11 +19,12 @@ export class CalcETO extends ServiceProtocol {
   }
 
   /**
-   * @param {Object} date Date to calc ET0
-   * @param {number} date.year The year
-   * @param {number} date.day The day
+   * @param {CalcEtoDTO} date Instance of CalcEtoDTO class
    */
   async execute(date) {
+    const year = date.getYear();
+    const day = date.getDay();
+
     const stationsEqps = await this.#equipmentRepository.getStations();
 
     const stationsEto = [];
@@ -83,7 +84,10 @@ export class CalcETO extends ServiceProtocol {
         }
 
         const eto = CalcEto({
-          date,
+          date: {
+            year,
+            day,
+          },
           altitude,
           atmosphericTemperatureAverage: atmosphericTemperature,
           relativeHumidityAverage: relativeHumidity,

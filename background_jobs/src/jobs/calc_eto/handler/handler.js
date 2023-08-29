@@ -7,7 +7,6 @@ export class CalcET0 {
   constructor(calcEtoByDay) {
     this.calcEtoByDay = calcEtoByDay;
     this.name_queue = CalcET0.name_queue;
-    this.logs = logs;
   }
 
   async handler(payload) {

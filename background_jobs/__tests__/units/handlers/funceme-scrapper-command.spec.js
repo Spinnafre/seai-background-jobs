@@ -11,7 +11,7 @@ import {
 import pluviometerDataMinerFactory from "../factories/funceme/pluviometer-measures-data-miner.js";
 import stationDataMinerFactory from "../factories/funceme/stations-measures-data-miner-service.js";
 import { FTPClientAdapterMock } from "../mock/funceme/ftp/connection.js";
-import { logsRepository } from "../database/inMemory/entities/logs.js";
+import { LogsRepositoryInMemory } from "../database/inMemory/entities/logs.js";
 import { FuncemeScrapperCommand } from "../../../src/jobs/scrapper/funceme/command-handler/funceme-scrapper-command.js";
 import { MetereologicalEquipmentInMemory } from "../database/inMemory/entities/metereologicalEquipment.js";
 
@@ -52,7 +52,7 @@ pluviometerDataMinerService = pluviometerDataMinerFactory(equipmetsDao);
 
 ftpClientAdapterMock = new FTPClientAdapterMock();
 
-commandLogs = new logsRepository();
+commandLogs = new LogsRepositoryInMemory();
 
 commandHandler = new FuncemeScrapperCommand(
   stationDataMinerService,

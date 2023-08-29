@@ -7,14 +7,29 @@ import {
   jest,
   afterEach,
   beforeEach,
+  beforeAll,
 } from "@jest/globals";
 import { CalcETO } from "../../../../src/jobs/calc_eto/services/calc-eto-by-date";
 import { MetereologicalEquipmentInMemory } from "../../database/inMemory/entities/metereologicalEquipment";
 import { EtoRepositoryInMemory } from "../../database/inMemory/entities/eto";
 import { StationReadRepositoryInMemory } from "../../database/inMemory/entities/stationRead";
-import { logsRepository } from "../../database/inMemory/entities/logs";
+import { LogsRepositoryInMemory } from "../../database/inMemory/entities/logs";
+import { CalcEtoDTO } from "../../../../src/jobs/calc_eto/handler/input-boundary";
 
+let calcEtoInputDTO = null;
 describe("# Calc ET0 Service", () => {
+  beforeAll(() => {
+    calcEtoInputDTO = new CalcEtoDTO(new Date());
+  });
+  beforeEach(() => {
+    jest.useFakeTimers("modern");
+    jest.setSystemTime(new Date(2023, 7, 29));
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   test("When has stations equipments, should be able to calculate measures and ET0 and save", async () => {
     const IdEquipment = 1;
 
@@ -47,7 +62,7 @@ describe("# Calc ET0 Service", () => {
 
     const etoRepository = new EtoRepositoryInMemory();
 
-    const logsRepo = new logsRepository();
+    const logsRepo = new LogsRepositoryInMemory();
 
     const calcEto = new CalcETO(
       equipmentRepository,
@@ -56,16 +71,13 @@ describe("# Calc ET0 Service", () => {
       logsRepo
     );
 
-    await calcEto.execute({
-      year: 2023,
-      day: 28,
-    });
+    await calcEto.execute(calcEtoInputDTO);
 
     const eto = await etoRepository.getValuesByStation(IdEquipment);
 
     expect(eto).toHaveLength(1);
 
-    expect(eto[0]).toEqual({ Value: 1.9100414438642679, FK_Station_Read: 1 });
+    expect(eto[0]).toEqual({ Value: 1.9100414403415098, FK_Station_Read: 1 });
 
     expect(logsRepo.logs).toMatchObject([
       {
@@ -102,7 +114,7 @@ describe("# Calc ET0 Service", () => {
 
     const etoRepository = new EtoRepositoryInMemory();
 
-    const logsRepo = new logsRepository();
+    const logsRepo = new LogsRepositoryInMemory();
 
     const calcEto = new CalcETO(
       equipmentRepository,
@@ -111,10 +123,7 @@ describe("# Calc ET0 Service", () => {
       logsRepo
     );
 
-    await calcEto.execute({
-      year: 2023,
-      day: 28,
-    });
+    await calcEto.execute(calcEtoInputDTO);
 
     const eto = await etoRepository.getValuesByStation(IdEquipment);
 
@@ -162,7 +171,7 @@ describe("# Calc ET0 Service", () => {
 
     const etoRepository = new EtoRepositoryInMemory();
 
-    const logsRepo = new logsRepository();
+    const logsRepo = new LogsRepositoryInMemory();
 
     const calcEto = new CalcETO(
       equipmentRepository,
@@ -171,10 +180,7 @@ describe("# Calc ET0 Service", () => {
       logsRepo
     );
 
-    await calcEto.execute({
-      year: 2023,
-      day: 28,
-    });
+    await calcEto.execute(calcEtoInputDTO);
 
     const eto = await etoRepository.getValuesByStation(IdEquipment);
 
@@ -189,7 +195,6 @@ describe("# Calc ET0 Service", () => {
 
   test("When stations equipments not exists, shouldn't be able to calculate ET0", async () => {
     const IdEquipment = 1;
-    const IdEquipmentExternal = "23984";
 
     const equipmentRepository = new MetereologicalEquipmentInMemory();
 
@@ -208,7 +213,7 @@ describe("# Calc ET0 Service", () => {
 
     const etoRepository = new EtoRepositoryInMemory();
 
-    const logsRepo = new logsRepository();
+    const logsRepo = new LogsRepositoryInMemory();
 
     const calcEto = new CalcETO(
       equipmentRepository,
@@ -217,10 +222,7 @@ describe("# Calc ET0 Service", () => {
       logsRepo
     );
 
-    await calcEto.execute({
-      year: 2023,
-      day: 28,
-    });
+    await calcEto.execute(calcEtoInputDTO);
 
     const eto = await etoRepository.getValuesByStation(IdEquipment);
 

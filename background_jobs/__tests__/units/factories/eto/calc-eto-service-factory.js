@@ -5,11 +5,13 @@ import {
 } from "../../database/inMemory/entities";
 
 import { CalcETO } from "../../../../src/jobs/calc_eto/services/calc-eto-by-date.js";
+import { LogsRepositoryInMemory } from "../../database/inMemory/entities/logs";
 
 export const CalcEtoByDateService = () => {
-  const equipmentRepository = new MetereologicalEquipmentInMemory();
-  const stationReadRepository = new StationReadRepositoryInMemory();
-  const etoRepository = new EtoRepositoryInMemory();
-
-  return new CalcETO(equipmentRepository, etoRepository, stationReadRepository);
+  return new CalcETO(
+    new MetereologicalEquipmentInMemory(),
+    new EtoRepositoryInMemory(),
+    new StationReadRepositoryInMemory(),
+    new LogsRepositoryInMemory()
+  );
 };

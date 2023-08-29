@@ -1,4 +1,4 @@
-export class logsRepository {
+export class LogsRepositoryInMemory {
   logs = [];
   async create(logs) {
     let data;
