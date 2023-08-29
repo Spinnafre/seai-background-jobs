@@ -19,7 +19,6 @@ export class StationReadRepositoryInMemory {
   }
 
   async getStationReadsByEquipment(idEqp) {
-    console.log(idEqp, " ", this.#ReadStations);
     const data = this.#ReadStations.filter((read) => {
       return read.FK_Equipment === idEqp;
     });

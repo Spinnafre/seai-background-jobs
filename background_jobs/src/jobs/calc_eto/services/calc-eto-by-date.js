@@ -24,11 +24,7 @@ export class CalcETO extends ServiceProtocol {
    * @param {number} date.day The day
    */
   async execute(date) {
-    console.log("date ::: ", date);
-
     const stationsEqps = await this.#equipmentRepository.getStations();
-
-    console.log("stationsEqps ::: ", stationsEqps);
 
     const stationsEto = [];
 
@@ -40,8 +36,6 @@ export class CalcETO extends ServiceProtocol {
         await this.#stationReadsRepository.getStationReadsByEquipment(
           station.id
         );
-
-      console.log("stationReads ::: ", stationReads);
 
       // e se não tiver dados de leituras da estação?
       if (stationReads === null) {

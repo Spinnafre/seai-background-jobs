@@ -14,8 +14,6 @@ export class ET0Repository {
       };
     });
 
-    console.log("Data to insert = ", toPersistency);
-
     await this.#connection.insert(toPersistency).into("Et0");
   }
 }

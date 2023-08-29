@@ -30,8 +30,6 @@ export function CalcEto({
   const year = date.year;
   const day = date.day;
 
-  console.log(year);
-
   const julianDay = day - year + 1;
 
   const PHI = (-4.19 * Math.PI) / 180;
@@ -115,10 +113,7 @@ export function CalcEto({
     currentSteamPressureValue
   );
 
-  console.log("aero ::: ", aero);
-
   const rad = CalcRadiation(delta, liquidRad, flowDensity, g_asterico);
-  console.log("rad ::: ", rad);
 
   const et0 = aero + rad;
 
