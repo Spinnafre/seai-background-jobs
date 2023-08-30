@@ -3,12 +3,13 @@ export class FuncemeDataMinerDTO {
 
   constructor(payload) {
     const separator = "-";
-    let month = payload.getMonth() + 1;
-    let day = payload.getDate();
+    const date = new Date(payload);
+    let month = date.getMonth() + 1;
+    let day = date.getDate();
     if (month < 10) month = `0${month}`;
     if (day < 10) day = `0${day}`;
 
-    this.date = `${payload.getFullYear()}${separator}${month}${separator}${day}`;
+    this.date = `${date.getFullYear()}${separator}${month}${separator}${day}`;
   }
 
   getDate() {

@@ -1,5 +1,6 @@
 import { BackgroundJobsManager } from "../../src/lib/jobQueue/background-jobs-manager.js";
 import { FuncemeScrapperCommand } from "../../src/jobs/scrapper/funceme/command-handler/funceme-scrapper-command.js";
+import { CalcET0Handler } from "../../src/jobs/calc_eto/handler/handler.js";
 
 import "dotenv/config.js";
 
@@ -24,7 +25,7 @@ async function register() {
   today.setHours(23, 0, 0);
   console.log(today.getTime(), ":::", yesterday.getTime());
 
-  const date = Intl.DateTimeFormat("pt-BR").format(yesterday);
+  const date = yesterday;
 
   await BackgroundJobsManager.connectToQueue();
 
@@ -46,17 +47,17 @@ async function register() {
     }
   );
 
-  // await QueueManager.createJob(
-  //   InmetScrapper.name_queue,
-  //   { date },
-  //   {
-  //     singletonKey: "2",
-  //     useSingletonQueue: true,
-  //     startAfter: today,
-  //     retryLimit: 1,
-  //     retryDelay: 15,
-  //   }
-  // );
+  await BackgroundJobsManager.createJob(
+    CalcET0Handler.name_queue,
+    { date },
+    {
+      singletonKey: "2",
+      useSingletonQueue: true,
+      // startAfter: today.setHours(0, 8, 0),
+      retryLimit: 3,
+      retryDelay: 15,
+    }
+  );
 }
 
 register();

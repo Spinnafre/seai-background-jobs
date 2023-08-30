@@ -1,3 +1,10 @@
+import path from "node:path";
+import { config } from "dotenv";
+
+config({
+  path: "../../.env",
+});
+
 import { TimeoutError } from "./errors/TimeoutError.js";
 import { FuncemeDataMinerDTO } from "./input-boundary.js";
 
@@ -36,6 +43,8 @@ export class FuncemeScrapperCommand {
 
   async handler(payload) {
     const { id, data } = payload;
+    console.log(path.resolve());
+    console.log(process.env);
 
     // DD/MM/YYYY
     const time = data.date;

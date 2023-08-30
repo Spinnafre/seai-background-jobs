@@ -4,6 +4,8 @@ import { DailyScheduleFactory } from "./jobs/scheduler/factories/scheduler-comma
 import { FuncemeScrapperCommand } from "./jobs/scrapper/funceme/command-handler/funceme-scrapper-command.js";
 import { SendNotification } from "./jobs/mailer/command-handler/send-notification.js";
 import { DailyScheduler } from "./jobs/scheduler/command-handler/scheduler.js";
+import { CalcET0Handler } from "./jobs/calc_eto/handler/handler.js";
+import { CalcEtoHandlerFactory } from "./jobs/calc_eto/factories/handler/calc-eto-handler-factory.js";
 
 export default [
   {
@@ -14,6 +16,18 @@ export default [
         process: (command) => {
           const funcemeScrapper = FuncemeScrapperCommandFactory();
           return funcemeScrapper.handler(command);
+        },
+      },
+    ],
+  },
+  {
+    queue_name: CalcET0Handler.name_queue,
+    workers: [
+      {
+        name: "calc_eto",
+        process: (command) => {
+          const calcEtoHandler = CalcEtoHandlerFactory();
+          return calcEtoHandler.handler(command);
         },
       },
     ],

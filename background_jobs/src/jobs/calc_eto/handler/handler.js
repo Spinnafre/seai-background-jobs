@@ -1,5 +1,11 @@
 import { CalcEtoDTO } from "./input-boundary.js";
 
+import { config } from "dotenv";
+
+config({
+  path: "../../.env",
+});
+
 export class CalcET0Handler {
   static name_queue = "cal-et0";
   calcEtoByDay;
