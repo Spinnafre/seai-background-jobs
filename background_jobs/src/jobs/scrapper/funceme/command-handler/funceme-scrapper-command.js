@@ -3,7 +3,7 @@ import { FuncemeDataMinerDTO } from "./input-boundary.js";
 
 export class FuncemeScrapperCommand {
   static name_queue = "funceme-scrapper";
-  static timeout = 2000;
+  static timeout = 20000;
 
   // ftpClient = null;
 
@@ -40,7 +40,9 @@ export class FuncemeScrapperCommand {
     // DD/MM/YYYY
     const time = data.date;
 
-    console.log("TIME = ", time);
+    console.log(
+      `[LOG] Iniciando busca de dados do ftp da FUNCEME pela data ${time}`
+    );
 
     const dto = new FuncemeDataMinerDTO(time);
 

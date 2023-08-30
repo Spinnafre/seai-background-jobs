@@ -1,10 +1,14 @@
 import { EquipmentMapper } from "../../../../../core/mappers/equipments-mapper.js";
 
-import { equipment_connection } from "../equipments-connections.js";
+import { equipmentConnection } from "../equipments-connections.js";
 
 export class MetereologicalEquipmentDao {
+  connection;
+  constructor() {
+    this.connection = equipmentConnection();
+  }
   async getFuncemeStations() {
-    const stations = await equipment_connection
+    const stations = await this.connection
       .select(
         "MetereologicalEquipment.Name as Name",
         "EquipmentType.Name as Type",
@@ -43,7 +47,7 @@ export class MetereologicalEquipmentDao {
   }
 
   async getFuncemePluviometers() {
-    const stations = await equipment_connection
+    const stations = await this.connection
       .select(
         "MetereologicalEquipment.Name as Name",
         "EquipmentType.Name as Type",
@@ -82,7 +86,7 @@ export class MetereologicalEquipmentDao {
   }
 
   async getInmetPluviometers() {
-    const pluviometers = await equipment_connection
+    const pluviometers = await this.connection
       .select(
         "MetereologicalEquipment.Name as Name",
         "EquipmentType.Name as Type",
@@ -117,7 +121,7 @@ export class MetereologicalEquipmentDao {
     };
   }
   async getInmetStations() {
-    const stations = await equipment_connection
+    const stations = await this.connection
       .select(
         "MetereologicalEquipment.Name as Name",
         "EquipmentType.Name as Type",

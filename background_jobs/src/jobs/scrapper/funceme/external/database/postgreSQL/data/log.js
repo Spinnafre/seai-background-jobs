@@ -1,6 +1,10 @@
-import { logs_connection } from "../logs-connection.js";
+import { logsConnection } from "../logs-connection.js";
 
 export class LogRepository {
+  connection;
+  constructor() {
+    this.connection = logsConnection();
+  }
   async create(logs) {
     let data;
 
@@ -23,7 +27,7 @@ export class LogRepository {
     }
 
     if (data !== null) {
-      await logs_connection.insert(data).into("Funceme_Data_Miner");
+      await this.connection.insert(data).into("Funceme_Data_Miner");
     }
   }
 }

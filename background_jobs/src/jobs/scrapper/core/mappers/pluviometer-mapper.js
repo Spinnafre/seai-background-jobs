@@ -16,7 +16,6 @@ export class PluviometerMapper {
 
       return {
         Value: null,
-        FK_Time: null,
         FK_Organ: pluviometer.organ.id,
         FK_Equipment: pluviometer.id,
       };
@@ -26,7 +25,6 @@ export class PluviometerMapper {
 
     return {
       Value: measure.pluviometer,
-      FK_Time: null,
       FK_Organ: pluviometer.organ.id,
       FK_Equipment: pluviometer.id,
     };
@@ -44,7 +42,6 @@ export class PluviometerMapper {
 
         return {
           Value: null,
-          FK_Time: null,
           FK_Organ: pluviometer.organ.id,
           FK_Equipment: pluviometer.id,
         };
@@ -54,7 +51,6 @@ export class PluviometerMapper {
 
       return {
         Value: measure.pluviometer,
-        FK_Time: null,
         FK_Organ: pluviometer.organ.id,
         FK_Equipment: pluviometer.id,
       };

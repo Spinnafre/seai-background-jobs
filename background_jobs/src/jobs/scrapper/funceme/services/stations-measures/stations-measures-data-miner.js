@@ -13,6 +13,7 @@ export class ExtractStationsFromFunceme extends ServiceProtocol {
   async execute(params) {
     const stations = await this.metereologicalEquipmentDao.getFuncemeStations();
 
+    console.log("DATE ::: ", params.getDate());
     if (!stations.equipments.length) {
       this.logs.addWarningLog(
         "Não há equipamentos de estações da FUNCEME cadastradas"

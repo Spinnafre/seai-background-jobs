@@ -1,12 +1,12 @@
-import { CalcEtoDTO } from "./input-boundary";
+import { CalcEtoDTO } from "./input-boundary.js";
 
-export class CalcET0 {
+export class CalcET0Handler {
   static name_queue = "cal-et0";
   calcEtoByDay;
 
   constructor(calcEtoByDay) {
     this.calcEtoByDay = calcEtoByDay;
-    this.name_queue = CalcET0.name_queue;
+    this.name_queue = CalcET0Handler.name_queue;
   }
 
   async handler(payload) {
@@ -19,7 +19,7 @@ export class CalcET0 {
     const dto = new CalcEtoDTO(time);
 
     try {
-      await this.calcEtoByDay(dto);
+      await this.calcEtoByDay.execute(dto);
     } catch (error) {
       console.error("[ERROR] - Falha ao executar worker da funceme.");
       console.error(error);

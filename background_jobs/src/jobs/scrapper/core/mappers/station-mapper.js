@@ -17,7 +17,6 @@ export class StationMapper {
         RelativeHumidity: null,
         AtmosphericTemperature: null,
         WindVelocity: null,
-        FK_Time: null,
         FK_Organ: station.organ.id,
         FK_Equipment: station.id,
       };
@@ -30,7 +29,6 @@ export class StationMapper {
       RelativeHumidity: humidity || null,
       AtmosphericTemperature: temperature || null,
       WindVelocity: windVelocity || null,
-      FK_Time: null,
       FK_Organ: station.organ.id,
       FK_Equipment: station.id,
     };
@@ -51,7 +49,6 @@ export class StationMapper {
           RelativeHumidity: null,
           AtmosphericTemperature: null,
           WindVelocity: null,
-          FK_Time: null,
           FK_Organ: station.organ.id,
           FK_Equipment: station.id,
         };
@@ -66,7 +63,6 @@ export class StationMapper {
         RelativeHumidity: humidity || null,
         AtmosphericTemperature: temperature || null,
         WindVelocity: windVelocity || null,
-        FK_Time: null,
         FK_Organ: station.organ.id,
         FK_Equipment: station.id,
       };

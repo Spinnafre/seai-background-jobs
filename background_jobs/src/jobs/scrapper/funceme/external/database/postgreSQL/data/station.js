@@ -1,8 +1,12 @@
-import { equipment_connection } from "../equipments-connections.js";
+import { equipmentConnection } from "../equipments-connections.js";
 
 export class StationReadDao {
+  connection;
+  constructor() {
+    this.connection = equipmentConnection();
+  }
   async create(measures = []) {
     console.log(measures);
-    await equipment_connection.insert(measures).into("ReadStations");
+    await this.connection.insert(measures).into("ReadStations");
   }
 }

@@ -4,7 +4,7 @@ export class MetereologicalEquipmentRepository {
   #connection;
 
   constructor() {
-    this.#connection = connections.equipments;
+    this.#connection = connections().equipments;
   }
 
   async getPluviometers(organName = null) {
@@ -47,7 +47,7 @@ export class MetereologicalEquipmentRepository {
         `);
     }
 
-    return pluviometers.map((station) => {
+    return pluviometers.rows.map((station) => {
       return {
         id: station.Id,
         code: station.Code,
@@ -64,8 +64,7 @@ export class MetereologicalEquipmentRepository {
 
     if (organName) {
       stations = await this.#connection.raw(
-        `
-        SELECT
+        `SELECT
           me."IdEquipment" AS "Id",
           me."IdEquipmentExternal" AS "code",
           me."Name" AS "Location",
@@ -98,7 +97,7 @@ export class MetereologicalEquipmentRepository {
               et."Name" = 'station'`);
     }
 
-    return stations.map((station) => {
+    return stations.rows.map((station) => {
       return {
         id: station.Id,
         code: station.Code,

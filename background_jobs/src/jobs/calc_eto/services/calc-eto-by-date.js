@@ -26,7 +26,7 @@ export class CalcETO extends ServiceProtocol {
     const day = date.getDay();
 
     const stationsEqps = await this.#equipmentRepository.getStations();
-
+    console.log("stationsEqps ::: ", stationsEqps);
     const stationsEto = [];
 
     const logs = [];
@@ -38,8 +38,10 @@ export class CalcETO extends ServiceProtocol {
           station.id
         );
 
+      console.log("stationReads ::: ", stationReads);
+
       // e se não tiver dados de leituras da estação?
-      if (stationReads === null) {
+      if (stationReads === null || stationReads.length === 0) {
         console.log("Estação está sem dados de medições.");
 
         logs.push({
@@ -104,7 +106,7 @@ export class CalcETO extends ServiceProtocol {
         }
 
         logs.push({
-          type: "success",
+          type: "info",
           message: `Sucesso ao calcular dados de ET0 da estação ${station.code} de ${station.location}`,
         });
 
@@ -121,7 +123,7 @@ export class CalcETO extends ServiceProtocol {
       await this.#etoRepository.add(stationsEto);
 
       logs.push({
-        type: "success",
+        type: "info",
         message: `Sucesso ao calcular dados de ET0 do dia.`,
       });
     } else {
