@@ -1,4 +1,4 @@
-import logsConnection from "../logs-connection.js";
+import logsConnection from "../../../scrapper/funceme/external/database/postgreSQL/logs-connection.js";
 
 export class LogRepository {
   connection;

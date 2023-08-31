@@ -2,7 +2,7 @@ import { stationDataMinerFactory } from "../services/stations-data-miner-factory
 import { pluviometerDataMinerFactory } from "../services/pluviometer-data-miner-factory.js";
 import { FTPClientAdapter } from "../../external/adapters/ftp/client/ftp-client-adapter.js";
 import { FuncemeScrapperCommand } from "../../command-handler/funceme-scrapper-command.js";
-import { LogRepository } from "../../external/database/postgreSQL/data/log.js";
+import { LogRepository } from "../../../../shared/database/repositories/Log.js";
 
 export const FuncemeScrapperCommandFactory = () => {
   const ftpClient = new FTPClientAdapter();

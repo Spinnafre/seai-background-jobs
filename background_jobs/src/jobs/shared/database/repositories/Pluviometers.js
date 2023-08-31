@@ -1,6 +1,6 @@
-import equipmentConnection from "../equipments-connections.js";
+import equipmentConnection from "../../../scrapper/funceme/external/database/postgreSQL/equipments-connections.js";
 
-export class PluviometerReadDao {
+export class PluviometerReadRepository {
   connection;
   constructor() {
     this.connection = equipmentConnection;

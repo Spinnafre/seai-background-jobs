@@ -28,4 +28,7 @@ export class StationReadRepository {
       };
     });
   }
+  async create(measures = []) {
+    await this.#connection.insert(measures).into("ReadStations");
+  }
 }

@@ -1,5 +1,3 @@
-import { EquipmentMapper } from "../../../../../src/jobs/scrapper/core/mappers/equipments-mapper.js";
-
 export class MetereologicalEquipmentInMemory {
   #MetereologicalEquipment;
 
@@ -11,20 +9,20 @@ export class MetereologicalEquipmentInMemory {
     this.#MetereologicalEquipment.push(data);
   }
 
-  async getStations(organName = "") {
-    let stations = [];
+  async getEquipments({ organName = null, eqpType = "" }) {
+    let equipments = [];
 
     if (organName) {
-      stations = this.#MetereologicalEquipment.filter(
-        (eqp) => eqp.Type == "station" && eqp.Organ === organName
+      equipments = this.#MetereologicalEquipment.filter(
+        (eqp) => eqp.Type == eqpType && eqp.Organ === organName
       );
     } else {
-      stations = this.#MetereologicalEquipment.filter(
-        (eqp) => eqp.Type == "station"
+      equipments = this.#MetereologicalEquipment.filter(
+        (eqp) => eqp.Type == eqpType
       );
     }
 
-    return stations.map((station) => {
+    return equipments.map((station) => {
       return {
         id: station.IdEquipment,
         code: station.IdEquipmentExternal,
@@ -34,28 +32,5 @@ export class MetereologicalEquipmentInMemory {
         organ: station.Organ,
       };
     });
-  }
-
-  async getFuncemeStations() {
-    const stations = this.#MetereologicalEquipment.filter(
-      (eqp) => eqp.Type == "station" && eqp.Organ === "FUNCEME"
-    );
-
-    const codes = stations.map((eqp) => eqp.IdEquipmentExternal);
-
-    return { equipments: EquipmentMapper.equipmentsToDomain(stations), codes };
-  }
-
-  async getFuncemePluviometers() {
-    const pluviometers = this.#MetereologicalEquipment.filter(
-      (eqp) => eqp.Type == "pluviometer" && eqp.Organ === "FUNCEME"
-    );
-
-    const codes = pluviometers.map((eqp) => eqp.IdEquipmentExternal);
-
-    return {
-      equipments: EquipmentMapper.equipmentsToDomain(pluviometers),
-      codes,
-    };
   }
 }

@@ -6,7 +6,7 @@ export class LogRepository {
   constructor() {
     this.#connection = connections.logs;
   }
-  async create(logs) {
+  async create(logs, tableName) {
     const data = logs.map((log) => {
       // Operation: "",
       return {
@@ -15,6 +15,6 @@ export class LogRepository {
       };
     });
 
-    await this.#connection.insert(data).into("Calc_Et0");
+    await this.#connection.insert(data).into(tableName);
   }
 }

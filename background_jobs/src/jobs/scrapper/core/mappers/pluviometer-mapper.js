@@ -11,12 +11,12 @@ export class PluviometerMapper {
   static pluviometerToPersistency(pluviometer, measure) {
     if (!measure) {
       console.log(
-        `Não foi possível obter dados de medição do pluviômetro ${pluviometer.name}, salvando dados sem medições`
+        `Não foi possível obter dados de medição do pluviômetro ${pluviometer.code}, salvando dados sem medições`
       );
 
       return {
         Value: null,
-        FK_Organ: pluviometer.organ.id,
+        FK_Organ: pluviometer.id_organ,
         FK_Equipment: pluviometer.id,
       };
     }
@@ -25,7 +25,7 @@ export class PluviometerMapper {
 
     return {
       Value: measure.pluviometer,
-      FK_Organ: pluviometer.organ.id,
+      FK_Organ: pluviometer.id_organ,
       FK_Equipment: pluviometer.id,
     };
   }
@@ -37,12 +37,12 @@ export class PluviometerMapper {
 
       if (!measure) {
         console.log(
-          `Não foi possível obter dados de medição do pluviômetro ${pluviometer.name}, salvando dados sem medições`
+          `Não foi possível obter dados de medição do pluviômetro ${pluviometer.coce}, salvando dados sem medições`
         );
 
         return {
           Value: null,
-          FK_Organ: pluviometer.organ.id,
+          FK_Organ: pluviometer.id_organ,
           FK_Equipment: pluviometer.id,
         };
       }
@@ -51,7 +51,7 @@ export class PluviometerMapper {
 
       return {
         Value: measure.pluviometer,
-        FK_Organ: pluviometer.organ.id,
+        FK_Organ: pluviometer.id_organ,
         FK_Equipment: pluviometer.id,
       };
     });

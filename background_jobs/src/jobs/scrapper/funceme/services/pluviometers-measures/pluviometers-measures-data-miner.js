@@ -14,10 +14,12 @@ export class ExtractPluviometersFromFunceme extends ServiceProtocol {
     console.log(
       `[Funceme] Iniciando busca de dados de pluviômetros pelo ftp da FUNCEME pela data ${params.getDate()}`
     );
-    const pluviometers =
-      await this.metereologicalEquipmentDao.getFuncemePluviometers();
+    const pluviometers = await this.metereologicalEquipmentDao.getEquipments({
+      organName: "FUNCEME",
+      eqpType: "pluviometer",
+    });
 
-    if (!pluviometers.equipments.length) {
+    if (!pluviometers.length) {
       //Talvez não faça sentido ficar avisando que não tem PLUVIôMETROS cadastrados
       this.logs.addWarningLog("Não há pluviômetros da FUNCEME cadastrados");
 
@@ -28,29 +30,31 @@ export class ExtractPluviometersFromFunceme extends ServiceProtocol {
       "Iniciando busca de dados de medições de pluviômetros da FUNCEME"
     );
 
+    const equipmentsCodes = pluviometers.map((eqp) => eqp.code);
+
     const measures = await this.dataMiner.fetch(
-      pluviometers.codes,
+      equipmentsCodes,
       params.getDate()
     );
 
-    const result = pluviometers.equipments.map((pluviometer) => {
+    const result = pluviometers.map((pluviometer) => {
       const measure =
         measures && measures.find((item) => item.code === pluviometer.code);
 
       if (!measure) {
         console.log(
-          `[Funceme] Não foi possível obter dados de medição do pluviômetro ${pluviometer.name}, salvando dados sem medições`
+          `[Funceme] Não foi possível obter dados de medição do pluviômetro ${pluviometer.code}, salvando dados sem medições`
         );
 
         this.logs.addWarningLog(
-          `Não foi possível obter dados de medição do pluviômetro ${pluviometer.name}, salvando dados sem medições.`
+          `Não foi possível obter dados de medição do pluviômetro ${pluviometer.code}, salvando dados sem medições.`
         );
 
         return PluviometerMapper.pluviometerToPersistency(pluviometer, null);
       }
 
       console.log(
-        `[Funceme] Sucesso ao obter dados de medição estação ${pluviometer.name}`
+        `[Funceme] Sucesso ao obter dados de medição do pluviômetro ${pluviometer.code}`
       );
 
       return PluviometerMapper.pluviometerToPersistency(pluviometer, measure);

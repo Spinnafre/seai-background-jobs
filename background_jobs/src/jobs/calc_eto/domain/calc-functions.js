@@ -24,8 +24,6 @@ export function EstimateSolarRadiation(
   // Máximo de horas de sol em um dia
   const sunMaxDailyHours = (24 / Math.PI) * omega_s; // ou N
 
-  console.log("sunMaxDailyHours ::: ", sunMaxDailyHours);
-
   const As = 0.25;
   const Bs = 0.5;
 

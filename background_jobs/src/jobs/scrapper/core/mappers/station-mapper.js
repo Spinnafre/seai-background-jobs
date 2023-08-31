@@ -17,7 +17,7 @@ export class StationMapper {
         RelativeHumidity: null,
         AtmosphericTemperature: null,
         WindVelocity: null,
-        FK_Organ: station.organ.id,
+        FK_Organ: station.id_organ,
         FK_Equipment: station.id,
       };
     }
@@ -29,7 +29,7 @@ export class StationMapper {
       RelativeHumidity: humidity || null,
       AtmosphericTemperature: temperature || null,
       WindVelocity: windVelocity || null,
-      FK_Organ: station.organ.id,
+      FK_Organ: station.id_organ,
       FK_Equipment: station.id,
     };
   }
@@ -41,7 +41,7 @@ export class StationMapper {
 
       if (!measure) {
         console.log(
-          `Não foi possível obter dados de medição estação ${station.name}, salvando dados sem medições`
+          `Não foi possível obter dados de medição estação ${station.code}, salvando dados sem medições`
         );
 
         return {
@@ -49,21 +49,21 @@ export class StationMapper {
           RelativeHumidity: null,
           AtmosphericTemperature: null,
           WindVelocity: null,
-          FK_Organ: station.organ.id,
+          FK_Organ: station.id_organ,
           FK_Equipment: station.id,
         };
       }
 
       const { radiation, humidity, temperature, windVelocity } = measure;
 
-      console.log(`Sucesso ao obter dados de medição estação ${station.name}`);
+      console.log(`Sucesso ao obter dados de medição estação ${station.code}`);
 
       return {
         TotalRadiation: radiation || null,
         RelativeHumidity: humidity || null,
         AtmosphericTemperature: temperature || null,
         WindVelocity: windVelocity || null,
-        FK_Organ: station.organ.id,
+        FK_Organ: station.id_organ,
         FK_Equipment: station.id,
       };
     });
