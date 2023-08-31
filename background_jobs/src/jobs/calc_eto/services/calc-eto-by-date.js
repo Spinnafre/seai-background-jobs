@@ -71,41 +71,43 @@ export class CalcETO extends ServiceProtocol {
           this.logs.addWarningLog(
             `Não há dados de radiação solar média da estação ${station.code} de ${station.location}, portanto irá ser estimado o valor da radiação solar.`
           );
-
-          if (relativeHumidity === null) {
-            this.logs.addWarningLog(
-              `Não há dados de umidade relativa média da estação ${station.code} de ${station.location}, portanto irá ser estimado o valor da umidade média.`
-            );
-          }
-
-          const eto = CalcEto({
-            date: {
-              year,
-              day,
-            },
-            altitude,
-            atmosphericTemperatureAverage: atmosphericTemperature,
-            relativeHumidityAverage: relativeHumidity,
-            totalRadiationAverage: totalRadiation,
-            sunQuantityHoursInDay: 11,
-          });
-
-          if ((eto === null) | (eto === undefined)) {
-            this.logs.addErrorLog(
-              `Não foi possível calcular ET0 da estação ${station.code} de ${station.location} pois não há dados de temperatura média.`
-            );
-            continue;
-          }
-
-          this.logs.addInfoLog(
-            `Sucesso ao calcular dados de ET0 da estação ${station.code} de ${station.location}`
-          );
-
-          stationsEto.push({
-            idRead,
-            eto,
-          });
         }
+
+        if (relativeHumidity === null) {
+          this.logs.addWarningLog(
+            `Não há dados de umidade relativa média da estação ${station.code} de ${station.location}, portanto irá ser estimado o valor da umidade média.`
+          );
+        }
+
+        console.log("[CALC ETO ] ", year + day, " ");
+
+        const eto = CalcEto({
+          date: {
+            year,
+            day,
+          },
+          altitude,
+          atmosphericTemperatureAverage: atmosphericTemperature,
+          relativeHumidityAverage: relativeHumidity,
+          totalRadiationAverage: totalRadiation,
+          sunQuantityHoursInDay: 11,
+        });
+
+        if ((eto === null) | (eto === undefined)) {
+          this.logs.addErrorLog(
+            `Não foi possível calcular ET0 da estação ${station.code} de ${station.location} pois não há dados de temperatura média.`
+          );
+          continue;
+        }
+
+        this.logs.addInfoLog(
+          `Sucesso ao calcular dados de ET0 da estação ${station.code} de ${station.location}`
+        );
+
+        stationsEto.push({
+          idRead,
+          eto,
+        });
       }
 
       if (stationsEto.length) {

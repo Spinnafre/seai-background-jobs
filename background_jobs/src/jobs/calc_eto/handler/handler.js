@@ -20,7 +20,29 @@ export class CalcET0Handler {
   async handler(payload) {
     // const { id, data } = payload;
 
-    const time = payload?.data?.date || new Date();
+    let time = null;
+    // const { id, data } = payload;
+    if (payload?.data?.date) {
+      time = payload?.data?.date;
+    } else {
+      // DD/MM/YYYY
+      // data que será agendado o worker para buscar dados
+      const current_date = new Date();
+
+      // data que será passada para o worker realizar a busca
+      // na fonte de dados
+      const yesterday = new Date(current_date).setDate(
+        current_date.getDate() - 1
+      );
+
+      current_date.setHours(22, 0, 0);
+
+      console.log(current_date.getTime(), ":::", yesterday);
+
+      //DD/MM/YYYY
+      // const date = Intl.DateTimeFormat("pt-BR").format(yesterday);
+      time = yesterday;
+    }
 
     console.log("Date ::: ", time);
 

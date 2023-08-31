@@ -45,9 +45,29 @@ export class FuncemeScrapperCommand {
   async handler(payload) {
     console.log(process.env);
     console.log("dbConfig ", dbConfig());
+    let time = null;
     // const { id, data } = payload;
-    // DD/MM/YYYY
-    const time = payload?.data?.date || new Date();
+    if (payload?.data?.date) {
+      time = payload?.data?.date;
+    } else {
+      // DD/MM/YYYY
+      // data que será agendado o worker para buscar dados
+      const current_date = new Date();
+
+      // data que será passada para o worker realizar a busca
+      // na fonte de dados
+      const yesterday = new Date(current_date).setDate(
+        current_date.getDate() - 1
+      );
+
+      current_date.setHours(22, 0, 0);
+
+      console.log(current_date.getTime(), ":::", yesterday);
+
+      //DD/MM/YYYY
+      // const date = Intl.DateTimeFormat("pt-BR").format(yesterday);
+      time = yesterday;
+    }
 
     console.log(
       `[LOG] Iniciando busca de dados do ftp da FUNCEME pela data ${time}`

@@ -1,11 +1,7 @@
-import { FuncemeScrapperCommandFactory } from "./jobs/scrapper/funceme/factories/command-handler/funceme-scrapper-command-factory.js";
-import { MailerFactory } from "./jobs/mailer/factories/send-notification-factory.js";
-import { DailyScheduleFactory } from "./jobs/scheduler/factories/scheduler-command-handler-factory.js";
-import { FuncemeScrapperCommand } from "./jobs/scrapper/funceme/command-handler/funceme-scrapper-command.js";
-import { SendNotification } from "./jobs/mailer/command-handler/send-notification.js";
-import { DailyScheduler } from "./jobs/scheduler/command-handler/scheduler.js";
-import { CalcET0Handler } from "./jobs/calc_eto/handler/handler.js";
 import { CalcEtoHandlerFactory } from "./jobs/calc_eto/factories/handler/calc-eto-handler-factory.js";
+import { CalcET0Handler } from "./jobs/calc_eto/handler/handler.js";
+import { FuncemeScrapperCommand } from "./jobs/scrapper/funceme/command-handler/funceme-scrapper-command.js";
+import { FuncemeScrapperCommandFactory } from "./jobs/scrapper/funceme/factories/command-handler/funceme-scrapper-command-factory.js";
 
 export default [
   {
