@@ -3,7 +3,7 @@ import { connections } from "../connection.js";
 export class ET0Repository {
   #connection;
   constructor() {
-    this.#connection = connections().equipments;
+    this.#connection = connections.equipments;
   }
 
   async add(reads = []) {

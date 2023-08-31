@@ -4,7 +4,7 @@ export class LogRepository {
   #connection;
 
   constructor() {
-    this.#connection = connections().logs;
+    this.#connection = connections.logs;
   }
   async create(logs) {
     const data = logs.map((log) => {

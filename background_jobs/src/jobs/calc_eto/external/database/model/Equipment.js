@@ -4,7 +4,7 @@ export class MetereologicalEquipmentRepository {
   #connection;
 
   constructor() {
-    this.#connection = connections().equipments;
+    this.#connection = connections.equipments;
   }
 
   async getPluviometers(organName = null) {

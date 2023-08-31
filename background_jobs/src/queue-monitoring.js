@@ -16,16 +16,16 @@ const cronJobs = [
       retryDelay: 15,
     },
   },
-  // {
-  //   queue: CalcET0Handler.name_queue,
-  //   cron: "*/2 * * * *",
-  //   data: null,
-  //   options: {
-  //     tz: "America/Fortaleza",
-  //     retryLimit: 3,
-  //     retryDelay: 15,
-  //   },
-  // },
+  {
+    queue: CalcET0Handler.name_queue,
+    cron: "*/2 * * * *",
+    data: null,
+    options: {
+      tz: "America/Fortaleza",
+      retryLimit: 3,
+      retryDelay: 15,
+    },
+  },
 ];
 
 await BackgroundJobsManager.connectToQueue();
