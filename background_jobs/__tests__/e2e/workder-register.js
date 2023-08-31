@@ -41,7 +41,7 @@ async function register() {
     {
       // singletonKey: "1",
       useSingletonQueue: true,
-      // startAfter: today,
+      startAfter: today,
       retryLimit: 3,
       retryDelay: 15,
     }
@@ -53,7 +53,7 @@ async function register() {
     {
       singletonKey: "2",
       useSingletonQueue: true,
-      // startAfter: today.setHours(0, 8, 0),
+      startAfter: new Date(today).setHours(23, 8, 0),
       retryLimit: 3,
       retryDelay: 15,
     }

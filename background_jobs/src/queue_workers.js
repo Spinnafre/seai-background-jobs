@@ -32,28 +32,16 @@ export default [
       },
     ],
   },
-  {
-    queue_name: SendNotification.name_queue,
-    workers: [
-      {
-        name: "mailer",
-        process: (command) => {
-          const mailer = MailerFactory();
-          return mailer.handler(command);
-        },
-      },
-    ],
-  },
-  {
-    queue_name: DailyScheduler.name_queue,
-    workers: [
-      {
-        name: "daily_scheduler",
-        process: (command) => {
-          const dailyScheduler = DailyScheduleFactory();
-          return dailyScheduler.handler(command);
-        },
-      },
-    ],
-  },
+  // {
+  //   queue_name: SendNotification.name_queue,
+  //   workers: [
+  //     {
+  //       name: "mailer",
+  //       process: (command) => {
+  //         const mailer = MailerFactory();
+  //         return mailer.handler(command);
+  //       },
+  //     },
+  //   ],
+  // }
 ];

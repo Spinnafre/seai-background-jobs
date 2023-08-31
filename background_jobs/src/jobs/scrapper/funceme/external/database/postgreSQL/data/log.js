@@ -1,9 +1,9 @@
-import { logsConnection } from "../logs-connection.js";
+import logsConnection from "../logs-connection.js";
 
 export class LogRepository {
   connection;
   constructor() {
-    this.connection = logsConnection();
+    this.connection = logsConnection;
   }
   async create(logs) {
     let data;

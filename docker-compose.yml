@@ -62,4 +62,4 @@ networks:
   back-tier:
   custom-proxy:
     external: true
-    name: background-jobs
+    name: jobs

@@ -7,6 +7,7 @@ config({
 
 import { TimeoutError } from "./errors/TimeoutError.js";
 import { FuncemeDataMinerDTO } from "./input-boundary.js";
+import { dbConfig } from "../../../../config/database.js";
 
 export class FuncemeScrapperCommand {
   static name_queue = "funceme-scrapper";
@@ -42,12 +43,11 @@ export class FuncemeScrapperCommand {
   }
 
   async handler(payload) {
-    const { id, data } = payload;
-    console.log(path.resolve());
     console.log(process.env);
-
+    console.log("dbConfig ", dbConfig());
+    // const { id, data } = payload;
     // DD/MM/YYYY
-    const time = data.date;
+    const time = payload?.data?.date || new Date();
 
     console.log(
       `[LOG] Iniciando busca de dados do ftp da FUNCEME pela data ${time}`

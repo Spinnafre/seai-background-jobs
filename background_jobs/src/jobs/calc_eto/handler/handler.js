@@ -18,9 +18,9 @@ export class CalcET0Handler {
   }
 
   async handler(payload) {
-    const { id, data } = payload;
+    // const { id, data } = payload;
 
-    const time = data.date;
+    const time = payload?.data?.date || new Date();
 
     console.log("Date ::: ", time);
 

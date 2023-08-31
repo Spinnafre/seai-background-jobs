@@ -1,4 +1,5 @@
 import { BackgroundJobsManager } from "../../../lib/jobQueue/background-jobs-manager.js";
+import { CalcET0Handler } from "../../calc_eto/handler/handler.js";
 
 import { FuncemeScrapperCommand } from "../../scrapper/funceme/command-handler/funceme-scrapper-command.js";
 
@@ -16,7 +17,7 @@ export class DailyScheduler {
       current_date.getDate() - 1
     );
 
-    current_date.setHours(23, 0, 0);
+    current_date.setHours(22, 0, 0);
 
     console.log(current_date.getTime(), ":::", yesterday);
 
@@ -33,6 +34,18 @@ export class DailyScheduler {
         singletonKey: "1",
         useSingletonQueue: true,
         startAfter: current_date,
+        retryLimit: 3,
+        retryDelay: 15,
+      }
+    );
+
+    await BackgroundJobsManager.createJob(
+      CalcET0Handler.name_queue,
+      { date },
+      {
+        singletonKey: "2",
+        useSingletonQueue: true,
+        startAfter: new Date(new Date().setHours(23, 0, 0)),
         retryLimit: 3,
         retryDelay: 15,
       }

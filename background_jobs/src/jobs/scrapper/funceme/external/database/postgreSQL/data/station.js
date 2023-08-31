@@ -1,9 +1,9 @@
-import { equipmentConnection } from "../equipments-connections.js";
+import equipmentConnection from "../equipments-connections.js";
 
 export class StationReadDao {
   connection;
   constructor() {
-    this.connection = equipmentConnection();
+    this.connection = equipmentConnection;
   }
   async create(measures = []) {
     console.log(measures);

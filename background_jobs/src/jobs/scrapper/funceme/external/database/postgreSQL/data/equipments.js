@@ -1,11 +1,11 @@
 import { EquipmentMapper } from "../../../../../core/mappers/equipments-mapper.js";
 
-import { equipmentConnection } from "../equipments-connections.js";
+import equipmentConnection from "../equipments-connections.js";
 
 export class MetereologicalEquipmentDao {
   connection;
   constructor() {
-    this.connection = equipmentConnection();
+    this.connection = equipmentConnection;
   }
   async getFuncemeStations() {
     const stations = await this.connection
