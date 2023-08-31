@@ -37,7 +37,7 @@ export class MetereologicalEquipmentDao {
     const items = stations.filter(
       (eqp) => eqp.Type === "station" && eqp.Organ === "FUNCEME"
     );
-    console.log("ITEMS =", items);
+
     const codes = items.map((eqp) => eqp.IdEquipmentExternal);
 
     return {
