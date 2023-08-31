@@ -11,9 +11,12 @@ export class ExtractStationsFromFunceme extends ServiceProtocol {
   }
 
   async execute(params) {
+    console.log(
+      `[Funceme] Iniciando busca de dados de medições das estações pelo ftp da FUNCEME pela data ${params.getDate()}`
+    );
+
     const stations = await this.metereologicalEquipmentDao.getFuncemeStations();
 
-    console.log("DATE ::: ", params.getDate());
     if (!stations.equipments.length) {
       this.logs.addWarningLog(
         "Não há equipamentos de estações da FUNCEME cadastradas"
@@ -46,7 +49,9 @@ export class ExtractStationsFromFunceme extends ServiceProtocol {
         return StationMapper.stationToPersistency(station, null);
       }
 
-      console.log(`Sucesso ao obter dados de medição estação ${station.name}`);
+      console.log(
+        `[Funceme] Sucesso ao obter dados de medição estação ${station.name}`
+      );
 
       return StationMapper.stationToPersistency(station, measure);
     });

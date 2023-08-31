@@ -43,8 +43,6 @@ export class FuncemeScrapperCommand {
   }
 
   async handler(payload) {
-    console.log(process.env);
-    console.log("dbConfig ", dbConfig());
     let time = null;
     // const { id, data } = payload;
     if (payload?.data?.date) {
@@ -62,16 +60,10 @@ export class FuncemeScrapperCommand {
 
       current_date.setHours(22, 0, 0);
 
-      console.log(current_date.getTime(), ":::", yesterday);
-
       //DD/MM/YYYY
       // const date = Intl.DateTimeFormat("pt-BR").format(yesterday);
       time = yesterday;
     }
-
-    console.log(
-      `[LOG] Iniciando busca de dados do ftp da FUNCEME pela data ${time}`
-    );
 
     const dto = new FuncemeDataMinerDTO(time);
 

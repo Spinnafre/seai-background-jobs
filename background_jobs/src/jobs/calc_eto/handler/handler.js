@@ -44,8 +44,6 @@ export class CalcET0Handler {
       time = yesterday;
     }
 
-    console.log("Date ::: ", time);
-
     const dto = new CalcEtoDTO(time);
 
     try {

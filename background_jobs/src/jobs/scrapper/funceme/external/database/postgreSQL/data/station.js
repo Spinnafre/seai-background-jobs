@@ -6,7 +6,6 @@ export class StationReadDao {
     this.connection = equipmentConnection;
   }
   async create(measures = []) {
-    console.log(measures);
     await this.connection.insert(measures).into("ReadStations");
   }
 }

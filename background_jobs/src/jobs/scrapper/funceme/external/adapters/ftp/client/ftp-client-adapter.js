@@ -37,7 +37,6 @@ export class FTPClientAdapter {
   async connect() {
     console.log("Iniciando conexão com o servidor FTP da funceme");
     return new Promise((resolve, reject) => {
-      console.log("FTP ::: Conectando a ", ftpConfig());
       this.connection.connect(ftpConfig());
 
       // this.connection.once("close", (err) => {
