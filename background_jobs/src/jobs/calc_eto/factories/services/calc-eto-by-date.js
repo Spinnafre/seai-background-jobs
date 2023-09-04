@@ -1,6 +1,9 @@
-import { MetereologicalEquipmentRepository } from "../../external/database/model/Equipment.js";
-import { ET0Repository } from "../../external/database/model/Et0.js";
-import { StationReadRepository } from "../../external/database/model/StationRead.js";
+import {
+  StationReadRepository,
+  MetereologicalEquipmentRepository,
+  ET0Repository,
+} from "../../../shared/database/repositories/index.js";
+
 import { CalcETO } from "../../services/calc-eto-by-date.js";
 
 export const CalcEtoByDateServiceFactory = () => {

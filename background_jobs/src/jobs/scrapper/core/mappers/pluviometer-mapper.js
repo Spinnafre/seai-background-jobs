@@ -1,3 +1,5 @@
+import { Logger } from "../../../../lib/logger/logger.js";
+
 export class PluviometerMapper {
   static mapMeasures(measures = []) {
     const [date, pluviometer] = Object.values(measures);
@@ -10,9 +12,9 @@ export class PluviometerMapper {
 
   static pluviometerToPersistency(pluviometer, measure) {
     if (!measure) {
-      console.log(
-        `Não foi possível obter dados de medição do pluviômetro ${pluviometer.code}, salvando dados sem medições`
-      );
+      Logger.warn({
+        msg: `Não foi possível obter dados de medição do pluviômetro ${pluviometer.code}, salvando dados sem medições`,
+      });
 
       return {
         Value: null,
@@ -36,9 +38,9 @@ export class PluviometerMapper {
         measures && measures.find((item) => item.code === pluviometer.code);
 
       if (!measure) {
-        console.log(
-          `Não foi possível obter dados de medição do pluviômetro ${pluviometer.coce}, salvando dados sem medições`
-        );
+        Logger.warn({
+          msg: `Não foi possível obter dados de medição do pluviômetro ${pluviometer.coce}, salvando dados sem medições`,
+        });
 
         return {
           Value: null,

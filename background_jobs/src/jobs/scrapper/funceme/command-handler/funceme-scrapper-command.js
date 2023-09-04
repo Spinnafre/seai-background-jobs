@@ -1,4 +1,3 @@
-import path from "node:path";
 import { config } from "dotenv";
 
 config({
@@ -7,7 +6,7 @@ config({
 
 import { TimeoutError } from "./errors/TimeoutError.js";
 import { FuncemeDataMinerDTO } from "./input-boundary.js";
-import { dbConfig } from "../../../../config/database.js";
+import { Logger } from "../../../../lib/logger/logger.js";
 
 export class FuncemeScrapperCommand {
   static name_queue = "funceme-scrapper";
@@ -74,15 +73,18 @@ export class FuncemeScrapperCommand {
 
       await this.ftpClient.close();
     } catch (error) {
-      console.error("[ERROR] - Falha ao executar worker da funceme.");
-      console.error(error);
-
+      Logger.error({
+        msg: "Falha ao executar worker da funceme.",
+        obj: error,
+      });
       await this.ftpClient.close();
 
-      await this.logs.create({
-        message: error.message,
-        type: "error",
-      });
+      await this.logs.create([
+        {
+          message: error.message,
+          type: "error",
+        },
+      ]);
 
       //Essencial para o PG-BOSS entender que ocorreu um erro
       throw error;

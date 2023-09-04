@@ -1,21 +1,15 @@
+import { Logger } from "../../../lib/logger/logger.js";
 import { ServiceProtocol } from "../../scrapper/core/service-protocol.js";
 import { CalcEto } from "../domain/calc-eto.js";
 export class CalcETO extends ServiceProtocol {
   #equipmentRepository;
   #stationReadsRepository;
   #etoRepository;
-  #logRepository;
-  constructor(
-    equipmentRepository,
-    etoRepository,
-    stationReadsRepository,
-    logRepository
-  ) {
+  constructor(equipmentRepository, etoRepository, stationReadsRepository) {
     super();
     this.#equipmentRepository = equipmentRepository;
     this.#stationReadsRepository = stationReadsRepository;
     this.#etoRepository = etoRepository;
-    this.#logRepository = logRepository;
   }
 
   /**
@@ -25,9 +19,13 @@ export class CalcETO extends ServiceProtocol {
     const year = date.getYear();
     const day = date.getDay();
 
-    console.log(`[Calc ETO] calculando dados de ETO do dia ${day}/${year}`);
+    Logger.info({
+      msg: `Calculando dados de ETO do dia ${day}/${year}`,
+    });
 
-    const stationsEqps = await this.#equipmentRepository.getStations();
+    const stationsEqps = await this.#equipmentRepository.getEquipments({
+      eqpType: "station",
+    });
 
     const stationsEto = [];
 
@@ -40,7 +38,9 @@ export class CalcETO extends ServiceProtocol {
 
       // e se não tiver dados de leituras da estação?
       if (stationReads === null || stationReads.length === 0) {
-        console.log("[Calc ETO] Estação está sem dados de medições.");
+        Logger.warn({
+          msg: " Estação está sem dados de medições.",
+        });
 
         this.logs.addWarningLog(
           `Não há dados de medições da estação ${station.code} de ${station.location}`
@@ -95,6 +95,7 @@ export class CalcETO extends ServiceProtocol {
           this.logs.addErrorLog(
             `Não foi possível calcular ET0 da estação ${station.code} de ${station.location} pois não há dados de temperatura média.`
           );
+
           continue;
         }
 
@@ -109,7 +110,9 @@ export class CalcETO extends ServiceProtocol {
       }
 
       if (stationsEto.length) {
-        console.log("[Calc ETO] Salvando dados de ETO...");
+        Logger.info({
+          msg: "Salvando dados de ETO...",
+        });
 
         await this.#etoRepository.add(stationsEto);
 

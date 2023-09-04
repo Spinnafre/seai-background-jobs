@@ -1,3 +1,5 @@
+import { Logger } from "../../../../lib/logger/logger.js";
+
 export class StationMapper {
   static mapMeasures(measures) {
     const [date, temperature, humidity, radiation] = Object.values(measures);
@@ -40,9 +42,9 @@ export class StationMapper {
         measures && measures.find((item) => item.code === station.code);
 
       if (!measure) {
-        console.log(
-          `Não foi possível obter dados de medição estação ${station.code}, salvando dados sem medições`
-        );
+        Logger.warn({
+          msg: `Não foi possível obter dados de medição estação ${station.code}, salvando dados sem medições`,
+        });
 
         return {
           TotalRadiation: null,
@@ -56,7 +58,9 @@ export class StationMapper {
 
       const { radiation, humidity, temperature, windVelocity } = measure;
 
-      console.log(`Sucesso ao obter dados de medição estação ${station.code}`);
+      Logger.info({
+        msg: `Sucesso ao obter dados de medição estação ${station.code}`,
+      });
 
       return {
         TotalRadiation: radiation || null,

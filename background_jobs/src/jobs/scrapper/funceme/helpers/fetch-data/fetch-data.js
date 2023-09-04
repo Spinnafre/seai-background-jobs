@@ -1,3 +1,4 @@
+import { Logger } from "../../../../../lib/logger/logger.js";
 import { convertCompressedFileStream } from "../../external/adapters/unzip/untar-adapter.js";
 
 export class FetchFuncemeData {
@@ -28,7 +29,7 @@ export class FetchFuncemeData {
       this.directory.fileName
     );
 
-    console.log(
+    Logger.info(
       `Iniciando extração de dados do diretório ${this.directory.folder}/${this.directory.fileName}`
     );
 

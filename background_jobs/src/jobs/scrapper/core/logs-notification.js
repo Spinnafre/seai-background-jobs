@@ -1,3 +1,5 @@
+import { Logger } from "../../../lib/logger/logger.js";
+
 export class Notification {
   #notifications;
   constructor() {
@@ -9,6 +11,9 @@ export class Notification {
   }
 
   addWarningLog(message) {
+    Logger.warn({
+      msg: message,
+    });
     this.#notifications.push({
       type: "warning",
       message,
@@ -16,6 +21,9 @@ export class Notification {
   }
 
   addErrorLog(message) {
+    Logger.error({
+      msg: message,
+    });
     this.#notifications.push({
       type: "error",
       message,
@@ -23,6 +31,9 @@ export class Notification {
   }
 
   addInfoLog(message) {
+    Logger.info({
+      msg: message,
+    });
     this.#notifications.push({
       type: "info",
       message,

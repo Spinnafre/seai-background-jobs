@@ -1,3 +1,4 @@
+import { Logger } from "../../../../../lib/logger/logger.js";
 import { ServiceProtocol } from "../../../core/service-protocol.js";
 
 import { PluviometerMapper } from ".././../../core/mappers/pluviometer-mapper.js";
@@ -11,9 +12,10 @@ export class ExtractPluviometersFromFunceme extends ServiceProtocol {
   }
 
   async execute(params) {
-    console.log(
-      `[Funceme] Iniciando busca de dados de pluviômetros pelo ftp da FUNCEME pela data ${params.getDate()}`
-    );
+    Logger.info({
+      msg: `Iniciando busca de dados de pluviômetros pelo ftp da FUNCEME pela data ${params.getDate()}`,
+    });
+
     const pluviometers = await this.metereologicalEquipmentDao.getEquipments({
       organName: "FUNCEME",
       eqpType: "pluviometer",
@@ -42,10 +44,6 @@ export class ExtractPluviometersFromFunceme extends ServiceProtocol {
         measures && measures.find((item) => item.code === pluviometer.code);
 
       if (!measure) {
-        console.log(
-          `[Funceme] Não foi possível obter dados de medição do pluviômetro ${pluviometer.code}, salvando dados sem medições`
-        );
-
         this.logs.addWarningLog(
           `Não foi possível obter dados de medição do pluviômetro ${pluviometer.code}, salvando dados sem medições.`
         );
@@ -53,8 +51,8 @@ export class ExtractPluviometersFromFunceme extends ServiceProtocol {
         return PluviometerMapper.pluviometerToPersistency(pluviometer, null);
       }
 
-      console.log(
-        `[Funceme] Sucesso ao obter dados de medição do pluviômetro ${pluviometer.code}`
+      this.logs.addInfoLog(
+        `Sucesso ao obter dados de medição do pluviômetro ${pluviometer.code}`
       );
 
       return PluviometerMapper.pluviometerToPersistency(pluviometer, measure);

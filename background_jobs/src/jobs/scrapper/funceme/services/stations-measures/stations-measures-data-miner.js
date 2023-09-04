@@ -1,3 +1,4 @@
+import { Logger } from "../../../../../lib/logger/logger.js";
 import { ServiceProtocol } from "../../../core/service-protocol.js";
 
 import { StationMapper } from ".././../../core/mappers/station-mapper.js";
@@ -11,9 +12,9 @@ export class ExtractStationsFromFunceme extends ServiceProtocol {
   }
 
   async execute(params) {
-    console.log(
-      `[Funceme] Iniciando busca de dados de medições das estações pelo ftp da FUNCEME pela data ${params.getDate()}`
-    );
+    Logger.info({
+      msg: `Iniciando busca de dados de medições das estações pelo ftp da FUNCEME pela data ${params.getDate()}`,
+    });
 
     const stations = await this.metereologicalEquipmentDao.getEquipments({
       organName: "FUNCEME",
@@ -43,10 +44,6 @@ export class ExtractStationsFromFunceme extends ServiceProtocol {
         measures && measures.find((item) => item.code === station.code);
 
       if (!measure) {
-        console.log(
-          `Não foi possível obter dados de medição estação ${station.code}, salvando dados sem medições`
-        );
-
         this.logs.addWarningLog(
           `Não foi possível obter dados de medição estação ${station.code}, salvando dados sem medições.`
         );
@@ -54,8 +51,8 @@ export class ExtractStationsFromFunceme extends ServiceProtocol {
         return StationMapper.stationToPersistency(station, null);
       }
 
-      console.log(
-        `[Funceme] Sucesso ao obter dados de medição estação ${station.code}`
+      this.logs.addInfoLog(
+        `Sucesso ao obter dados de medição estação ${station.code}`
       );
 
       return StationMapper.stationToPersistency(station, measure);

@@ -1,11 +1,11 @@
+import { Logger } from "../logger/logger.js";
 import { PgBossAdapter } from "./pg-boss/connection.js";
 
 export class BackgroundJobsManager {
   static client = null;
 
   static async registerAllWorkers(queue_jobs = []) {
-    console.log("[⚡] Iniciando workers...");
-    console.log(queue_jobs);
+    Logger.info({ msg: "[⚡] Iniciando workers..." });
 
     for (const task of queue_jobs) {
       for (const worker of task.workers) {
@@ -13,11 +13,15 @@ export class BackgroundJobsManager {
       }
     }
 
-    console.log("[😉] Sucesso ao iniciar os workers...");
+    Logger.info({
+      msg: "[😉] Sucesso ao iniciar os workers...",
+    });
   }
 
   static async scheduleCronJobs(jobs = []) {
-    console.log("Registrando seeds...");
+    Logger.info({
+      msg: "Registrando seeds...",
+    });
 
     for (const job of jobs) {
       const { cron, data, options, queue } = job;
@@ -31,11 +35,15 @@ export class BackgroundJobsManager {
   }
 
   static async startQueueMonitoring() {
-    console.log("[🔍] Iniciando monitoramento de jobs");
+    Logger.info({
+      msg: "[🔍] Iniciando monitoramento de jobs",
+    });
 
     await this.client.startMonitoring();
 
-    console.log("[✅] Monitoramento iniciado com sucesso");
+    Logger.info({
+      msg: "[✅] Monitoramento iniciado com sucesso",
+    });
 
     return this;
   }
@@ -47,13 +55,15 @@ export class BackgroundJobsManager {
       data,
       options
     );
-    console.log(`[✅] CronJob agendado com sucesso para a fila ${name_queue}`);
+    Logger.info({
+      msg: `[✅] CronJob agendado com sucesso para a fila ${name_queue}`,
+    });
   }
 
   static async registerWorker(name_queue, worker) {
-    console.log(
-      `[⚙️] Registrando worker ${worker.name} para a fila ${name_queue}`
-    );
+    Logger.info({
+      msg: `[⚙️] Registrando worker ${worker.name} para a fila ${name_queue}`,
+    });
     await BackgroundJobsManager.client.registerWorker(
       name_queue,
       worker.process
@@ -75,6 +85,8 @@ export class BackgroundJobsManager {
       data,
       options
     );
-    console.log(`[✅] JOB ${id} adicionado com sucesso na fila ${name_queue}`);
+    Logger.info({
+      msg: `[✅] JOB ${id} adicionado com sucesso na fila ${name_queue}`,
+    });
   }
 }

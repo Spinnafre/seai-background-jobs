@@ -1,4 +1,5 @@
 import { dbConfig } from "../../../config/database.js";
+import { Logger } from "../../logger/logger.js";
 
 export class PgBossAdapter {
   _boss;
@@ -18,7 +19,9 @@ export class PgBossAdapter {
     if (!PgBossAdapter.isInitialized()) {
       const { default: pg } = await import("pg-boss");
 
-      console.log("[⚙️] Criando conexão com o banco de dados de jobs");
+      Logger.info({
+        msg: "[⚙️] Criando conexão com o banco de dados de jobs",
+      });
 
       // const connection = new pg("postgres://postgres:iaes@jobs_database:5432");
       const connection = new pg({
@@ -30,14 +33,17 @@ export class PgBossAdapter {
       });
 
       connection.on("error", (error) => {
-        console.error(
-          `[❌] Falha ao realizar conexão com o banco de dados de JOBS`
-        );
+        Logger.error({
+          msg: `Falha ao realizar conexão com o banco de dados de JOBS`,
+          obj: error,
+        });
 
         throw error;
       });
 
-      console.log("[✅] Conexão iniciada com sucesso");
+      Logger.info({
+        msg: "[✅] Conexão iniciada com sucesso",
+      });
 
       PgBossAdapter.instance = new PgBossAdapter(connection);
     }
@@ -59,8 +65,7 @@ export class PgBossAdapter {
   }
 
   async fetch(name_queue, qtd) {
-    const job = await this._boss.fetch(name_queue, qtd);
-    return job;
+    return await this._boss.fetch(name_queue, qtd);
   }
 
   async registerJob(name_queue, data, options) {

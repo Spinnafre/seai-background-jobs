@@ -1,3 +1,4 @@
+import { Logger } from "../../../lib/logger/logger.js";
 import { CalcEtoDTO } from "./input-boundary.js";
 
 import { config } from "dotenv";
@@ -18,8 +19,6 @@ export class CalcET0Handler {
   }
 
   async handler(payload) {
-    // const { id, data } = payload;
-
     let time = null;
     // const { id, data } = payload;
     if (payload?.data?.date) {
@@ -37,7 +36,9 @@ export class CalcET0Handler {
 
       current_date.setHours(22, 0, 0);
 
-      console.log(current_date.getTime(), ":::", yesterday);
+      Logger.info({
+        msg: `Current date : ${current_date.getTime()}, Date to search data : ${yesterday}`,
+      });
 
       //DD/MM/YYYY
       // const date = Intl.DateTimeFormat("pt-BR").format(yesterday);
@@ -48,10 +49,13 @@ export class CalcET0Handler {
 
     try {
       await this.calcEtoByDay.execute(dto);
+
       await this.logsRepository.create(this.calcEtoByDay.getLogs());
     } catch (error) {
-      console.error("[ERROR] - Falha ao executar worker da funceme.");
-      console.error(error);
+      Logger.error({
+        msg: "Falha ao executar worker da funceme.",
+        obj: error,
+      });
 
       await this.logsRepository.create({
         message: error.message,
