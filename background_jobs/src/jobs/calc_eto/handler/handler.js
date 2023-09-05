@@ -1,20 +1,20 @@
-import { Logger } from "../../../lib/logger/logger.js";
 import { CalcEtoDTO } from "./input-boundary.js";
 
-import { config } from "dotenv";
+// import { config } from "dotenv";
 
-config({
-  path: "../../.env",
-});
+// config({
+//   path: "../../.env",
+// });
 
+import { Logger } from "../../../lib/logger/logger.js";
 export class CalcET0Handler {
   static name_queue = "cal-et0";
   calcEtoByDay;
-  logsRepository;
+  dbLogger;
 
-  constructor(calcEtoByDay, logsRepository) {
+  constructor(calcEtoByDay, dbLogger) {
     this.calcEtoByDay = calcEtoByDay;
-    this.logsRepository = logsRepository;
+    this.dbLogger = dbLogger;
     this.name_queue = CalcET0Handler.name_queue;
   }
 
@@ -50,14 +50,14 @@ export class CalcET0Handler {
     try {
       await this.calcEtoByDay.execute(dto);
 
-      await this.logsRepository.create(this.calcEtoByDay.getLogs());
+      await this.dbLogger.add(this.calcEtoByDay.getLogs());
     } catch (error) {
       Logger.error({
         msg: "Falha ao executar worker da funceme.",
         obj: error,
       });
 
-      await this.logsRepository.create({
+      await this.dbLogger.add({
         message: error.message,
         type: "error",
       });

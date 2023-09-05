@@ -7,6 +7,7 @@ export class LogRepository {
     this.#connection = connections.logs;
   }
   async create(logs, tableName) {
+    console.log(logs, " ", tableName);
     const data = logs.map((log) => {
       // Operation: "",
       return {

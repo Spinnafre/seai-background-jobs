@@ -1,8 +1,8 @@
-import { config } from "dotenv";
+// import { config } from "dotenv";
 
-config({
-  path: "../../.env",
-});
+// config({
+//   path: "../../.env",
+// });
 
 import { TimeoutError } from "./errors/TimeoutError.js";
 import { FuncemeDataMinerDTO } from "./input-boundary.js";
@@ -14,11 +14,11 @@ export class FuncemeScrapperCommand {
 
   // ftpClient = null;
 
-  constructor(stationDataMiner, pluviometerDataMiner, ftpClient, logs) {
+  constructor(stationDataMiner, pluviometerDataMiner, ftpClient, dbLogger) {
     this.stationDataMiner = stationDataMiner;
     this.pluviometerDataMiner = pluviometerDataMiner;
     this.ftpClient = ftpClient;
-    this.logs = logs;
+    this.dbLogger = dbLogger;
     this.name_queue = FuncemeScrapperCommand.name_queue;
   }
 
@@ -27,8 +27,8 @@ export class FuncemeScrapperCommand {
 
     await this.pluviometerDataMiner.execute(dto);
 
-    await this.logs.create(this.stationDataMiner.getLogs());
-    await this.logs.create(this.pluviometerDataMiner.getLogs());
+    await this.dbLogger.add(this.stationDataMiner.getLogs());
+    await this.dbLogger.add(this.pluviometerDataMiner.getLogs());
   }
 
   async timeout() {
@@ -79,12 +79,10 @@ export class FuncemeScrapperCommand {
       });
       await this.ftpClient.close();
 
-      await this.logs.create([
-        {
-          message: error.message,
-          type: "error",
-        },
-      ]);
+      await this.dbLogger.add({
+        message: error.message,
+        type: "error",
+      });
 
       //Essencial para o PG-BOSS entender que ocorreu um erro
       throw error;

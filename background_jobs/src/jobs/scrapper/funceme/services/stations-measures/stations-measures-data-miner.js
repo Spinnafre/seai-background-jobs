@@ -39,7 +39,7 @@ export class ExtractStationsFromFunceme extends ServiceProtocol {
       params.getDate()
     );
 
-    const result = stations.equipments.map((station) => {
+    const result = stations.map((station) => {
       const measure =
         measures && measures.find((item) => item.code === station.code);
 

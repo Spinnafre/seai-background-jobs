@@ -3,6 +3,7 @@ import { pluviometerDataMinerFactory } from "../services/pluviometer-data-miner-
 import { FTPClientAdapter } from "../../external/adapters/ftp/client/ftp-client-adapter.js";
 import { FuncemeScrapperCommand } from "../../command-handler/funceme-scrapper-command.js";
 import { LogRepository } from "../../../../shared/database/repositories/Log.js";
+import { FuncemeDataMinerLogger } from "../../../../../lib/logger/log-register.js";
 
 export const FuncemeScrapperCommandFactory = () => {
   const ftpClient = new FTPClientAdapter();
@@ -10,6 +11,6 @@ export const FuncemeScrapperCommandFactory = () => {
     stationDataMinerFactory(ftpClient),
     pluviometerDataMinerFactory(ftpClient),
     ftpClient,
-    new LogRepository()
+    new FuncemeDataMinerLogger(new LogRepository())
   );
 };

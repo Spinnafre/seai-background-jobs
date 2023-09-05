@@ -20,7 +20,7 @@ export class CalcETO extends ServiceProtocol {
     const day = date.getDay();
 
     Logger.info({
-      msg: `Calculando dados de ETO do dia ${day}/${year}`,
+      msg: `Calculando dados de ETO pela data ${day}/${date.getMonth()}/${year}`,
     });
 
     const stationsEqps = await this.#equipmentRepository.getEquipments({

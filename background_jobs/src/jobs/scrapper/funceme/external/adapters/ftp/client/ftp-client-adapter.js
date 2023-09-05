@@ -1,5 +1,5 @@
 import Client from "ftp";
-import { ftpConfig } from "../../../../../../../config/ftp.js";
+import { ftpConfig } from "../../../../../../../config/app.js";
 import { Logger } from "../../../../../../../lib/logger/logger.js";
 
 export class FTPClientAdapter {
@@ -44,7 +44,7 @@ export class FTPClientAdapter {
       msg: "Iniciando conexão com o servidor FTP da funceme",
     });
     return new Promise((resolve, reject) => {
-      this.connection.connect(ftpConfig());
+      this.connection.connect(ftpConfig);
 
       // this.connection.once("close", (err) => {
       //   if (err)

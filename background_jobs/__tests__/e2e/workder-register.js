@@ -6,38 +6,16 @@ import "dotenv/config.js";
 
 import queue_jobs from "../../src/queue_workers.js";
 
-const cronJobs = [
-  {
-    queue: "daily-scheduler",
-    cron: "* * * * *",
-    data: null,
-    options: {
-      tz: "America/Chicago",
-    },
-  },
-];
-
 async function register() {
-  const today = new Date();
-  const yesterday = new Date(today);
-
-  yesterday.setDate(yesterday.getDate() - 1);
-  today.setHours(23, 0, 0);
-  console.log(today.getTime(), ":::", yesterday.getTime());
-
-  const date = yesterday;
-
   await BackgroundJobsManager.connectToQueue();
 
   await BackgroundJobsManager.startQueueMonitoring();
-
-  await BackgroundJobsManager.scheduleCronJobs(cronJobs);
 
   await BackgroundJobsManager.registerAllWorkers(queue_jobs);
 
   await BackgroundJobsManager.createJob(
     FuncemeScrapperCommand.name_queue,
-    { date },
+    { date: null },
     {
       // singletonKey: "1",
       useSingletonQueue: true,
@@ -49,7 +27,7 @@ async function register() {
 
   await BackgroundJobsManager.createJob(
     CalcET0Handler.name_queue,
-    { date },
+    { date: null },
     {
       singletonKey: "2",
       useSingletonQueue: true,

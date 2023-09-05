@@ -30,6 +30,7 @@ export class MetereologicalEquipmentInMemory {
         altitude: station.Altitude,
         type: station.Type,
         organ: station.Organ,
+        id_organ: station.Organ_Id,
       };
     });
   }

@@ -15,7 +15,7 @@ export class MetereologicalEquipmentRepository {
         `
         SELECT
           equipment."IdEquipment" AS "Id",
-          equipment."IdEquipmentExternal" AS "code",
+          equipment."IdEquipmentExternal" AS "Code",
           equipment."Name" AS "Location",
           equipment."Altitude",
           eqp_type."Name" AS "Type",
@@ -35,7 +35,7 @@ export class MetereologicalEquipmentRepository {
         `
         SELECT
           equipment."IdEquipment" AS "Id",
-          equipment."IdEquipmentExternal" AS "code",
+          equipment."IdEquipmentExternal" AS "Code",
           equipment."Name" AS "Location",
           equipment."Altitude",
           eqp_type."Name" AS "Type",
