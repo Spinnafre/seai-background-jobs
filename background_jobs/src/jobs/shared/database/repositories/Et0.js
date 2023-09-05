@@ -6,6 +6,13 @@ export class ET0Repository {
     this.#connection = connections.equipments;
   }
 
+  async deleteByTime(time) {
+    await this.#connection.raw(
+      `delete from "Et0" as rs
+where cast(rs."Time" as DATE) = ?`,
+      [time]
+    );
+  }
   async add(reads = []) {
     const toPersistency = reads.map((read) => {
       return {

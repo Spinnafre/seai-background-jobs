@@ -4,7 +4,26 @@ export class StationReadRepositoryInMemory {
   constructor(reads = []) {
     this.#ReadStations = reads;
   }
+  async getStationsReadsByDate(idEqp, idOrgan, date) {
+    const data = this.#ReadStations.filter((read) => {
+      return (
+        read.FK_Equipment === idEqp &&
+        read.Time === date &&
+        read.FK_Organ === idOrgan
+      );
+    });
 
+    if (!data) {
+      return null;
+    }
+
+    return data.map((read) => {
+      return {
+        idRead: read.IdRead,
+        time: read.Time,
+      };
+    });
+  }
   async create(measures = []) {
     const data = measures.map((read) => ({
       IdRead: Math.round(Math.random() * 1000),
@@ -12,6 +31,11 @@ export class StationReadRepositoryInMemory {
     }));
 
     this.#ReadStations = [...data];
+
+    return data.map((read) => ({
+      idRead: read.IdRead,
+      date: read.Time,
+    }));
   }
 
   async list() {

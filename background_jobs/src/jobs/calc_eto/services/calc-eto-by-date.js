@@ -5,6 +5,7 @@ export class CalcETO extends ServiceProtocol {
   #equipmentRepository;
   #stationReadsRepository;
   #etoRepository;
+
   constructor(equipmentRepository, etoRepository, stationReadsRepository) {
     super();
     this.#equipmentRepository = equipmentRepository;
@@ -18,6 +19,14 @@ export class CalcETO extends ServiceProtocol {
   async execute(date) {
     const year = date.getYear();
     const day = date.getDay();
+
+    const dateToRemove = `${year}-${date.getMonth()}-${day}`;
+
+    Logger.warn({
+      msg: `Deletando dados de ETO do dia ${dateToRemove}`,
+    });
+
+    await this.#etoRepository.deleteByTime(dateToRemove);
 
     Logger.info({
       msg: `Calculando dados de ETO pela data ${day}/${date.getMonth()}/${year}`,
