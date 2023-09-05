@@ -1,7 +1,5 @@
 import { FTPClientAdapterMock } from "../../mock/funceme/ftp/connection.js";
 
-import { StationMapper } from "../../../src/jobs/scrapper/core/mappers/station-mapper.js";
-
 import { MetereologicalEquipmentInMemory } from "../../database/inMemory/entities/metereologicalEquipment.js";
 import { StationReadRepositoryInMemory } from "../../database/inMemory/entities/stationRead.js";
 

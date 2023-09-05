@@ -1,6 +1,7 @@
 import Client from "ftp";
 import { ftpConfig } from "../../../../../../../config/app.js";
 import { Logger } from "../../../../../../../lib/logger/logger.js";
+import { ConnectionError } from "../../../../command-handler/errors/ConnectionError.js";
 
 export class FTPClientAdapter {
   connection;
@@ -19,8 +20,7 @@ export class FTPClientAdapter {
       this.connection.end();
 
       this.connection.once("close", (err) => {
-        if (err)
-          return reject(new Error(`Falha ao fechar a conexão ::: ${err}`));
+        if (err) return reject(new ConnectionError(err.message));
         Logger.info({
           msg: "Conexão com ftp fechada com sucesso",
         });

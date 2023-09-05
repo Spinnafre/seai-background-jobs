@@ -7,6 +7,7 @@
 import { TimeoutError } from "./errors/TimeoutError.js";
 import { FuncemeDataMinerDTO } from "./input-boundary.js";
 import { Logger } from "../../../../lib/logger/logger.js";
+import { ConnectionError } from "./errors/ConnectionError.js";
 
 export class FuncemeScrapperCommand {
   static name_queue = "funceme-scrapper";
@@ -77,7 +78,10 @@ export class FuncemeScrapperCommand {
         msg: "Falha ao executar worker da funceme.",
         obj: error,
       });
-      await this.ftpClient.close();
+
+      if (error instanceof ConnectionError === false) {
+        await this.ftpClient.close();
+      }
 
       await this.dbLogger.add({
         message: error.message,

@@ -30,7 +30,7 @@ export class CalcETOLogger extends DbLogger {
 export class FuncemeDataMinerLogger extends DbLogger {
   constructor(logRepository) {
     super(logRepository);
-    Object.freeze(this);
+    // Object.freeze(this);
   }
   async save(logs) {
     await this.logRepository.create(logs, "Funceme_Data_Miner");
