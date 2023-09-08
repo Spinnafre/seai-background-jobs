@@ -11,7 +11,7 @@ import { ConnectionError } from "./errors/ConnectionError.js";
 
 export class FuncemeScrapperCommand {
   static name_queue = "funceme-scrapper";
-  static timeout = 20000;
+  static timeout = 50000;
 
   // ftpClient = null;
 

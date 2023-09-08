@@ -22,6 +22,12 @@ export class PluviometerRead {
     });
   }
 
+  async deleteByTime(time) {
+    this.#PluviometerRead = this.#PluviometerRead.filter(
+      (read) => read.Time !== time
+    );
+  }
+
   async create(measures) {
     const data = measures.map((read) => ({
       IdRead: Math.round(Math.random() * 1000),

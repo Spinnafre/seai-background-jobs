@@ -1,8 +1,8 @@
 import { connections } from "../connection.js";
 export class PluviometerReadRepository {
-  connection;
+  #connection;
   constructor() {
-    this.connection = connections.equipments;
+    this.#connection = connections.equipments;
   }
   async getPluviometersReadsByDate(idEqp, idOrgan, date) {
     const data = await this.#connection.raw(
@@ -34,15 +34,14 @@ export class PluviometerReadRepository {
   async deleteByTime(time) {
     await this.#connection.raw(
       `delete from "ReadPluviometers" as rs
-where cast(rs."Time" as DATE) = ?`,
+where TO_CHAR(rs."Time" :: DATE, 'yyyy-mm-dd') = ?`,
       [time]
     );
   }
   async create(measures = []) {
-    const created = await this.connection
+    const created = await this.#connection("ReadPluviometers")
       .returning(["IdRead", "Time"])
-      .insert(measures)
-      .into("ReadPluviometers");
+      .insert(measures);
 
     return created.map((read) => ({
       idRead: read.IdRead,

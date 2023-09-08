@@ -38,6 +38,12 @@ export class StationReadRepositoryInMemory {
     }));
   }
 
+  async deleteByTime(time) {
+    this.#ReadStations = this.#ReadStations.filter(
+      (read) => read.Time !== time
+    );
+  }
+
   async list() {
     return this.#ReadStations;
   }

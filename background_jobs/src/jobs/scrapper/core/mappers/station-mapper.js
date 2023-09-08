@@ -12,9 +12,38 @@ export class StationMapper {
     };
   }
 
-  static stationToPersistency(station, measure) {
+  static stationToPersistency(station, measure, date = null) {
+    const data = {
+      TotalRadiation: null,
+      RelativeHumidity: null,
+      AtmosphericTemperature: null,
+      WindVelocity: null,
+      FK_Organ: station.id_organ,
+      FK_Equipment: station.id,
+    };
+
+    if (date)
+      Object.assign(data, {
+        Time: date,
+      });
+
     if (!measure) {
-      return {
+      return data;
+    }
+
+    const { radiation, humidity, temperature, windVelocity } = measure;
+
+    return Object.assign(data, {
+      TotalRadiation: radiation || null,
+      RelativeHumidity: humidity || null,
+      AtmosphericTemperature: temperature || null,
+      WindVelocity: windVelocity || null,
+    });
+  }
+
+  static stationsToPersistency(stations = [], measures = [], date = null) {
+    return stations.map((station) => {
+      const data = {
         TotalRadiation: null,
         RelativeHumidity: null,
         AtmosphericTemperature: null,
@@ -22,22 +51,12 @@ export class StationMapper {
         FK_Organ: station.id_organ,
         FK_Equipment: station.id,
       };
-    }
 
-    const { radiation, humidity, temperature, windVelocity } = measure;
+      if (date)
+        Object.assign(data, {
+          Time: date,
+        });
 
-    return {
-      TotalRadiation: radiation || null,
-      RelativeHumidity: humidity || null,
-      AtmosphericTemperature: temperature || null,
-      WindVelocity: windVelocity || null,
-      FK_Organ: station.id_organ,
-      FK_Equipment: station.id,
-    };
-  }
-
-  static stationsToPersistency(stations = [], measures = []) {
-    return stations.map((station) => {
       const measure =
         measures && measures.find((item) => item.code === station.code);
 
@@ -46,14 +65,7 @@ export class StationMapper {
           msg: `Não foi possível obter dados de medição estação ${station.code}, salvando dados sem medições`,
         });
 
-        return {
-          TotalRadiation: null,
-          RelativeHumidity: null,
-          AtmosphericTemperature: null,
-          WindVelocity: null,
-          FK_Organ: station.id_organ,
-          FK_Equipment: station.id,
-        };
+        return data;
       }
 
       const { radiation, humidity, temperature, windVelocity } = measure;
@@ -62,14 +74,12 @@ export class StationMapper {
         msg: `Sucesso ao obter dados de medição estação ${station.code}`,
       });
 
-      return {
+      return Object.assign(data, {
         TotalRadiation: radiation || null,
         RelativeHumidity: humidity || null,
         AtmosphericTemperature: temperature || null,
         WindVelocity: windVelocity || null,
-        FK_Organ: station.id_organ,
-        FK_Equipment: station.id,
-      };
+      });
     });
   }
 }

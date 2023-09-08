@@ -48,15 +48,30 @@ export class ExtractStationsFromFunceme extends ServiceProtocol {
           `Não foi possível obter dados de medição estação ${station.code}, salvando dados sem medições.`
         );
 
-        return StationMapper.stationToPersistency(station, null);
+        return StationMapper.stationToPersistency(
+          station,
+          null,
+          params.getDate()
+        );
       }
 
       this.logs.addInfoLog(
         `Sucesso ao obter dados de medição estação ${station.code}`
       );
 
-      return StationMapper.stationToPersistency(station, measure);
+      return StationMapper.stationToPersistency(
+        station,
+        measure,
+        params.getDate()
+      );
     });
+
+    Logger.info({
+      msg: `Apagando dados de medições das estações da FUNCEME pela data ${params.getDate()}`,
+    });
+
+    // yyyy-mm-dd
+    await this.stationReadDao.deleteByTime(params.getDate());
 
     await this.stationReadDao.create(result);
 

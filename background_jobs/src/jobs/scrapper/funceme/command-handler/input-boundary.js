@@ -12,6 +12,7 @@ export class FuncemeDataMinerDTO {
     this.date = `${date.getFullYear()}${separator}${month}${separator}${day}`;
   }
 
+  // yyyy-mm-dd
   getDate() {
     return this.date;
   }

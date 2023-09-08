@@ -4,11 +4,15 @@ import { ServiceProtocol } from "../../../core/service-protocol.js";
 import { PluviometerMapper } from ".././../../core/mappers/pluviometer-mapper.js";
 
 export class ExtractPluviometersFromFunceme extends ServiceProtocol {
-  constructor(dataMiner, metereologicalEquipmentDao, pluviometerReadDao) {
+  constructor(
+    dataMiner,
+    metereologicalEquipmentDao,
+    pluviometerReadRepository
+  ) {
     super();
     this.dataMiner = dataMiner;
     this.metereologicalEquipmentDao = metereologicalEquipmentDao;
-    this.pluviometerReadDao = pluviometerReadDao;
+    this.pluviometerReadRepository = pluviometerReadRepository;
   }
 
   async execute(params) {
@@ -48,17 +52,32 @@ export class ExtractPluviometersFromFunceme extends ServiceProtocol {
           `Não foi possível obter dados de medição do pluviômetro ${pluviometer.code}, salvando dados sem medições.`
         );
 
-        return PluviometerMapper.pluviometerToPersistency(pluviometer, null);
+        return PluviometerMapper.pluviometerToPersistency(
+          pluviometer,
+          null,
+          params.getDate()
+        );
       }
 
       this.logs.addInfoLog(
         `Sucesso ao obter dados de medição do pluviômetro ${pluviometer.code}`
       );
 
-      return PluviometerMapper.pluviometerToPersistency(pluviometer, measure);
+      return PluviometerMapper.pluviometerToPersistency(
+        pluviometer,
+        measure,
+        params.getDate()
+      );
     });
 
-    await this.pluviometerReadDao.create(result);
+    Logger.info({
+      msg: `Apagando dados de pluviômetros da FUNCEME pela data ${params.getDate()}`,
+    });
+
+    // yyyy-mm-dd
+    await this.pluviometerReadRepository.deleteByTime(params.getDate());
+
+    await this.pluviometerReadRepository.create(result);
 
     this.logs.addInfoLog(
       "Sucesso ao salvar leituras de pluviômetros da FUNCEME"

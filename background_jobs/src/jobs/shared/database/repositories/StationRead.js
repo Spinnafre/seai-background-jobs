@@ -57,17 +57,17 @@ export class StationReadRepository {
     });
   }
   async deleteByTime(time) {
+    // yyyy-mm-dd
     await this.#connection.raw(
       `delete from "ReadStations" as rs
-where cast(rs."Time" as DATE) = ?`,
+where TO_CHAR(rs."Time" :: DATE, 'yyyy-mm-dd') = ?`,
       [time]
     );
   }
   async create(measures = []) {
-    const created = await this.#connection
+    const created = await this.#connection("ReadStations")
       .returning(["IdRead", "Time"])
-      .insert(measures)
-      .into("ReadStations");
+      .insert(measures);
 
     return created.map((read) => ({
       idRead: read.IdRead,

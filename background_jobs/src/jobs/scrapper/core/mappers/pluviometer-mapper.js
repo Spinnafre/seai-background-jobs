@@ -10,30 +10,50 @@ export class PluviometerMapper {
     };
   }
 
-  static pluviometerToPersistency(pluviometer, measure) {
+  static pluviometerToPersistency(pluviometer, measure, date = null) {
+    const data = {
+      Value: null,
+      FK_Organ: pluviometer.id_organ,
+      FK_Equipment: pluviometer.id,
+    };
+
+    if (date)
+      Object.assign(data, {
+        Time: date,
+      });
+
     if (!measure) {
       Logger.warn({
         msg: `Não foi possível obter dados de medição do pluviômetro ${pluviometer.code}, salvando dados sem medições`,
       });
 
-      return {
-        Value: null,
-        FK_Organ: pluviometer.id_organ,
-        FK_Equipment: pluviometer.id,
-      };
+      return data;
     }
 
     // const { pluviometer } = measure;
 
-    return {
+    return Object.assign(data, {
       Value: measure.pluviometer,
-      FK_Organ: pluviometer.id_organ,
-      FK_Equipment: pluviometer.id,
-    };
+    });
   }
 
-  static pluviometersToPersistency(pluviometers = [], measures = []) {
+  static pluviometersToPersistency(
+    pluviometers = [],
+    measures = [],
+    date = null
+  ) {
     return pluviometers.map((pluviometer) => {
+      const data = {
+        Value: null,
+        FK_Organ: pluviometer.id_organ,
+        FK_Equipment: pluviometer.id,
+      };
+
+      if (date)
+        Object.assign(data, {
+          Time: date,
+        });
+
       const measure =
         measures && measures.find((item) => item.code === pluviometer.code);
 
@@ -42,20 +62,14 @@ export class PluviometerMapper {
           msg: `Não foi possível obter dados de medição do pluviômetro ${pluviometer.coce}, salvando dados sem medições`,
         });
 
-        return {
-          Value: null,
-          FK_Organ: pluviometer.id_organ,
-          FK_Equipment: pluviometer.id,
-        };
+        return data;
       }
 
       // const { pluviometer } = measure;
 
-      return {
+      return Object.assign(data, {
         Value: measure.pluviometer,
-        FK_Organ: pluviometer.id_organ,
-        FK_Equipment: pluviometer.id,
-      };
+      });
     });
   }
 }
