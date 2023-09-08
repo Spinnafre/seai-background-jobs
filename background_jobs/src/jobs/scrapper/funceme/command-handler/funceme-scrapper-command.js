@@ -15,9 +15,16 @@ export class FuncemeScrapperCommand {
 
   // ftpClient = null;
 
-  constructor(stationDataMiner, pluviometerDataMiner, ftpClient, dbLogger) {
+  constructor(
+    stationDataMiner,
+    pluviometerDataMiner,
+    ftpClient,
+    dbLogger,
+    metereologicalOrganRepository
+  ) {
     this.stationDataMiner = stationDataMiner;
     this.pluviometerDataMiner = pluviometerDataMiner;
+    this.metereologicalOrganRepository = metereologicalOrganRepository;
     this.ftpClient = ftpClient;
     this.dbLogger = dbLogger;
     this.name_queue = FuncemeScrapperCommand.name_queue;
@@ -68,7 +75,19 @@ export class FuncemeScrapperCommand {
     const dto = new FuncemeDataMinerDTO(time);
 
     try {
-      await this.ftpClient.connect();
+      const ftpConfig = await this.metereologicalOrganRepository.getOrganByName(
+        "FUNCEME"
+      );
+
+      if (ftpConfig === null) {
+        throw new Error(
+          "Não foi possível buscar credenciais de acesso ao FTP da FUNCEME"
+        );
+      }
+
+      const { host, user, password } = ftpConfig;
+
+      await this.ftpClient.connect({ host, user, password });
 
       await Promise.race([this.runAllServices(dto), this.timeout()]);
 
