@@ -1,4 +1,4 @@
-import { dbConfig } from "../../../config/database.js";
+// import { dbConfig } from "../../../config/database.js";
 import { Logger } from "../../logger/logger.js";
 
 export class PgBossAdapter {
