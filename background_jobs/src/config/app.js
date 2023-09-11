@@ -42,7 +42,7 @@ const databaseCredentials = {
       port: Number(process.env.DB_JOB_PORT_DEV),
       user: process.env.DB_JOB_USER_NAME_DEV,
       password: process.env.DB_JOB_PASSWORD_DEV,
-      database: "postgres",
+      database: process.env.DB_JOB_NAME_DEV,
     },
   },
   production: {
@@ -80,7 +80,7 @@ const databaseCredentials = {
       port: Number(process.env.DB_JOB_PORT_PROD),
       user: process.env.DB_JOB_USER_NAME_PROD,
       password: process.env.DB_JOB_PASSWORD_PROD,
-      database: "postgres",
+      database: process.env.DB_JOB_NAME_PROD,
     },
   },
   test: {
@@ -118,7 +118,7 @@ const databaseCredentials = {
       port: Number(process.env.DB_JOB_PORT_TEST),
       user: process.env.DB_JOB_USER_NAME_TEST,
       password: process.env.DB_JOB_PASSWORD_TEST,
-      database: "postgres",
+      database: process.env.DB_JOB_NAME_TEST,
     },
   },
 };

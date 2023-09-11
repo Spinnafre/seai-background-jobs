@@ -1,4 +1,4 @@
-// import { dbConfig } from "../../../config/database.js";
+import { databaseConfig } from "../../../config/app.js";
 import { Logger } from "../../logger/logger.js";
 
 export class PgBossAdapter {
@@ -23,13 +23,12 @@ export class PgBossAdapter {
         msg: "[⚙️] Criando conexão com o banco de dados de jobs",
       });
 
-      // const connection = new pg("postgres://postgres:iaes@jobs_database:5432");
       const connection = new pg({
-        database: "postgres",
-        port: 5432,
-        host: "jobs_database",
-        password: "iaes",
-        user: "postgres",
+        database: databaseConfig.jobs.database,
+        port: databaseConfig.jobs.port,
+        host: databaseConfig.jobs.host,
+        password: databaseConfig.jobs.password,
+        user: databaseConfig.jobs.user,
       });
 
       connection.on("error", (error) => {
