@@ -1,10 +1,17 @@
-const app = require("./app.js");
+import "dotenv/config.js";
 
-process.on("uncaughtException", function (err) {
-  console.log("Caught exception: " + err);
-  process.exit(1);
+import { serverConfig } from "./config/server.js";
+import { Logger } from "./lib/logger/logger.js";
+
+const port = serverConfig.PORT;
+
+const { default: app } = await import("./app.js");
+
+app.listen(port, function () {
+  Logger.info({ msg: "Server listening on port " + port });
 });
 
-app.listen(3000, function () {
-  console.log("Server listening on port " + 3000);
+process.on("uncaughtException", function (error) {
+  Logger.error({ msg: "Caught exception: " + error.message, obj: error });
+  process.exit(1);
 });
