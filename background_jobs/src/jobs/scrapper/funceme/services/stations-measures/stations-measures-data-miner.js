@@ -39,6 +39,8 @@ export class ExtractStationsFromFunceme extends ServiceProtocol {
       params.getDate()
     );
 
+    console.log({ measures });
+
     const result = stations.map((station) => {
       const measure =
         measures && measures.find((item) => item.code === station.code);
@@ -72,6 +74,8 @@ export class ExtractStationsFromFunceme extends ServiceProtocol {
 
     // yyyy-mm-dd
     await this.stationReadDao.deleteByTime(params.getDate());
+
+    console.log("Salvando ::: ", result);
 
     await this.stationReadDao.create(result);
 

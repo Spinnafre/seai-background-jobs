@@ -61,9 +61,9 @@ describe("# Station-Measures-Data-Miner", () => {
   });
 
   test("When has equipments but measures not exists, should be able to save measures data with null", async function () {
-    jest.setSystemTime(new Date(2023, 5, 2));
+    jest.setSystemTime(new Date(2022, 4, 2));
 
-    const stationCode = "A325";
+    const stationCode = "B8524E9A";
 
     const equipments = [
       {
@@ -108,12 +108,19 @@ describe("# Station-Measures-Data-Miner", () => {
     expect(stationReadDaoSpy).toHaveBeenCalled();
 
     const station = await stationReadDao.list();
+    console.log({ station });
+    console.log({ logs });
 
     station.forEach((pluviometer) => {
       expect(pluviometer).toMatchObject({
         TotalRadiation: null,
-        RelativeHumidity: null,
-        AtmosphericTemperature: null,
+        MaxRelativeHumidity: null,
+        MinRelativeHumidity: null,
+        AverageRelativeHumidity: null,
+        MaxAtmosphericTemperature: null,
+        MinAtmosphericTemperature: null,
+        AverageAtmosphericTemperature: null,
+        AtmosphericPressure: null,
         WindVelocity: null,
         FK_Organ: 2,
         FK_Equipment: 1,
@@ -137,9 +144,9 @@ describe("# Station-Measures-Data-Miner", () => {
   });
 
   test("When has stations measures in funceme stations files, should create log with success and save stations with measures", async function () {
-    jest.setSystemTime(new Date(2023, 3, 4));
+    jest.setSystemTime(new Date(2023, 0, 1));
 
-    const equipmentCode = "A325";
+    const equipmentCode = "B8524E9A";
 
     const equipments = [
       {
@@ -185,11 +192,18 @@ describe("# Station-Measures-Data-Miner", () => {
 
     const station = await stationReadDao.list();
 
+    console.log({ station });
+
     const stationInDatabase = {
-      TotalRadiation: null,
-      RelativeHumidity: 82.42,
-      AtmosphericTemperature: 24.59,
-      WindVelocity: null,
+      TotalRadiation: 228.68,
+      MaxRelativeHumidity: 65.83,
+      MinRelativeHumidity: 60.39,
+      AverageRelativeHumidity: 62.95,
+      MaxAtmosphericTemperature: 30.02,
+      MinAtmosphericTemperature: 28.42,
+      AverageAtmosphericTemperature: 29.11,
+      AtmosphericPressure: 996.2,
+      WindVelocity: 3.56,
       FK_Organ: 2,
       FK_Equipment: 1,
     };
@@ -245,8 +259,13 @@ describe("# Station-Measures-Data-Miner", () => {
 
     const stationInDatabase = {
       TotalRadiation: null,
-      RelativeHumidity: null,
-      AtmosphericTemperature: null,
+      MaxRelativeHumidity: null,
+      MinRelativeHumidity: null,
+      AverageRelativeHumidity: null,
+      MaxAtmosphericTemperature: null,
+      MinAtmosphericTemperature: null,
+      AverageAtmosphericTemperature: null,
+      AtmosphericPressure: null,
       WindVelocity: null,
       FK_Organ: 2,
       FK_Equipment: 1,
