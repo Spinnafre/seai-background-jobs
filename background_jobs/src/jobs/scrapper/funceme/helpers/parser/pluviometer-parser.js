@@ -18,7 +18,7 @@ export class PluviometerParser extends CsvParser {
   }
 
   splitMeasures(string) {
-    return string.slice(4).join("\n");
+    return string.slice(5).join("\n");
   }
 
   static async parse(rawData = []) {
