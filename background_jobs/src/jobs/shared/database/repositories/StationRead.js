@@ -34,12 +34,21 @@ export class StationReadRepository {
     });
   }
 
-  async getStationReadsByEquipment(idEqp) {
+  async getStationReads({ idEqp, date, hour }) {
+    const whereSQL = {
+      FK_Equipment: idEqp,
+      Time: date,
+    };
+
+    if (hour) {
+      Object.assign(whereSQL, {
+        Hour: hour,
+      });
+    }
+
     const data = await this.#connection
       .select()
-      .where({
-        FK_Equipment: idEqp,
-      })
+      .where(whereSQL)
       .from("ReadStations");
 
     if (!data) {
@@ -49,9 +58,16 @@ export class StationReadRepository {
     return data.map((stationRead) => {
       return {
         idRead: stationRead.IdRead,
+        time: stationRead.Time,
+        hour: stationRead.Hour,
         totalRadiation: stationRead.TotalRadiation,
-        relativeHumidity: stationRead.RelativeHumidity,
+        averageRelativeHumidity: stationRead.AverageRelativeHumidity,
+        maxRelativeHumidity: stationRead.MaxRelativeHumidity,
+        minRelativeHumidity: stationRead.MinRelativeHumidity,
         atmosphericTemperature: stationRead.AtmosphericTemperature,
+        minAtmosphericTemperature: stationRead.MinAtmosphericTemperature,
+        maxAtmosphericTemperature: stationRead.MaxAtmosphericTemperature,
+        atmosphericPressure: stationRead.AtmosphericPressure,
         windVelocity: stationRead.WindVelocity,
       };
     });
@@ -64,6 +80,17 @@ where TO_CHAR(rs."Time" :: DATE, 'yyyy-mm-dd') = ?`,
       [time]
     );
   }
+
+  async deleteByDateTime(time, hour) {
+    // yyyy-mm-dd
+    await this.#connection.raw(
+      `delete from "ReadStations" as rs
+where TO_CHAR(rs."Time" :: DATE, 'yyyy-mm-dd') = ? 
+and rs."Hour" = ?`,
+      [time, hour]
+    );
+  }
+
   async create(measures = []) {
     const created = await this.#connection("ReadStations")
       .returning(["IdRead", "Time"])

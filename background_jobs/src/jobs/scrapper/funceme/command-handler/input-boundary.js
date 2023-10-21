@@ -1,5 +1,6 @@
 export class FuncemeDataMinerDTO {
   date;
+  #hour;
 
   constructor(payload) {
     const separator = "-";
@@ -10,10 +11,15 @@ export class FuncemeDataMinerDTO {
     if (day < 10) day = `0${day}`;
 
     this.date = `${date.getFullYear()}${separator}${month}${separator}${day}`;
+    this.#hour = date.getHours();
   }
 
   // yyyy-mm-dd
   getDate() {
     return this.date;
+  }
+
+  getHour() {
+    return this.#hour;
   }
 }

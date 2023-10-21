@@ -21,7 +21,7 @@ export class CalcETO extends ServiceProtocol {
     const day = date.getDay();
 
     Logger.info({
-      msg: `Calculando dados de ETO pela data ${day}/${date.getMonth()}/${year}`,
+      msg: `Calculando dados de ETO pela data ${date.getDate()}`,
     });
 
     const stationsEqps = await this.#equipmentRepository.getEquipments({
@@ -30,12 +30,21 @@ export class CalcETO extends ServiceProtocol {
 
     const stationsEto = [];
 
+    if (stationsEqps.length === 0) {
+      Logger.warn({
+        msg: "Não há equipamentos de estação cadastrados.",
+      });
+
+      this.logs.addWarningLog(`Não há equipamentos de estação cadastrados.`);
+      return;
+    }
+
     for (const station of stationsEqps) {
       // buscar leituras da estação usando o Fk_Equipment
-      const stationReads =
-        await this.#stationReadsRepository.getStationReadsByEquipment(
-          station.id
-        );
+      const stationReads = await this.#stationReadsRepository.getStationReads({
+        idEqp: station.id,
+        date: date.getDate(),
+      });
 
       // e se não tiver dados de leituras da estação?
       if (stationReads === null || stationReads.length === 0) {
@@ -55,17 +64,32 @@ export class CalcETO extends ServiceProtocol {
       for (const stationRead of stationReads) {
         const {
           idRead,
-          atmosphericTemperature,
+          averageAtmosphericTemperature,
+          minAtmosphericTemperature,
+          maxAtmosphericTemperature,
+          averageRelativeHumidity,
+          maxRelativeHumidity,
+          minRelativeHumidity,
+          atmosphericPressure,
           totalRadiation,
-          relativeHumidity,
+          windVelocity,
         } = stationRead;
 
-        if (atmosphericTemperature === null) {
+        if (averageAtmosphericTemperature === null) {
           this.logs.addWarningLog(
             `Não irá computar os dados de ET0 pois não há dados de temperatura atmosférica média da estação ${station.code} de ${station.location}`
           );
 
           continue;
+        }
+
+        if (
+          minAtmosphericTemperature === null ||
+          maxAtmosphericTemperature === null
+        ) {
+          this.logs.addWarningLog(
+            `Não há dados de temperatura máxima ou mínima da estação ${station.code} de ${station.location}, portanto os valores irão serem estimados.`
+          );
         }
 
         if (totalRadiation === null) {
@@ -74,7 +98,19 @@ export class CalcETO extends ServiceProtocol {
           );
         }
 
-        if (relativeHumidity === null) {
+        if (atmosphericPressure === null) {
+          this.logs.addWarningLog(
+            `Não há dados de pressão atmosférica da estação ${station.code} de ${station.location}, portanto o valor irá ser estimado.`
+          );
+        }
+
+        if (windVelocity === null) {
+          this.logs.addWarningLog(
+            `Não há dados da velocidade média do vento da estação ${station.code} de ${station.location}, portanto irá ser adotado o valor de referência de 2 m/s.`
+          );
+        }
+
+        if (averageRelativeHumidity === null) {
           this.logs.addWarningLog(
             `Não há dados de umidade relativa média da estação ${station.code} de ${station.location}, portanto irá ser estimado o valor da umidade média.`
           );
@@ -85,11 +121,19 @@ export class CalcETO extends ServiceProtocol {
             year,
             day,
           },
-          altitude,
-          atmosphericTemperatureAverage: atmosphericTemperature,
-          relativeHumidityAverage: relativeHumidity,
-          totalRadiationAverage: totalRadiation,
-          sunQuantityHoursInDay: 11,
+          measures: {
+            altitude,
+            sunQuantityHoursInDay: 11,
+            averageAtmosphericTemperature,
+            minAtmosphericTemperature,
+            maxAtmosphericTemperature,
+            averageRelativeHumidity,
+            maxRelativeHumidity,
+            minRelativeHumidity,
+            atmosphericPressure,
+            totalRadiation,
+            windVelocity,
+          },
         });
 
         if ((eto === null) | (eto === undefined)) {

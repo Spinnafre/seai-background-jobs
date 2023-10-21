@@ -71,7 +71,7 @@ export function CalcLiquidRadiation(
   return liquidRad;
 }
 
-export function CalcMaxAndMinTemperature(
+export function CalcMaxAndMinTemperatureEstimation(
   solarRadiationTotal,
   extraterrestrialRadiation,
   temperatureAverage

@@ -8,7 +8,7 @@ import {
   CalcGama,
   CalcInclinationBetweenSteamPressureAndTemperature,
   CalcLiquidRadiation,
-  CalcMaxAndMinTemperature,
+  CalcMaxAndMinTemperatureEstimation,
   CalcNebulosityFactor,
   CalcRadiation,
   CalcSteamPressureEstimation,
@@ -17,14 +17,24 @@ import {
   EstimateSolarRadiation,
 } from "./calc-functions.js";
 
-export function CalcEto({
-  date,
-  altitude,
-  atmosphericTemperatureAverage,
-  totalRadiationAverage,
-  relativeHumidityAverage,
-  sunQuantityHoursInDay,
-}) {
+export function CalcEto(
+  { date, measures } = {
+    date: {},
+    measures: {
+      altitude,
+      sunQuantityHoursInDay: 11,
+      averageAtmosphericTemperature,
+      minAtmosphericTemperature,
+      maxAtmosphericTemperature,
+      averageRelativeHumidity,
+      maxRelativeHumidity,
+      minRelativeHumidity,
+      atmosphericPressure,
+      totalRadiation,
+      windVelocity,
+    },
+  }
+) {
   // Dá para usar a altitude como constante, só q tem q saber se é 10 metros ou 2 metros
   // const z = 2 // Altura do anemometro em m
   const year = date.year;
@@ -49,47 +59,64 @@ export function CalcEto({
 
   // adjust solar radiation
   // Radiação precisa estar em Mj/wh (multiplicar por 24 e por 0.0036)
-  const solarRadiation = totalRadiationAverage
-    ? AdjustSolarRadiation(totalRadiationAverage)
+  const solarRadiation = measures.totalRadiation
+    ? AdjustSolarRadiation(measures.totalRadiation)
     : EstimateSolarRadiation(
         omega_s,
         extraterrestrialRadiation,
-        sunQuantityHoursInDay
+        measures.sunQuantityHoursInDay
       );
 
-  const windVelocity = 2;
+  const windVelocity = measures.windVelocity || 2;
 
   const clearSkyRadiation = CalcClearSkyRadiation(
-    altitude,
+    measures.altitude,
     extraterrestrialRadiation
   ); // radiação de céu limpo
 
-  const { maxTemperature, minTemperature } = CalcMaxAndMinTemperature(
-    solarRadiation,
-    extraterrestrialRadiation,
-    atmosphericTemperatureAverage
-  );
+  let minAtmosphericTemperature = null;
+  let maxAtmosphericTemperature = null;
+
+  if (
+    measures.minAtmosphericTemperature &&
+    measures.maxAtmosphericTemperature
+  ) {
+    minAtmosphericTemperature = measures.minAtmosphericTemperature;
+    maxAtmosphericTemperature = measures.maxAtmosphericTemperature;
+  } else {
+    console.log("Estimando temperatura máxima e mínima...");
+    const { maxTemperature, minTemperature } =
+      CalcMaxAndMinTemperatureEstimation(
+        solarRadiation,
+        extraterrestrialRadiation,
+        measures.averageAtmosphericTemperature
+      );
+
+    minAtmosphericTemperature = minTemperature;
+    maxAtmosphericTemperature = maxTemperature;
+  }
 
   const nebulosityFactor = CalcNebulosityFactor(
     solarRadiation,
     clearSkyRadiation
   );
-  // calc pressure
-  // will alway be estimated
-  const atmosphericPressure = 101.3 * ((293 - 0.0095 * altitude) / 293) ** 5.23; // Pressão utilizando a altitude local
+
+  const atmosphericPressure =
+    measures.atmosphericPressure ||
+    101.3 * ((293 - 0.0095 * measures.altitude) / 293) ** 5.23; // Pressão utilizando a altitude local
 
   const { currentSteamPressureValue, saturationSteamPressure } =
-    relativeHumidityAverage
+    measures.averageRelativeHumidity
       ? CalcSteamPressureWithAverageMeasures(
-          atmosphericTemperatureAverage,
-          relativeHumidityAverage
+          measures.averageAtmosphericTemperature,
+          measures.averageRelativeHumidity
         )
-      : CalcSteamPressureEstimation(minTemperature);
+      : CalcSteamPressureEstimation(minAtmosphericTemperature);
 
   const gama = CalcGama(atmosphericPressure);
 
   const delta = CalcInclinationBetweenSteamPressureAndTemperature(
-    atmosphericTemperatureAverage
+    measures.averageAtmosphericTemperature
   );
 
   const flowDensity = CalcFlowHeatSoil();
@@ -97,8 +124,8 @@ export function CalcEto({
 
   const liquidRad = CalcLiquidRadiation(
     solarRadiation,
-    maxTemperature,
-    minTemperature,
+    maxAtmosphericTemperature,
+    minAtmosphericTemperature,
     currentSteamPressureValue,
     nebulosityFactor
   );
@@ -107,7 +134,7 @@ export function CalcEto({
     gama,
     delta,
     g_asterico,
-    atmosphericTemperatureAverage,
+    measures.averageAtmosphericTemperature,
     windVelocity,
     saturationSteamPressure,
     currentSteamPressureValue

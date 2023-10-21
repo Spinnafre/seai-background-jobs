@@ -108,8 +108,6 @@ describe("# Station-Measures-Data-Miner", () => {
     expect(stationReadDaoSpy).toHaveBeenCalled();
 
     const station = await stationReadDao.list();
-    console.log({ station });
-    console.log({ logs });
 
     station.forEach((pluviometer) => {
       expect(pluviometer).toMatchObject({

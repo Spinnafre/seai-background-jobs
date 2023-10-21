@@ -48,9 +48,18 @@ export class StationReadRepositoryInMemory {
     return this.#ReadStations;
   }
 
-  async getStationReadsByEquipment(idEqp) {
+  async getStationReads({ idEqp, date, hour }) {
+    console.log("getStationReads ::: ", { idEqp, date, hour });
     const data = this.#ReadStations.filter((read) => {
-      return read.FK_Equipment === idEqp;
+      if (hour) {
+        return (
+          read.FK_Equipment === idEqp &&
+          read.Time === date &&
+          read.Hour === hour
+        );
+      } else {
+        return read.FK_Equipment === idEqp && read.Time === date;
+      }
     });
 
     if (!data) {
@@ -60,9 +69,17 @@ export class StationReadRepositoryInMemory {
     return data.map((stationRead) => {
       return {
         idRead: stationRead.IdRead,
+        time: stationRead.Time,
+        hour: stationRead.Hour,
         totalRadiation: stationRead.TotalRadiation,
-        relativeHumidity: stationRead.RelativeHumidity,
-        atmosphericTemperature: stationRead.AtmosphericTemperature,
+        averageRelativeHumidity: stationRead.AverageRelativeHumidity,
+        maxRelativeHumidity: stationRead.MaxRelativeHumidity,
+        minRelativeHumidity: stationRead.MinRelativeHumidity,
+        averageAtmosphericTemperature:
+          stationRead.AverageAtmosphericTemperature,
+        minAtmosphericTemperature: stationRead.MinAtmosphericTemperature,
+        maxAtmosphericTemperature: stationRead.MaxAtmosphericTemperature,
+        atmosphericPressure: stationRead.AtmosphericPressure,
         windVelocity: stationRead.WindVelocity,
       };
     });
