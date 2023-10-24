@@ -26,7 +26,7 @@ export class MetereologicalEquipmentInMemory {
       return {
         id: station.IdEquipment,
         code: station.IdEquipmentExternal,
-        location: "test",
+        location: station.Name,
         altitude: station.Altitude,
         type: station.Type,
         organ: station.Organ,

@@ -1,11 +1,11 @@
 // npm run test:dev -i __tests__/units/services/funceme/station-measures-data-miner.spec.js
 import {
-  describe,
-  expect,
-  test,
-  jest,
   afterEach,
   beforeEach,
+  describe,
+  expect,
+  jest,
+  test,
 } from "@jest/globals";
 
 import { FTPClientAdapterMock } from "../../mock/funceme/ftp/connection.js";
@@ -16,11 +16,10 @@ import { StationReadRepositoryInMemory } from "../../database/inMemory/entities/
 // import { ReadTimeInMemory } from "../../database/inMemory/entities/readTime.js";
 import { MetereologicalEquipmentInMemory } from "../../database/inMemory/entities/metereologicalEquipment.js";
 
-import { FormatDate } from "../../../../src/jobs/scrapper/utils/date-formatter.js";
+import { FuncemeDataMinerDTO } from "../../../../src/jobs/scrapper/funceme/command-handler/dto.js";
 import { FetchFuncemeData } from "../../../../src/jobs/scrapper/funceme/helpers/fetch-data/fetch-data.js";
-import { ExtractStationsFromFunceme } from "../../../../src/jobs/scrapper/funceme/services/stations-measures/stations-measures-data-miner.js";
 import { StationParser } from "../../../../src/jobs/scrapper/funceme/helpers/parser/station-parser.js";
-import { FuncemeDataMinerDTO } from "../../../../src/jobs/scrapper/funceme/command-handler/input-boundary.js";
+import { ExtractStationsFromFunceme } from "../../../../src/jobs/scrapper/funceme/services/stations-measures/stations-measures-data-miner.js";
 
 let ftpAdapterMock = null;
 let metereologicalEquipmentDao = null;
