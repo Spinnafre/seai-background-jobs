@@ -1,15 +1,18 @@
+import { CalcETOByDate } from "../../services/calc-eto-by-date.js";
 import {
-  ET0Repository,
   MetereologicalEquipmentRepository,
   StationReadRepository,
-} from "../../../../jobs/shared/database/repositories/index.js";
+  ET0Repository,
+} from "../../../../shared/database/repositories/index.js";
 
-import { CalcETO } from "../../services/calc-eto-by-date.js";
-
-export const CalcEtoByDateServiceFactory = () => {
+export const makeCalcEtoByDateService = () => {
   const equipmentRepository = new MetereologicalEquipmentRepository();
   const stationReadRepository = new StationReadRepository();
   const etoRepository = new ET0Repository();
 
-  return new CalcETO(equipmentRepository, etoRepository, stationReadRepository);
+  return new CalcETOByDate(
+    equipmentRepository,
+    etoRepository,
+    stationReadRepository
+  );
 };

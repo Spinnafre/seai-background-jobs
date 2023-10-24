@@ -3,13 +3,16 @@ import { ConnectionError } from "../core/errors/ConnectionError.js";
 
 export class FuncemeFtpDataMinerController {
   #dataMinerServices = [];
+  #logger;
+  #ftpClient;
+  #getFtpCredentials;
   static timeout = 50000;
 
-  constructor(ftpClient, logger, dataMinerServices = [], getFtpCredentials) {
-    this.logger = logger;
-    this.ftpClient = ftpClient;
+  constructor(ftpClient, logger, getFtpCredentials, dataMinerServices = []) {
+    this.#logger = logger;
+    this.#ftpClient = ftpClient;
+    this.#getFtpCredentials = getFtpCredentials;
     this.#dataMinerServices.concat(dataMinerServices);
-    this.getFtpCredentials = getFtpCredentials;
   }
 
   async runServices(dto) {
@@ -24,11 +27,15 @@ export class FuncemeFtpDataMinerController {
     await this.logger.add(logs);
   }
 
+  setService(service) {
+    this.#dataMinerServices.push(service);
+  }
+
   // TO-DO: check if is necessary to add unref in the runServices promise
   async runWithTimeout(dto) {
     await Promise.race([
       this.runServices(dto),
-      timeout(FuncemeDataMinerController.timeout),
+      timeout(FuncemeFtpDataMinerController.timeout),
     ]);
   }
 
@@ -36,7 +43,7 @@ export class FuncemeFtpDataMinerController {
     const dto = new FuncemeScrapperWorkerDTO(request);
 
     try {
-      const credentialsOrError = await this.getFtpCredentials.execute(
+      const credentialsOrError = await this.#getFtpCredentials.execute(
         "FUNCEME"
       );
 
@@ -46,11 +53,11 @@ export class FuncemeFtpDataMinerController {
 
       const { host, user, password } = credentialsOrError.value();
 
-      await this.ftpClient.connect({ host, user, password });
+      await this.#ftpClient.connect({ host, user, password });
 
       await this.runWithTimeout(dto);
 
-      await this.ftpClient.close();
+      await this.#ftpClient.close();
 
       return Right.create();
     } catch (error) {
@@ -60,10 +67,10 @@ export class FuncemeFtpDataMinerController {
       });
 
       if (error instanceof ConnectionError === false) {
-        await this.ftpClient.close();
+        await this.#ftpClient.close();
       }
 
-      await this.logger.addError(error.message);
+      await this.#logger.addError(error.message);
 
       //Essencial para o PG-BOSS entender que ocorreu um erro
       return Left.create(error);

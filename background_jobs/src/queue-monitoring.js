@@ -1,9 +1,10 @@
 import "dotenv/config.js";
-import { BackgroundJobsManager } from "./lib/jobQueue/background-jobs-manager.js";
 
-import { Logger } from "./lib/logger/logger.js";
-import workers from "./queue_workers.js";
-import { cronJobs } from "./config/cron.js";
+import { Logger } from "./shared/logger.js";
+
+import workers from "./workers/workers.js";
+import { cronJobs } from "./workers/cron.js";
+import { BackgroundJobsManager } from "./workers/lib/jobQueue/background-jobs-manager.js";
 
 await BackgroundJobsManager.connectToQueue();
 

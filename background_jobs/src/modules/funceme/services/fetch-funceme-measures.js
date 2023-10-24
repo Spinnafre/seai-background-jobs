@@ -2,22 +2,24 @@ import { Logger } from "../../../../lib/logger/logger.js";
 import { Left, Right } from "../../../shared/result.js";
 import { ServiceProtocol } from "../../core/service-protocol.js";
 
-export class ExtractPluviometersFromFunceme extends ServiceProtocol {
+export class FetchFuncemeMeasures extends ServiceProtocol {
   constructor(
     fetchFtpData,
-    metereologicalEquipmentDao,
+    metereologicalEquipmentsRepository,
     equipmentMeasuresRepository,
     parser,
     mapper,
-    directory
+    equipmentType
   ) {
     super();
     this.fetchFtpData = fetchFtpData;
-    this.metereologicalEquipmentDao = metereologicalEquipmentDao;
+    this.metereologicalEquipmentsRepository =
+      metereologicalEquipmentsRepository;
     this.equipmentMeasuresRepository = equipmentMeasuresRepository;
     this.parser = parser;
     this.mapper = mapper;
     this.directory = directory;
+    this.equipmentType = equipmentType;
   }
 
   // Send to Domain Layer
@@ -65,13 +67,13 @@ export class ExtractPluviometersFromFunceme extends ServiceProtocol {
       msg: `Iniciando busca de dados pelo FTP da FUNCEME pela data ${request.getDate()}`,
     });
 
-    const equipments = await this.metereologicalEquipmentDao.getEquipments({
-      organName: "FUNCEME",
-      eqpType: "pluviometer",
-    });
+    const equipments =
+      await this.metereologicalEquipmentsRepository.getEquipments({
+        organName: "FUNCEME",
+        eqpType: this.equipmentType,
+      });
 
     if (!equipments.length) {
-      //Talvez não faça sentido ficar avisando que não tem Equipamentos cadastrados
       this.logs.addWarningLog("Não há equipamentos da FUNCEME cadastrados");
 
       return Left.create(

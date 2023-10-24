@@ -1,9 +1,8 @@
-import { CalcET0Handler } from "../jobs/calc_eto/handler/handler";
-import { FuncemeScrapperCommand } from "../jobs/scrapper/funceme/command-handler/funceme-scrapper-command";
+import { FuncemeFTPDataMinerWorker, CalcET0Worker } from "./handlers/index.js";
 
 export const cronJobs = [
   {
-    queue: FuncemeScrapperCommand.name_queue,
+    queue: FuncemeFTPDataMinerWorker,
     cron: "* * * * *",
     data: null,
     options: {
@@ -13,7 +12,7 @@ export const cronJobs = [
     },
   },
   {
-    queue: CalcET0Handler.name_queue,
+    queue: CalcET0Worker.name_queue,
     cron: "*/2 * * * *",
     data: null,
     options: {

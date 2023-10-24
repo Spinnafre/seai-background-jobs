@@ -1,4 +1,4 @@
-export default {
+export const FUNCEME_FTP_DIRECTORIES = {
   directories: {
     station: {
       folder: "pcds",

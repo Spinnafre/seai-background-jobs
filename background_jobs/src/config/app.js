@@ -122,29 +122,5 @@ const databaseCredentials = {
     },
   },
 };
+
 export const databaseConfig = databaseCredentials[env];
-
-export const ftpConfig = {
-  host: process.env.FTP_FUNCEME_HOST,
-  user: process.env.FTP_FUNCEME_USER,
-  password: process.env.FTP_FUNCEME_PASSWORD,
-  keepalive: 10000,
-  pasvTimeout: 10000,
-  connTimeout: 15000,
-  port: 21,
-};
-
-export const mailerConfig = {
-  host: process.env.MAIL_HOST,
-  port: Number(process.env.MAIL_PORT),
-  auth: {
-    username: process.env.MAIL_USERNAME,
-    password: process.env.MAIL_PASSWORD,
-  },
-  from: process.env.MAILER_FROM || "",
-  to: "",
-  subject: "",
-  text: "",
-  html: "",
-  attachments: [],
-};

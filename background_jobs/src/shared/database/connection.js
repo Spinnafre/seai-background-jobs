@@ -1,6 +1,7 @@
 import knex from "knex";
-import { databaseConfig, env } from "../../../config/app.js";
-import { Logger } from "../../../lib/logger/logger.js";
+
+import { databaseConfig, env } from "../../../src/config/index.js";
+import { Logger } from "../../../src/shared/logger.js";
 
 Logger.info({
   msg: `Connecting to the database in mode ${env}.`,
