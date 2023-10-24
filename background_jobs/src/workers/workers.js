@@ -8,9 +8,8 @@ export default [
     workers: [
       {
         name: FuncemeFTPDataMinerWorker.worker_name,
-        process: (command) => {
-          return makeFetchFuncemeMeasuresHandler().handler(command);
-        },
+        process: (command) =>
+          makeFetchFuncemeMeasuresHandler().handler(command),
       },
     ],
   },
@@ -19,9 +18,7 @@ export default [
     workers: [
       {
         name: CalcET0Worker.worker_name,
-        process: (command) => {
-          return makeCalcEtoWorkerHandler().handler(command);
-        },
+        process: (command) => makeCalcEtoWorkerHandler().handler(command),
       },
     ],
   },
