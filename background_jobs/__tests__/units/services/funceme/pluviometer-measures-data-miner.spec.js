@@ -8,23 +8,18 @@ import {
   test,
 } from "@jest/globals";
 
+import { FetchFTPData } from "../../../../src/modules/funceme/services/fetch-ftp-data.js";
+import { FuncemeServicesBuilder } from "../../factories/services/funceme/fetch-funceme-pluviometers-measures.js";
+import { MetereologicalEquipmentRepositoryInMemory } from "../../mock/repositories/inMemory/entities/metereologicalEquipment.js";
+import { PluviometerReadRepositoryInMemory } from "../../mock/repositories/inMemory/entities/pluviometerRead.js";
+import { FuncemeScrapperWorkerDTO } from "../../../../src/workers/handlers/funceme/dto.js";
 import { FTPClientAdapterMock } from "../../mock/funceme/ftp/connection.js";
 
-import { PluviometerMapper } from "../../../../src/jobs/scrapper/core/mappers/pluviometer-mapper.js";
-
-import { MetereologicalEquipmentInMemory } from "../../database/inMemory/entities/metereologicalEquipment.js";
-import { PluviometerRead } from "../../database/inMemory/entities/pluviometerRead.js";
-
-import { FuncemeDataMinerDTO } from "../../../../src/jobs/scrapper/funceme/command-handler/input-boundary.js";
-import { FetchFuncemeData } from "../../../../src/jobs/scrapper/funceme/helpers/fetch-data/fetch-data.js";
-import { PluviometerParser } from "../../../../src/jobs/scrapper/funceme/helpers/parser/pluviometer-parser.js";
-import { ExtractPluviometersFromFunceme } from "../../../../src/jobs/scrapper/funceme/services/pluviometers-measures/pluviometers-measures-data-miner.js";
-
-let ftpAdapterMock = null;
-let metereologicalEquipmentDao = null;
-let pluviometerReadDao = null;
-let fetchFuncemeData = null;
+let fetchFtpData = null;
+let metereologicalEquipmentRepositoryInMemory = null;
+let pluviometerReadRepositoryInMemory = null;
 let service = null;
+let ftpClientAdapter = null;
 
 describe("# Pluviometer-Measures-Data-Miner", () => {
   beforeEach(() => {
@@ -36,23 +31,18 @@ describe("# Pluviometer-Measures-Data-Miner", () => {
   });
 
   beforeEach(() => {
-    ftpAdapterMock = new FTPClientAdapterMock();
+    ftpClientAdapter = new FTPClientAdapterMock()
+    fetchFtpData = new FetchFTPData(ftpClientAdapter);
 
-    fetchFuncemeData = new FetchFuncemeData(
-      ftpAdapterMock,
-      new PluviometerParser(),
-      PluviometerMapper,
-      { folder: "pluviometros", fileName: "prec_data_2023.tar.gz" }
-    );
+    metereologicalEquipmentRepositoryInMemory = new MetereologicalEquipmentRepositoryInMemory();
+    pluviometerReadRepositoryInMemory = new PluviometerReadRepositoryInMemory();
 
-    metereologicalEquipmentDao = new MetereologicalEquipmentInMemory();
-    pluviometerReadDao = new PluviometerRead();
+    service = new FuncemeServicesBuilder({
+      FetchFTPData: fetchFtpData,
+      MetereologicalEquipmentRepositoryInMemory: metereologicalEquipmentRepositoryInMemory,
+      PluviometerReadRepositoryInMemory: pluviometerReadRepositoryInMemory
 
-    service = new ExtractPluviometersFromFunceme(
-      fetchFuncemeData,
-      metereologicalEquipmentDao,
-      pluviometerReadDao
-    );
+    }).makeFetchFuncemePluviometerMeasures()
   });
 
   test("When has equipments but measures not exists, should be able to save measures data with null", async function () {
@@ -71,22 +61,22 @@ describe("# Pluviometer-Measures-Data-Miner", () => {
       },
     ];
 
-    const pluviometerReadDaoSpy = jest.spyOn(pluviometerReadDao, "create");
+    const pluviometerReadRepositoryInMemorySpy = jest.spyOn(pluviometerReadRepositoryInMemory, "create");
 
-    await metereologicalEquipmentDao.createMetereologicalEquipment(
+    await metereologicalEquipmentRepositoryInMemory.createMetereologicalEquipment(
       equipments[0]
     );
 
     // Irá ser responsabilidade de um serviço principal
-    const lastDate = new FuncemeDataMinerDTO(Date.now());
+    const request = new FuncemeScrapperWorkerDTO();
 
-    await service.execute(lastDate);
+    await service.execute(request);
 
     const logs = service.getLogs();
 
-    expect(pluviometerReadDaoSpy).toHaveBeenCalled();
+    expect(pluviometerReadRepositoryInMemorySpy).toHaveBeenCalled();
 
-    const pluviometers = await pluviometerReadDao.list();
+    const pluviometers = await pluviometerReadRepositoryInMemory.list();
 
     pluviometers.forEach((pluviometer) => {
       expect(pluviometer).toMatchObject({
@@ -131,9 +121,9 @@ describe("# Pluviometer-Measures-Data-Miner", () => {
       },
     ];
 
-    const pluviometerReadDaoSpy = jest.spyOn(pluviometerReadDao, "create");
+    const pluviometerReadRepositoryInMemorySpy = jest.spyOn(pluviometerReadRepositoryInMemory, "create");
 
-    await metereologicalEquipmentDao.createMetereologicalEquipment(
+    await metereologicalEquipmentRepositoryInMemory.createMetereologicalEquipment(
       equipments[0]
     );
     // Irá ser responsabilidade de um serviço principal
@@ -141,11 +131,11 @@ describe("# Pluviometer-Measures-Data-Miner", () => {
 
     await service.execute(lastDate);
 
-    expect(pluviometerReadDaoSpy).toHaveBeenCalled();
+    expect(pluviometerReadRepositoryInMemorySpy).toHaveBeenCalled();
 
     const logs = service.getLogs();
 
-    const pluviometers = await pluviometerReadDao.list();
+    const pluviometers = await pluviometerReadRepositoryInMemory.list();
 
     pluviometers.forEach((pluviometer) => {
       expect(pluviometer).toMatchObject({
@@ -189,9 +179,9 @@ describe("# Pluviometer-Measures-Data-Miner", () => {
       },
     ];
 
-    const pluviometerReadDaoSpy = jest.spyOn(pluviometerReadDao, "create");
+    const pluviometerReadRepositoryInMemorySpy = jest.spyOn(pluviometerReadRepositoryInMemory, "create");
 
-    await metereologicalEquipmentDao.createMetereologicalEquipment(
+    await metereologicalEquipmentRepositoryInMemory.createMetereologicalEquipment(
       equipments[0]
     );
 
@@ -200,9 +190,9 @@ describe("# Pluviometer-Measures-Data-Miner", () => {
 
     await service.execute(lastDate);
 
-    expect(pluviometerReadDaoSpy).toHaveBeenCalled();
+    expect(pluviometerReadRepositoryInMemorySpy).toHaveBeenCalled();
 
-    const pluviometers = await pluviometerReadDao.list();
+    const pluviometers = await pluviometerReadRepositoryInMemory.list();
 
     pluviometers.forEach((pluviometer) => {
       expect(pluviometer).toMatchObject({

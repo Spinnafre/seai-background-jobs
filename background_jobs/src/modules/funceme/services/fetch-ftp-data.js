@@ -36,7 +36,7 @@ export class FetchFTPData {
       fileName
     );
 
-    const data = await serialize(compressedFileStream);
+    const data = await this.serialize(compressedFileStream);
 
     return data;
   }

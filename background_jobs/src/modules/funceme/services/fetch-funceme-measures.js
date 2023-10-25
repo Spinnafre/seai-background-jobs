@@ -9,6 +9,7 @@ export class FetchFuncemeMeasures extends ServiceProtocol {
     equipmentMeasuresRepository,
     parser,
     mapper,
+    directory,
     equipmentType
   ) {
     super();
