@@ -1,4 +1,4 @@
-export class MetereologicalEquipmentInMemory {
+export class MetereologicalEquipmentRepositoryInMemory {
   #MetereologicalEquipment;
 
   constructor(data = []) {

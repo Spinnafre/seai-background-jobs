@@ -1,5 +1,4 @@
 // npm run test:dev -i __tests__/units/services/calc-eto/calc-eto.spec.js
-
 import {
   describe,
   expect,
@@ -10,12 +9,14 @@ import {
   beforeAll,
   afterAll,
 } from "@jest/globals";
-import { CalcETO } from "../../../../src/jobs/calc_eto/services/calc-eto-by-date";
-import { MetereologicalEquipmentInMemory } from "../../database/inMemory/entities/metereologicalEquipment";
-import { EtoRepositoryInMemory } from "../../database/inMemory/entities/eto";
-import { StationReadRepositoryInMemory } from "../../database/inMemory/entities/stationRead";
-import { LogsRepositoryInMemory } from "../../database/inMemory/entities/logs";
-import { CalcEtoDTO } from "../../../../src/jobs/calc_eto/worker-handler/dto";
+
+import { MetereologicalEquipmentRepositoryInMemory } from "../../mock/repositories/inMemory/entities/metereologicalEquipment";
+import { StationReadRepositoryInMemory } from "../../mock/repositories/inMemory/entities/stationRead";
+import { EtoRepositoryInMemory } from "../../mock/repositories/inMemory/entities/eto";
+import { LogsRepositoryInMemory } from "../../mock/repositories/inMemory/entities/logs.js";
+import { CalcETOByDate } from "../../../../src/modules/calc-eto/services/calc-eto-by-date.js";
+import { CalcEtoWorkerDTO } from "../../../../src/workers/handlers/calc_eto/dto.js";
+
 
 let calcEtoInputDTO = null;
 
@@ -26,7 +27,7 @@ describe("# Calc ET0 Service", () => {
 
   beforeEach(() => {
     jest.setSystemTime(new Date(2023, 7, 29));
-    calcEtoInputDTO = new CalcEtoDTO(new Date());
+    calcEtoInputDTO = new CalcEtoWorkerDTO(new Date());
   });
 
   afterAll(() => {
@@ -39,7 +40,7 @@ describe("# Calc ET0 Service", () => {
     const EquipmentLocation = "Test";
     const IdEquipmentExternal = "23984";
 
-    const equipmentRepository = new MetereologicalEquipmentInMemory([
+    const equipmentRepository = new MetereologicalEquipmentRepositoryInMemory([
       {
         IdEquipment,
         IdEquipmentExternal: "23984",
@@ -65,7 +66,7 @@ describe("# Calc ET0 Service", () => {
         AverageAtmosphericTemperature: 3,
         AtmosphericPressure: 3,
         WindVelocity: 2,
-        Time: calcEtoInputDTO.getDate(),
+        Time: calcEtoInputDTO.getDateToQuery().getDate(),
         Hour: null,
         FK_Organ: 2,
         FK_Equipment: IdEquipment,
@@ -74,13 +75,10 @@ describe("# Calc ET0 Service", () => {
 
     const etoRepository = new EtoRepositoryInMemory();
 
-    const logsRepo = new LogsRepositoryInMemory();
-
-    const calcEto = new CalcETO(
+    const calcEto = new CalcETOByDate(
       equipmentRepository,
       etoRepository,
       readStations,
-      logsRepo
     );
 
     await calcEto.execute(calcEtoInputDTO);
@@ -108,7 +106,7 @@ describe("# Calc ET0 Service", () => {
     const equipmentLocation = "Test";
     const IdEquipmentExternal = "23984";
 
-    const equipmentRepository = new MetereologicalEquipmentInMemory([
+    const equipmentRepository = new MetereologicalEquipmentRepositoryInMemory([
       {
         IdEquipment,
         IdEquipmentExternal,
@@ -126,13 +124,10 @@ describe("# Calc ET0 Service", () => {
 
     const etoRepository = new EtoRepositoryInMemory();
 
-    const logsRepo = new LogsRepositoryInMemory();
-
-    const calcEto = new CalcETO(
+    const calcEto = new CalcETOByDate(
       equipmentRepository,
       etoRepository,
       readStations,
-      logsRepo
     );
 
     await calcEto.execute(calcEtoInputDTO);
@@ -154,7 +149,7 @@ describe("# Calc ET0 Service", () => {
     const IdEquipmentExternal = "23984";
     const equipmentLocation = "Test";
 
-    const equipmentRepository = new MetereologicalEquipmentInMemory([
+    const equipmentRepository = new MetereologicalEquipmentRepositoryInMemory([
       {
         IdEquipment,
         IdEquipmentExternal,
@@ -180,7 +175,7 @@ describe("# Calc ET0 Service", () => {
         AverageAtmosphericTemperature: null,
         AtmosphericPressure: 3,
         WindVelocity: 2,
-        Time: calcEtoInputDTO.getDate(),
+        Time: calcEtoInputDTO.getDateToQuery().getDate(),
         Hour: null,
         FK_Organ: 2,
         FK_Equipment: IdEquipment,
@@ -189,13 +184,10 @@ describe("# Calc ET0 Service", () => {
 
     const etoRepository = new EtoRepositoryInMemory();
 
-    const logsRepo = new LogsRepositoryInMemory();
-
-    const calcEto = new CalcETO(
+    const calcEto = new CalcETOByDate(
       equipmentRepository,
       etoRepository,
-      readStations,
-      logsRepo
+      readStations
     );
 
     await calcEto.execute(calcEtoInputDTO);
@@ -215,7 +207,7 @@ describe("# Calc ET0 Service", () => {
     const IdEquipmentExternal = "23984";
     const equipmentLocation = "Test";
 
-    const equipmentRepository = new MetereologicalEquipmentInMemory([
+    const equipmentRepository = new MetereologicalEquipmentRepositoryInMemory([
       {
         IdEquipment,
         IdEquipmentExternal,
@@ -241,7 +233,7 @@ describe("# Calc ET0 Service", () => {
         AverageAtmosphericTemperature: 3,
         AtmosphericPressure: 3,
         WindVelocity: 2,
-        Time: calcEtoInputDTO.getDate(),
+        Time: calcEtoInputDTO.getDateToQuery().getDate(),
         Hour: null,
         FK_Organ: 2,
         FK_Equipment: IdEquipment,
@@ -250,13 +242,10 @@ describe("# Calc ET0 Service", () => {
 
     const etoRepository = new EtoRepositoryInMemory();
 
-    const logsRepo = new LogsRepositoryInMemory();
-
-    const calcEto = new CalcETO(
+    const calcEto = new CalcETOByDate(
       equipmentRepository,
       etoRepository,
-      readStations,
-      logsRepo
+      readStations
     );
 
     await calcEto.execute(calcEtoInputDTO);
@@ -279,7 +268,7 @@ describe("# Calc ET0 Service", () => {
     const IdEquipmentExternal = "23984";
     const equipmentLocation = "Test";
 
-    const equipmentRepository = new MetereologicalEquipmentInMemory([
+    const equipmentRepository = new MetereologicalEquipmentRepositoryInMemory([
       {
         IdEquipment,
         IdEquipmentExternal,
@@ -305,7 +294,7 @@ describe("# Calc ET0 Service", () => {
         AverageAtmosphericTemperature: 3,
         AtmosphericPressure: 3,
         WindVelocity: 2,
-        Time: calcEtoInputDTO.getDate(),
+        Time: calcEtoInputDTO.getDateToQuery().getDate(),
         Hour: null,
         FK_Organ: 2,
         FK_Equipment: IdEquipment,
@@ -314,13 +303,11 @@ describe("# Calc ET0 Service", () => {
 
     const etoRepository = new EtoRepositoryInMemory();
 
-    const logsRepo = new LogsRepositoryInMemory();
 
-    const calcEto = new CalcETO(
+    const calcEto = new CalcETOByDate(
       equipmentRepository,
       etoRepository,
       readStations,
-      logsRepo
     );
 
     await calcEto.execute(calcEtoInputDTO);
@@ -343,7 +330,7 @@ describe("# Calc ET0 Service", () => {
     const IdEquipmentExternal = "23984";
     const equipmentLocation = "Test";
 
-    const equipmentRepository = new MetereologicalEquipmentInMemory([
+    const equipmentRepository = new MetereologicalEquipmentRepositoryInMemory([
       {
         IdEquipment,
         IdEquipmentExternal,
@@ -369,7 +356,7 @@ describe("# Calc ET0 Service", () => {
         AverageAtmosphericTemperature: 3,
         AtmosphericPressure: null,
         WindVelocity: 2,
-        Time: calcEtoInputDTO.getDate(),
+        Time: calcEtoInputDTO.getDateToQuery().getDate(),
         Hour: null,
         FK_Organ: 2,
         FK_Equipment: IdEquipment,
@@ -380,7 +367,7 @@ describe("# Calc ET0 Service", () => {
 
     const logsRepo = new LogsRepositoryInMemory();
 
-    const calcEto = new CalcETO(
+    const calcEto = new CalcETOByDate(
       equipmentRepository,
       etoRepository,
       readStations,
@@ -407,7 +394,7 @@ describe("# Calc ET0 Service", () => {
     const IdEquipmentExternal = "23984";
     const equipmentLocation = "Test";
 
-    const equipmentRepository = new MetereologicalEquipmentInMemory([
+    const equipmentRepository = new MetereologicalEquipmentRepositoryInMemory([
       {
         IdEquipment,
         IdEquipmentExternal,
@@ -433,7 +420,7 @@ describe("# Calc ET0 Service", () => {
         AverageAtmosphericTemperature: 3,
         AtmosphericPressure: 3,
         WindVelocity: null,
-        Time: calcEtoInputDTO.getDate(),
+        Time: calcEtoInputDTO.getDateToQuery().getDate(),
         Hour: null,
         FK_Organ: 2,
         FK_Equipment: IdEquipment,
@@ -444,7 +431,7 @@ describe("# Calc ET0 Service", () => {
 
     const logsRepo = new LogsRepositoryInMemory();
 
-    const calcEto = new CalcETO(
+    const calcEto = new CalcETOByDate(
       equipmentRepository,
       etoRepository,
       readStations,
@@ -471,7 +458,7 @@ describe("# Calc ET0 Service", () => {
     const IdEquipmentExternal = "23984";
     const equipmentLocation = "Test";
 
-    const equipmentRepository = new MetereologicalEquipmentInMemory([
+    const equipmentRepository = new MetereologicalEquipmentRepositoryInMemory([
       {
         IdEquipment,
         IdEquipmentExternal,
@@ -497,7 +484,7 @@ describe("# Calc ET0 Service", () => {
         AverageAtmosphericTemperature: 3,
         AtmosphericPressure: 3,
         WindVelocity: 5,
-        Time: calcEtoInputDTO.getDate(),
+        Time: calcEtoInputDTO.getDateToQuery().getDate(),
         Hour: null,
         FK_Organ: 2,
         FK_Equipment: IdEquipment,
@@ -506,20 +493,17 @@ describe("# Calc ET0 Service", () => {
 
     const etoRepository = new EtoRepositoryInMemory();
 
-    const logsRepo = new LogsRepositoryInMemory();
-
-    const calcEto = new CalcETO(
+    const calcEto = new CalcETOByDate(
       equipmentRepository,
       etoRepository,
       readStations,
-      logsRepo
     );
 
     await calcEto.execute(calcEtoInputDTO);
 
     expect(calcEto.getLogs()).toEqual([
       {
-        message: `Não há dados de umidade relativa média da estação${IdEquipmentExternal} de ${equipmentLocation}, portanto irá ser estimado o valor da umidade média.`,
+        message: `Não há dados de umidade relativa média da estação ${IdEquipmentExternal} de ${equipmentLocation}, portanto irá ser estimado o valor da umidade média.`,
         type: "warning",
       },
       {
@@ -533,7 +517,7 @@ describe("# Calc ET0 Service", () => {
   test("When stations equipments not exists, shouldn't be able to calculate ET0", async () => {
     const IdEquipment = 1;
 
-    const equipmentRepository = new MetereologicalEquipmentInMemory();
+    const equipmentRepository = new MetereologicalEquipmentRepositoryInMemory();
 
     const readStations = new StationReadRepositoryInMemory([
       {
@@ -547,7 +531,7 @@ describe("# Calc ET0 Service", () => {
         AverageAtmosphericTemperature: null,
         AtmosphericPressure: 3,
         WindVelocity: 2,
-        Time: calcEtoInputDTO.getDate(),
+        Time: calcEtoInputDTO.getDateToQuery().getDate(),
         Hour: null,
         FK_Organ: 2,
         FK_Equipment: IdEquipment,
@@ -556,13 +540,10 @@ describe("# Calc ET0 Service", () => {
 
     const etoRepository = new EtoRepositoryInMemory();
 
-    const logsRepo = new LogsRepositoryInMemory();
-
-    const calcEto = new CalcETO(
+    const calcEto = new CalcETOByDate(
       equipmentRepository,
       etoRepository,
       readStations,
-      logsRepo
     );
 
     await calcEto.execute(calcEtoInputDTO);
@@ -571,9 +552,10 @@ describe("# Calc ET0 Service", () => {
 
     expect(eto).toHaveLength(0);
 
+
     expect(calcEto.getLogs()).toContainEqual({
       message: "Não há equipamentos de estação cadastrados.",
-      type: "warning",
+      type: "error",
     });
   });
 });

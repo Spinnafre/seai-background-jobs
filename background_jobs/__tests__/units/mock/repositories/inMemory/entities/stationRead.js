@@ -49,7 +49,6 @@ export class StationReadRepositoryInMemory {
   }
 
   async getStationReads({ idEqp, date, hour }) {
-    console.log("getStationReads ::: ", { idEqp, date, hour });
     const data = this.#ReadStations.filter((read) => {
       if (hour) {
         return (

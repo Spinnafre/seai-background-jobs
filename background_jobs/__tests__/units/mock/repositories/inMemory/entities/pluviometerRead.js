@@ -1,4 +1,4 @@
-export class PluviometerRead {
+export class PluviometerReadRepositoryInMemory {
   #PluviometerRead = [];
 
   async getPluviometersReadsByDate(idEqp, idOrgan, date) {

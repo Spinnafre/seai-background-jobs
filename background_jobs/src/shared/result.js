@@ -21,7 +21,7 @@ export class Right {
   }
 
   static create(data) {
-    return new Ok(data);
+    return new Right(data);
   }
 }
 
@@ -46,6 +46,6 @@ export class Left {
   }
 
   static create(data) {
-    return new Err(data);
+    return new Left(data);
   }
 }

@@ -84,7 +84,6 @@ export function CalcEto(
     minAtmosphericTemperature = measures.minAtmosphericTemperature;
     maxAtmosphericTemperature = measures.maxAtmosphericTemperature;
   } else {
-    console.log("Estimando temperatura máxima e mínima...");
     const { maxTemperature, minTemperature } =
       CalcMaxAndMinTemperatureEstimation(
         solarRadiation,
