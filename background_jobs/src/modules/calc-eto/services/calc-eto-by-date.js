@@ -1,6 +1,6 @@
-import { Logger } from "../../../lib/logger/logger.js";
+import { Logger } from "../../../shared/logger.js";
 import { Left, Right } from "../../../shared/result.js";
-import { ServiceProtocol } from "../../scrapper/core/service-protocol.js";
+import { ServiceProtocol } from "../../funceme/core/service-protocol.js";
 import { CalcEto } from "../domain/calc-eto.js";
 
 export class CalcETOByDate extends ServiceProtocol {

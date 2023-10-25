@@ -7,11 +7,11 @@ import {
 import { PluviometerMapper } from "../../core/mappers/index.js";
 
 import { PluviometerParser } from "../../core/parser/index.js";
-import { FuncemeDataMinerService } from "../../services/fetch-funceme-measures.js";
-import { makeFetchFTPData } from "./fetch-ftp-data-factory.js";
+import { FetchFuncemeMeasures } from "../../services/fetch-funceme-measures.js";
+import { makeFetchFTPData } from "./fetch-ftp-data.js";
 
 export const makeFetchFuncemePluviometerMeasures = (FtpClientAdapter) => {
-  return new FuncemeDataMinerService(
+  return new FetchFuncemeMeasures(
     makeFetchFTPData(FtpClientAdapter),
     new MetereologicalEquipmentRepository(),
     new PluviometerReadRepository(),

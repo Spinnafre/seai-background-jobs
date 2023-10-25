@@ -40,8 +40,6 @@ export class FuncemeFtpDataMinerController {
   }
 
   async handle(request) {
-    const dto = new FuncemeScrapperWorkerDTO(request);
-
     try {
       const credentialsOrError = await this.#getFtpCredentials.execute(
         "FUNCEME"
@@ -55,7 +53,7 @@ export class FuncemeFtpDataMinerController {
 
       await this.#ftpClient.connect({ host, user, password });
 
-      await this.runWithTimeout(dto);
+      await this.runWithTimeout(request);
 
       await this.#ftpClient.close();
 

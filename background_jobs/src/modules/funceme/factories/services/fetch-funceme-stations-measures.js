@@ -7,11 +7,11 @@ import {
 import { StationMapper } from "../../core/mappers/index.js";
 
 import { StationParser } from "../../core/parser/index.js";
-import { FuncemeDataMinerService } from "../../services/fetch-funceme-measures.js";
+import { FetchFuncemeMeasures } from "../../services/fetch-funceme-measures.js";
 import { makeFetchFTPData } from "./fetch-ftp-data.js";
 
 export const makeFetchFuncemeStationsMeasures = (FtpClientAdapter) => {
-  return new FuncemeDataMinerService(
+  return new FetchFuncemeMeasures(
     makeFetchFTPData(FtpClientAdapter),
     new MetereologicalEquipmentRepository(),
     new StationReadRepository(),

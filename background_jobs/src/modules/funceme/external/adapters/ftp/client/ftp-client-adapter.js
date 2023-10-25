@@ -1,7 +1,7 @@
 import Client from "ftp";
-import { ftpConfig } from "../../../../../../../config/app.js";
-import { Logger } from "../../../../../../../lib/logger/logger.js";
+import { ftpConfig } from "../../../../config/ftp.js";
 import { ConnectionError } from "../../../../core/errors/ConnectionError.js";
+import { Logger } from "../../../../../../shared/logger.js";
 
 export class FTPClientAdapter {
   connection;

@@ -1,5 +1,5 @@
-import { databaseConfig } from "../../../config/app.js";
-import { Logger } from "../../logger/logger.js";
+import { Logger } from "../../../../shared/logger.js";
+import { databaseConfig } from "../../../../config/app.js";
 
 export class PgBossAdapter {
   _boss;
@@ -21,6 +21,14 @@ export class PgBossAdapter {
 
       Logger.info({
         msg: "[⚙️] Criando conexão com o banco de dados de jobs",
+      });
+
+      console.log({
+        database: databaseConfig.jobs.database,
+        port: databaseConfig.jobs.port,
+        host: databaseConfig.jobs.host,
+        password: databaseConfig.jobs.password,
+        user: databaseConfig.jobs.user,
       });
 
       const connection = new pg({

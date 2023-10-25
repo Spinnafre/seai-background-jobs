@@ -1,4 +1,4 @@
-import { Logger } from "../logger/logger.js";
+import { Logger } from "../../../shared/logger.js";
 import { PgBossAdapter } from "./pg-boss/connection.js";
 
 export class BackgroundJobsManager {

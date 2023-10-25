@@ -1,6 +1,6 @@
-import { Logger } from "../../../../lib/logger/logger.js";
+import { Logger } from "../../../shared/logger.js";
 import { Left, Right } from "../../../shared/result.js";
-import { ServiceProtocol } from "../../core/service-protocol.js";
+import { ServiceProtocol } from "../core/service-protocol.js";
 
 export class GetFtpCredentials extends ServiceProtocol {
   constructor(metereologicalOrganRepository) {

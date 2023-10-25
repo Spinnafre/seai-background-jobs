@@ -19,9 +19,9 @@ export class DateFormatter {
   }
 
   static getPreviousDate(date, prev) {
-    const prev = new Date(date).setDate(date.getDate() - prev);
+    const previousDate = new Date(date).setDate(date.getDate() - prev);
     // const date = Intl.DateTimeFormat("pt-BR").format(yesterday);
-    return new Date(prev);
+    return new Date(previousDate);
     // return Number((previous.valueOf() / 1000).toPrecision(10));
   }
 

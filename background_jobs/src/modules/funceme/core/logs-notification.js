@@ -1,4 +1,4 @@
-import { Logger } from "../../../../lib/logger/logger.js";
+import { Logger } from "../../../shared/logger.js";
 
 export class Notification {
   #notifications;

@@ -1,4 +1,4 @@
-import { Logger } from "../../../../lib/logger/logger.js";
+import { Logger } from "../../../shared/logger.js";
 import { Left, Right } from "../../../shared/result.js";
 import { convertCompressedFileStream } from "../external/adapters/unzip/untar-adapter.js";
 

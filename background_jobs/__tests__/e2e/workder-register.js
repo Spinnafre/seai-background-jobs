@@ -1,20 +1,24 @@
-import { BackgroundJobsManager } from "../../src/lib/jobQueue/background-jobs-manager.js";
-import { FuncemeScrapperCommand } from "../../src/jobs/scrapper/funceme/command-handler/funceme-scrapper-command.js";
-import { CalcET0Handler } from "../../src/jobs/calc_eto/handler/handler.js";
-
 import "dotenv/config.js";
 
-import queue_jobs from "../../src/queue_workers.js";
+import workers from "../../src/workers/workers.js";
+import { BackgroundJobsManager } from "../../src/workers/lib/jobQueue/background-jobs-manager.js";
+import {
+  CalcET0Worker,
+  FuncemeFTPDataMinerWorker,
+} from "../../src/workers/handlers/index.js";
+
+// node
 
 async function register() {
+  console.log(process.env);
   await BackgroundJobsManager.connectToQueue();
 
   await BackgroundJobsManager.startQueueMonitoring();
 
-  await BackgroundJobsManager.registerAllWorkers(queue_jobs);
+  await BackgroundJobsManager.registerAllWorkers(workers);
 
   await BackgroundJobsManager.createJob(
-    FuncemeScrapperCommand.name_queue,
+    FuncemeFTPDataMinerWorker.name_queue,
     { date: null },
     {
       // singletonKey: "1",
@@ -26,7 +30,7 @@ async function register() {
   );
 
   await BackgroundJobsManager.createJob(
-    CalcET0Handler.name_queue,
+    CalcET0Worker.name_queue,
     { date: null },
     {
       singletonKey: "2",

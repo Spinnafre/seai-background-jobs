@@ -1,5 +1,4 @@
 import { Left, Right } from "../../../shared/result.js";
-import { CalcEtoWorkerDTO } from "../services/dto.js";
 
 export class CalcETOPerDayController {
   calcEtoByDay;
@@ -11,10 +10,8 @@ export class CalcETOPerDayController {
   }
 
   async handle(request) {
-    const dto = new CalcEtoWorkerDTO(request);
-
     try {
-      const resultOrError = await this.calcEtoByDay.execute(dto);
+      const resultOrError = await this.calcEtoByDay.execute(request);
 
       if (resultOrError.isError()) {
         return Left.create(resultOrError.error().message);

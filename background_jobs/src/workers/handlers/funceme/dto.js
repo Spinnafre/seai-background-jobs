@@ -1,5 +1,5 @@
 import { DateFormatter } from "../../../shared/date-formatter.js";
-import { DailyWorkerDTO } from "../../../shared/workers-dtos/worker-handler-dto.js";
+import { DailyWorkerDTO } from "../../../shared/workers/handlerDTO.js";
 
 export class FuncemeScrapperWorkerDTO extends DailyWorkerDTO {
   constructor(payload) {
