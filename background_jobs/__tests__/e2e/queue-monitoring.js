@@ -11,7 +11,7 @@ import {
 
 async function register() {
   console.log(process.env);
-  const today = new Date()
+  const today = new Date();
   await BackgroundJobsManager.connectToQueue();
 
   await BackgroundJobsManager.startQueueMonitoring();
@@ -23,7 +23,7 @@ async function register() {
     { date: null },
     {
       // singletonKey: "1",
-      useSingletonQueue: true,
+      // useSingletonQueue: true,
       // startAfter: today,
       retryLimit: 3,
       retryDelay: 15,
@@ -34,8 +34,8 @@ async function register() {
     CalcET0Worker.name_queue,
     { date: null },
     {
-      singletonKey: "2",
-      useSingletonQueue: true,
+      // singletonKey: "2",
+      // useSingletonQueue: true,
       // startAfter: new Date(today).setHours(23, 8, 0),
       retryLimit: 3,
       retryDelay: 15,

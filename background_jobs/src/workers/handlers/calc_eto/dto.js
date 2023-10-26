@@ -10,4 +10,10 @@ export class CalcEtoWorkerDTO extends DailyWorkerDTO {
     const yesterDayDate = DateFormatter.getPreviousDate(new Date(), 1);
     return yesterDayDate;
   }
+
+  getDate() {
+    return DateFormatter.formatByDateSeparator(this.getDateToQuery(), {
+      separator: "-",
+    });
+  }
 }

@@ -1,4 +1,6 @@
+import { Logger } from "../../../shared/logger.js";
 import { Left, Right } from "../../../shared/result.js";
+import { timeout } from "../../../shared/service-or-timeout.js";
 import { ConnectionError } from "../core/errors/ConnectionError.js";
 
 export class FuncemeFtpDataMinerController {
@@ -20,11 +22,10 @@ export class FuncemeFtpDataMinerController {
 
     for (const service of this.#dataMinerServices) {
       await service.execute(dto);
-
-      logs.concat(service.getLogs());
+      logs.push(...service.getLogs());
     }
 
-    await this.logger.add(logs);
+    await this.#logger.add(logs);
   }
 
   setService(service) {

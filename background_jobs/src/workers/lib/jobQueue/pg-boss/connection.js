@@ -23,14 +23,6 @@ export class PgBossAdapter {
         msg: "[⚙️] Criando conexão com o banco de dados de jobs",
       });
 
-      console.log({
-        database: databaseConfig.jobs.database,
-        port: databaseConfig.jobs.port,
-        host: databaseConfig.jobs.host,
-        password: databaseConfig.jobs.password,
-        user: databaseConfig.jobs.user,
-      });
-
       const connection = new pg({
         database: databaseConfig.jobs.database,
         port: databaseConfig.jobs.port,

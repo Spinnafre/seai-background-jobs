@@ -23,7 +23,9 @@ export class CalcETOByDate extends ServiceProtocol {
     const day = date.getDateToQuery().getDay();
 
     Logger.info({
-      msg: `Calculando dados de ETO pela data ${date.getDateToQuery().getDate()}`,
+      msg: `Calculando dados de ETO pela data ${date
+        .getDateToQuery()
+        .getDate()}`,
     });
 
     const stationsEqps = await this.#equipmentRepository.getEquipments({
@@ -37,7 +39,7 @@ export class CalcETOByDate extends ServiceProtocol {
         msg: "Não há equipamentos de estação cadastrados.",
       });
 
-      this.logs.addErrorLog( "Não há equipamentos de estação cadastrados.",)
+      this.logs.addErrorLog("Não há equipamentos de estação cadastrados.");
 
       return Left.create(
         new Error(`Não há equipamentos de estação cadastrados.`)
@@ -48,7 +50,7 @@ export class CalcETOByDate extends ServiceProtocol {
       // buscar leituras da estação usando o Fk_Equipment
       const stationReads = await this.#stationReadsRepository.getStationReads({
         idEqp: station.id,
-        date: date.getDateToQuery().getDate(),
+        date: date.getDateToQuery(),
       });
 
       // e se não tiver dados de leituras da estação?
@@ -169,6 +171,7 @@ export class CalcETOByDate extends ServiceProtocol {
           msg: "Salvando dados de ETO...",
         });
 
+        await this.#etoRepository.deleteByTime(date.getDate());
         await this.#etoRepository.add(stationsEto);
 
         this.logs.addInfoLog(`Sucesso ao calcular dados de ET0 do dia.`);

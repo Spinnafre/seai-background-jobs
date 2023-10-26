@@ -123,5 +123,4 @@ const databaseCredentials = {
   },
 };
 
-console.log(databaseCredentials[env])
 export const databaseConfig = databaseCredentials[env];

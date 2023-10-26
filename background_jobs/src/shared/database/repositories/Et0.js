@@ -6,12 +6,23 @@ export class ET0Repository {
     this.#connection = connections.equipments;
   }
 
-  async deleteByTime(time) {
-    await this.#connection.raw(
-      `delete from "Et0" as rs
-where cast(rs."Time" as DATE) = ?`,
-      [time]
+  // Date string YYYY-MM-DD
+  async deleteByTime(date) {
+    const rawReads = await this.#connection.raw(
+      `SELECT e."FK_Station_Read" , rs."Time"  FROM "Et0" e 
+        INNER JOIN "ReadStations" rs 
+        ON rs."IdRead" = e."FK_Station_Read"
+        WHERE rs."Time" = ?`,
+      [date]
     );
+
+    if (!rawReads || rawReads.rows.length === 0) {
+      return;
+    }
+
+    const toDelete = rawReads.rows.map((raw) => raw.FK_Station_Read);
+
+    await this.#connection("Et0").delete().whereIn("FK_Station_Read", toDelete);
   }
   async add(reads = []) {
     const toPersistency = reads.map((read) => {

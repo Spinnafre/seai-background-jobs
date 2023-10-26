@@ -64,7 +64,8 @@ export class StationReadRepository {
         averageRelativeHumidity: stationRead.AverageRelativeHumidity,
         maxRelativeHumidity: stationRead.MaxRelativeHumidity,
         minRelativeHumidity: stationRead.MinRelativeHumidity,
-        atmosphericTemperature: stationRead.AtmosphericTemperature,
+        averageAtmosphericTemperature:
+          stationRead.AverageAtmosphericTemperature,
         minAtmosphericTemperature: stationRead.MinAtmosphericTemperature,
         maxAtmosphericTemperature: stationRead.MaxAtmosphericTemperature,
         atmosphericPressure: stationRead.AtmosphericPressure,
