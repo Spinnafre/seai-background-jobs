@@ -31,7 +31,7 @@ export class ET0Repository {
         FK_Station_Read: read.idRead,
       };
     });
-
+    console.log("Saving ETO ", { toPersistency });
     await this.#connection.insert(toPersistency).into("Et0");
   }
 }

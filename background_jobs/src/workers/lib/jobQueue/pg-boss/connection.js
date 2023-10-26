@@ -72,6 +72,13 @@ export class PgBossAdapter {
   }
 
   async registerWorker(name_queue, handler) {
-    await this._boss.work(name_queue, handler);
+    await this._boss.work(
+      name_queue,
+      {
+        batchSize: 1,
+        includeMetadata: true,
+      },
+      handler
+    );
   }
 }

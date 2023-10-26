@@ -172,6 +172,7 @@ export class CalcETOByDate extends ServiceProtocol {
         });
 
         await this.#etoRepository.deleteByTime(date.getDate());
+
         await this.#etoRepository.add(stationsEto);
 
         this.logs.addInfoLog(`Sucesso ao calcular dados de ET0 do dia.`);

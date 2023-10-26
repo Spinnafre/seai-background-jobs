@@ -2,7 +2,7 @@ import { FuncemeFTPDataMinerWorker, CalcET0Worker } from "./handlers/index.js";
 
 export const cronJobs = [
   {
-    queue: FuncemeFTPDataMinerWorker,
+    queue: FuncemeFTPDataMinerWorker.name_queue,
     cron: "* * * * *",
     data: null,
     options: {
