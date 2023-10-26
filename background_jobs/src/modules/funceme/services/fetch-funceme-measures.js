@@ -30,14 +30,14 @@ export class FetchFuncemeMeasures extends ServiceProtocol {
   ) {
     const acc = [];
 
-    equipmentsData.filter();
     equipmentsData.forEach((data) => {
       const measure = data.measures.find((measure) => measure.data == date);
 
       if (measure) {
         acc.push({
           code: data.code,
-          ...this.mapper.toDomain(measure),
+          name: data.name,
+          measures: measure,
         });
       }
     });
@@ -63,6 +63,7 @@ export class FetchFuncemeMeasures extends ServiceProtocol {
     return filteredByDate;
   }
 
+  // OBS: Sempre irá tentar buscar dados de medições do dia anterior a data informada
   async execute(request) {
     Logger.info({
       msg: `Iniciando busca de dados pelo FTP da FUNCEME pela data ${request.getDate()}`,
@@ -75,14 +76,20 @@ export class FetchFuncemeMeasures extends ServiceProtocol {
       });
 
     if (!equipments.length) {
-      this.logs.addWarningLog("Não há equipamentos da FUNCEME cadastrados");
+      this.logs.addWarningLog(
+        `Não há equipamentos de ${this.equipmentType} da FUNCEME cadastrados`
+      );
 
       return Left.create(
-        new Error("Não há equipamentos da FUNCEME cadastrados")
+        new Error(
+          `Não há equipamentos de ${this.equipmentType} da FUNCEME cadastrados`
+        )
       );
     }
 
-    this.logs.addInfoLog("Iniciando busca de dados de medições da FUNCEME");
+    this.logs.addInfoLog(
+      `Iniciando busca de dados de medições de ${this.equipmentType} da FUNCEME`
+    );
 
     const equipmentsCodes = equipments.map((eqp) => eqp.code);
 
@@ -91,17 +98,16 @@ export class FetchFuncemeMeasures extends ServiceProtocol {
     );
 
     if (rawMeasuresOrError.isError()) {
+      this.logs.addErrorLog(rawMeasuresOrError.error());
       return Left.create(rawMeasuresOrError.error());
     }
 
-    const rawMeasures = rawMeasuresOrError.value();
+    const rawMeasures = await this.parser.parse(rawMeasuresOrError.value());
 
     const measuresToDomain = this.filterMeasures({
       data: rawMeasures,
       params: { codes: equipmentsCodes, date: request.getDate() },
     }).map(this.mapper.toDomain);
-
-    console.log({ measuresToDomain });
 
     const toPersistency = equipments.map((equipment) => {
       const measure = measuresToDomain.find(
@@ -110,14 +116,14 @@ export class FetchFuncemeMeasures extends ServiceProtocol {
 
       if (!measure) {
         this.logs.addWarningLog(
-          `Não foi possível obter dados de medição ${equipment.code}, salvando dados sem medições.`
+          `Não foi possível obter dados de medição ${equipment.code} de ${this.equipmentType}, salvando dados sem medições.`
         );
 
         return this.mapper.toPersistency(equipment, null, request.getDate());
       }
 
       this.logs.addInfoLog(
-        `Sucesso ao obter dados de medição de ${equipment.code}`
+        `Sucesso ao obter dados de medição de ${this.equipmentType} com código ${equipment.code}`
       );
 
       return this.mapper.toPersistency(equipment, measure, request.getDate());

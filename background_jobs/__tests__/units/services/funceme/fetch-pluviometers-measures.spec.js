@@ -9,7 +9,7 @@ import {
 } from "@jest/globals";
 
 import { FetchFTPData } from "../../../../src/modules/funceme/services/fetch-ftp-data.js";
-import { FuncemeServicesBuilder } from "../../factories/services/funceme/fetch-funceme-pluviometers-measures.js";
+import { FuncemeServicesBuilder } from "../../factories/services/funceme/funceme-services.js";
 import { MetereologicalEquipmentRepositoryInMemory } from "../../mock/repositories/inMemory/entities/metereologicalEquipment.js";
 import { PluviometerReadRepositoryInMemory } from "../../mock/repositories/inMemory/entities/pluviometerRead.js";
 import { FuncemeScrapperWorkerDTO } from "../../../../src/workers/handlers/funceme/dto.js";
@@ -31,18 +31,19 @@ describe("# Pluviometer-Measures-Data-Miner", () => {
   });
 
   beforeEach(() => {
-    ftpClientAdapter = new FTPClientAdapterMock()
+    ftpClientAdapter = new FTPClientAdapterMock();
     fetchFtpData = new FetchFTPData(ftpClientAdapter);
 
-    metereologicalEquipmentRepositoryInMemory = new MetereologicalEquipmentRepositoryInMemory();
+    metereologicalEquipmentRepositoryInMemory =
+      new MetereologicalEquipmentRepositoryInMemory();
     pluviometerReadRepositoryInMemory = new PluviometerReadRepositoryInMemory();
 
     service = new FuncemeServicesBuilder({
       FetchFTPData: fetchFtpData,
-      MetereologicalEquipmentRepositoryInMemory: metereologicalEquipmentRepositoryInMemory,
-      PluviometerReadRepositoryInMemory: pluviometerReadRepositoryInMemory
-
-    }).makeFetchFuncemePluviometerMeasures()
+      MetereologicalEquipmentRepositoryInMemory:
+        metereologicalEquipmentRepositoryInMemory,
+      PluviometerReadRepositoryInMemory: pluviometerReadRepositoryInMemory,
+    }).makeFetchFuncemePluviometerMeasures();
   });
 
   test("When has equipments but measures not exists, should be able to save measures data with null", async function () {
@@ -61,7 +62,10 @@ describe("# Pluviometer-Measures-Data-Miner", () => {
       },
     ];
 
-    const pluviometerReadRepositoryInMemorySpy = jest.spyOn(pluviometerReadRepositoryInMemory, "create");
+    const pluviometerReadRepositoryInMemorySpy = jest.spyOn(
+      pluviometerReadRepositoryInMemory,
+      "create"
+    );
 
     await metereologicalEquipmentRepositoryInMemory.createMetereologicalEquipment(
       equipments[0]
@@ -121,7 +125,10 @@ describe("# Pluviometer-Measures-Data-Miner", () => {
       },
     ];
 
-    const pluviometerReadRepositoryInMemorySpy = jest.spyOn(pluviometerReadRepositoryInMemory, "create");
+    const pluviometerReadRepositoryInMemorySpy = jest.spyOn(
+      pluviometerReadRepositoryInMemory,
+      "create"
+    );
 
     await metereologicalEquipmentRepositoryInMemory.createMetereologicalEquipment(
       equipments[0]
@@ -179,7 +186,10 @@ describe("# Pluviometer-Measures-Data-Miner", () => {
       },
     ];
 
-    const pluviometerReadRepositoryInMemorySpy = jest.spyOn(pluviometerReadRepositoryInMemory, "create");
+    const pluviometerReadRepositoryInMemorySpy = jest.spyOn(
+      pluviometerReadRepositoryInMemory,
+      "create"
+    );
 
     await metereologicalEquipmentRepositoryInMemory.createMetereologicalEquipment(
       equipments[0]

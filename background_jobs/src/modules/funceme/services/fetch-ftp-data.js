@@ -11,7 +11,7 @@ export class FetchFTPData {
     try {
       const serializedData = await convertCompressedFileStream(data);
 
-      console.log(`FetchFTPData(${folder},${fileName}) = ${data}`);
+      // console.log(`serialize = ${serializedData}`);
 
       if (serializedData.length) {
         return Right.create(serializedData);

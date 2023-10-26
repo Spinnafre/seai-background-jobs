@@ -1,4 +1,4 @@
-// npm run test:dev -i __tests__/units/services/funceme/station-measures-data-miner.spec.js
+// npm run test:dev -i __tests__/units/services/funceme/fetch-funceme-stations-measures.spec.js
 import {
   afterEach,
   beforeEach,
@@ -9,25 +9,21 @@ import {
 } from "@jest/globals";
 
 import { FTPClientAdapterMock } from "../../mock/funceme/ftp/connection.js";
-
-import { StationMapper } from "../../../../src/jobs/scrapper/core/mappers/station-mapper.js";
-
-import { StationReadRepositoryInMemory } from "../../database/inMemory/entities/stationRead.js";
-// import { ReadTimeInMemory } from "../../database/inMemory/entities/readTime.js";
-import { MetereologicalEquipmentInMemory } from "../../database/inMemory/entities/metereologicalEquipment.js";
-
-import { FuncemeDataMinerDTO } from "../../../../src/jobs/scrapper/funceme/command-handler/dto.js";
-import { FetchFuncemeData } from "../../../../src/jobs/scrapper/funceme/helpers/fetch-data/fetch-data.js";
-import { StationParser } from "../../../../src/jobs/scrapper/funceme/helpers/parser/station-parser.js";
-import { ExtractStationsFromFunceme } from "../../../../src/jobs/scrapper/funceme/services/stations-measures/stations-measures-data-miner.js";
-
-let ftpAdapterMock = null;
-let metereologicalEquipmentDao = null;
-let stationReadDao = null;
-let fetchFuncemeData = null;
-let stationsMeasuresDataMinerService = null;
+import {
+  MetereologicalEquipmentRepositoryInMemory,
+  StationReadRepositoryInMemory,
+} from "../../mock/repositories/inMemory/entities/index.js";
+import { FuncemeServicesBuilder } from "../../factories/services/funceme/funceme-services.js";
+import { FetchFTPData } from "../../../../src/modules/funceme/services/fetch-ftp-data.js";
+import { FuncemeScrapperWorkerDTO } from "../../../../src/workers/handlers/funceme/dto.js";
+import { EQUIPMENT_TYPE } from "../../../../src/modules/funceme/config/equipments-types.js";
 
 describe("# Station-Measures-Data-Miner", () => {
+  let ftpAdapterMock = null;
+  let metereologicalEquipmentRepository = null;
+  let stationReadRepository = null;
+  let service = null;
+
   beforeEach(() => {
     jest.useFakeTimers("modern");
     // jest.setSystemTime(new Date(2023, 3, 2));
@@ -40,27 +36,21 @@ describe("# Station-Measures-Data-Miner", () => {
   beforeEach(() => {
     ftpAdapterMock = new FTPClientAdapterMock();
 
-    const stationParser = new StationParser();
+    const fetchFtpData = new FetchFTPData(ftpAdapterMock);
 
-    fetchFuncemeData = new FetchFuncemeData(
-      ftpAdapterMock,
-      stationParser,
-      StationMapper,
-      { folder: "pcds", fileName: "stn_data_2023.tar.gz" }
-    );
+    metereologicalEquipmentRepository =
+      new MetereologicalEquipmentRepositoryInMemory();
+    stationReadRepository = new StationReadRepositoryInMemory();
 
-    metereologicalEquipmentDao = new MetereologicalEquipmentInMemory();
-    stationReadDao = new StationReadRepositoryInMemory();
-
-    stationsMeasuresDataMinerService = new ExtractStationsFromFunceme(
-      fetchFuncemeData,
-      metereologicalEquipmentDao,
-      stationReadDao
-    );
+    service = new FuncemeServicesBuilder({
+      FetchFTPData: fetchFtpData,
+      MetereologicalEquipmentRepository: metereologicalEquipmentRepository,
+      StationReadRepository: stationReadRepository,
+    }).makeFetchFuncemeStationsMeasures();
   });
 
   test("When has equipments but measures not exists, should be able to save measures data with null", async function () {
-    jest.setSystemTime(new Date(2022, 4, 2));
+    jest.setSystemTime(new Date(1920, 4, 2));
 
     const stationCode = "B8524E9A";
 
@@ -89,27 +79,30 @@ describe("# Station-Measures-Data-Miner", () => {
       },
     ];
 
-    const stationReadDaoSpy = jest.spyOn(stationReadDao, "create");
+    const stationReadRepositorySpy = jest.spyOn(
+      stationReadRepository,
+      "create"
+    );
 
-    await metereologicalEquipmentDao.createMetereologicalEquipment(
+    await metereologicalEquipmentRepository.createMetereologicalEquipment(
       equipments[0]
     );
-    await metereologicalEquipmentDao.createMetereologicalEquipment(
+    await metereologicalEquipmentRepository.createMetereologicalEquipment(
       equipments[1]
     );
 
-    const lastDate = new FuncemeDataMinerDTO(Date.now());
+    const dto = new FuncemeScrapperWorkerDTO();
 
-    await stationsMeasuresDataMinerService.execute(lastDate);
+    await service.execute(dto);
 
-    const logs = stationsMeasuresDataMinerService.getLogs();
+    const logs = service.getLogs();
 
-    expect(stationReadDaoSpy).toHaveBeenCalled();
+    expect(stationReadRepositorySpy).toHaveBeenCalled();
 
-    const station = await stationReadDao.list();
+    const stationsMeasures = await stationReadRepository.list();
 
-    station.forEach((pluviometer) => {
-      expect(pluviometer).toMatchObject({
+    stationsMeasures.forEach((measure) => {
+      expect(measure).toMatchObject({
         TotalRadiation: null,
         MaxRelativeHumidity: null,
         MinRelativeHumidity: null,
@@ -127,21 +120,21 @@ describe("# Station-Measures-Data-Miner", () => {
     expect(logs).toEqual([
       {
         type: "info",
-        message: "Iniciando busca de dados de medições das estações da FUNCEME",
+        message: `Iniciando busca de dados de medições de ${EQUIPMENT_TYPE.STATIONS} da FUNCEME`,
       },
       {
         type: "warning",
-        message: `Não foi possível obter dados de medição estação ${stationCode}, salvando dados sem medições.`,
+        message: `Não foi possível obter dados de medição ${stationCode} de ${EQUIPMENT_TYPE.STATIONS}, salvando dados sem medições.`,
       },
       {
         type: "info",
-        message: "Sucesso ao salvar leituras de estações da FUNCEME",
+        message: "Sucesso ao salvar leituras",
       },
     ]);
   });
 
   test("When has stations measures in funceme stations files, should create log with success and save stations with measures", async function () {
-    jest.setSystemTime(new Date(2023, 0, 1));
+    jest.setSystemTime(new Date(2023, 0, 2));
 
     const equipmentCode = "B8524E9A";
 
@@ -170,26 +163,27 @@ describe("# Station-Measures-Data-Miner", () => {
       },
     ];
 
-    const stationReadDaoSpy = jest.spyOn(stationReadDao, "create");
+    const stationReadRepositorySpy = jest.spyOn(
+      stationReadRepository,
+      "create"
+    );
 
-    await metereologicalEquipmentDao.createMetereologicalEquipment(
+    await metereologicalEquipmentRepository.createMetereologicalEquipment(
       equipments[0]
     );
-    await metereologicalEquipmentDao.createMetereologicalEquipment(
+    await metereologicalEquipmentRepository.createMetereologicalEquipment(
       equipments[1]
     );
 
-    const lastDate = new FuncemeDataMinerDTO(Date.now());
+    const dto = new FuncemeScrapperWorkerDTO();
 
-    await stationsMeasuresDataMinerService.execute(lastDate);
+    await service.execute(dto);
 
-    const logs = stationsMeasuresDataMinerService.getLogs();
+    const logs = service.getLogs();
 
-    expect(stationReadDaoSpy).toHaveBeenCalled();
+    expect(stationReadRepositorySpy).toHaveBeenCalled();
 
-    const station = await stationReadDao.list();
-
-    console.log({ station });
+    const stationsMeasures = await stationReadRepository.list();
 
     const stationInDatabase = {
       TotalRadiation: 228.68,
@@ -205,22 +199,22 @@ describe("# Station-Measures-Data-Miner", () => {
       FK_Equipment: 1,
     };
 
-    station.forEach((pluviometer) => {
-      expect(pluviometer).toMatchObject(stationInDatabase);
+    stationsMeasures.forEach((measure) => {
+      expect(measure).toMatchObject(stationInDatabase);
     });
 
     expect(logs).toEqual([
       {
         type: "info",
-        message: "Iniciando busca de dados de medições das estações da FUNCEME",
+        message: `Iniciando busca de dados de medições de ${EQUIPMENT_TYPE.STATIONS} da FUNCEME`,
       },
       {
         type: "info",
-        message: `Sucesso ao obter dados de medição estação ${equipmentCode}`,
+        message: `Sucesso ao obter dados de medição de ${EQUIPMENT_TYPE.STATIONS} com código ${equipmentCode}`,
       },
       {
         type: "info",
-        message: "Sucesso ao salvar leituras de estações da FUNCEME",
+        message: `Sucesso ao salvar leituras`,
       },
     ]);
   });
@@ -240,19 +234,22 @@ describe("# Station-Measures-Data-Miner", () => {
       },
     ];
 
-    const stationReadDaoSpy = jest.spyOn(stationReadDao, "create");
+    const stationReadRepositorySpy = jest.spyOn(
+      stationReadRepository,
+      "create"
+    );
 
-    await metereologicalEquipmentDao.createMetereologicalEquipment(
+    await metereologicalEquipmentRepository.createMetereologicalEquipment(
       equipments[0]
     );
 
-    const lastDate = new FuncemeDataMinerDTO(Date.now());
+    const dto = new FuncemeScrapperWorkerDTO();
 
-    await stationsMeasuresDataMinerService.execute(lastDate);
+    await service.execute(dto);
 
-    expect(stationReadDaoSpy).toHaveBeenCalled();
+    expect(stationReadRepositorySpy).toHaveBeenCalled();
 
-    const station = await stationReadDao.list();
+    const stationsMeasures = await stationReadRepository.list();
 
     const stationInDatabase = {
       TotalRadiation: null,
@@ -268,23 +265,22 @@ describe("# Station-Measures-Data-Miner", () => {
       FK_Equipment: 1,
     };
 
-    station.forEach((pluviometer) => {
-      expect(pluviometer).toMatchObject(stationInDatabase);
+    stationsMeasures.forEach((measure) => {
+      expect(measure).toMatchObject(stationInDatabase);
     });
 
-    expect(stationsMeasuresDataMinerService.getLogs()).toEqual([
+    expect(service.getLogs()).toEqual([
       {
         type: "info",
-        message: "Iniciando busca de dados de medições das estações da FUNCEME",
+        message: `Iniciando busca de dados de medições de ${EQUIPMENT_TYPE.STATIONS} da FUNCEME`,
       },
       {
         type: "warning",
-        message:
-          "Não foi possível obter dados de medição estação AA@!@#925, salvando dados sem medições.",
+        message: `Não foi possível obter dados de medição AA@!@#925 de ${EQUIPMENT_TYPE.STATIONS}, salvando dados sem medições.`,
       },
       {
         type: "info",
-        message: "Sucesso ao salvar leituras de estações da FUNCEME",
+        message: "Sucesso ao salvar leituras",
       },
     ]);
   });

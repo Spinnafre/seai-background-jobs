@@ -1,4 +1,4 @@
-export * from "./funcemeLog.js";
+export * from "./logs.js";
 export * from "./metereologicalEquipment.js";
 export * from "./pluviometerRead.js";
 export * from "./stationRead.js";
