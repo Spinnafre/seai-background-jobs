@@ -68,7 +68,6 @@ export class FetchFuncemeMeasures extends ServiceProtocol {
     Logger.info({
       msg: `Iniciando busca de dados pelo FTP da FUNCEME pela data ${request.getDate()}`,
     });
-
     const equipments =
       await this.metereologicalEquipmentsRepository.getEquipments({
         organName: "FUNCEME",

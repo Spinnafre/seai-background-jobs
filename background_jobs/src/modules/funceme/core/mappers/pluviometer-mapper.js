@@ -4,11 +4,12 @@ export class PluviometerMapper {
   static toDomain(pluviometerEqp) {
     const [date, pluviometer] = Object.values(pluviometerEqp.measures);
 
+    const toFloat = parseFloat(pluviometer);
     return {
       code: pluviometerEqp.code,
       name: pluviometerEqp.name,
       date,
-      pluviometer: parseFloat(pluviometer) || null,
+      pluviometer: toFloat >= 0 ? toFloat : null,
     };
   }
 

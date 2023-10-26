@@ -1,4 +1,4 @@
-// npm run test:dev -i __tests__/units/services/funceme/pluviometer-measures-data-miner.spec.js
+// npm run test:dev -i __tests__/units/services/funceme/fetch-pluviometers-measures.spec.js
 import {
   afterEach,
   beforeEach,
@@ -14,6 +14,7 @@ import { MetereologicalEquipmentRepositoryInMemory } from "../../mock/repositori
 import { PluviometerReadRepositoryInMemory } from "../../mock/repositories/inMemory/entities/pluviometerRead.js";
 import { FuncemeScrapperWorkerDTO } from "../../../../src/workers/handlers/funceme/dto.js";
 import { FTPClientAdapterMock } from "../../mock/funceme/ftp/connection.js";
+import { EQUIPMENT_TYPE } from "../../../../src/modules/funceme/config/equipments-types.js";
 
 let fetchFtpData = null;
 let metereologicalEquipmentRepositoryInMemory = null;
@@ -40,14 +41,14 @@ describe("# Pluviometer-Measures-Data-Miner", () => {
 
     service = new FuncemeServicesBuilder({
       FetchFTPData: fetchFtpData,
-      MetereologicalEquipmentRepositoryInMemory:
+      MetereologicalEquipmentRepository:
         metereologicalEquipmentRepositoryInMemory,
-      PluviometerReadRepositoryInMemory: pluviometerReadRepositoryInMemory,
+      PluviometerReadRepository: pluviometerReadRepositoryInMemory,
     }).makeFetchFuncemePluviometerMeasures();
   });
 
   test("When has equipments but measures not exists, should be able to save measures data with null", async function () {
-    jest.setSystemTime(new Date(2023, 5, 12));
+    jest.setSystemTime(new Date(1900, 5, 12));
     const equipments = [
       {
         IdEquipment: 2,
@@ -93,28 +94,28 @@ describe("# Pluviometer-Measures-Data-Miner", () => {
     expect(logs).toEqual([
       {
         type: "info",
-        message:
-          "Iniciando busca de dados de medições de pluviômetros da FUNCEME",
+        message: `Iniciando busca de dados de medições de ${EQUIPMENT_TYPE.PLUVIOMETERS} da FUNCEME`,
       },
       {
         type: "warning",
-        message:
-          "Não foi possível obter dados de medição do pluviômetro 23984, salvando dados sem medições.",
+        message: `Não foi possível obter dados de medição 23984 de ${EQUIPMENT_TYPE.PLUVIOMETERS}, salvando dados sem medições.`,
       },
       {
         type: "info",
-        message: "Sucesso ao salvar leituras de pluviômetros da FUNCEME",
+        message: "Sucesso ao salvar leituras",
       },
     ]);
   });
 
   test("When has pluviometer measures in funceme files, should create log with success and save data with measures", async function () {
-    jest.setSystemTime(new Date(2023, 3, 4));
+    jest.setSystemTime(new Date(2023, 1, 25));
+
+    const eqpCode = "23978";
 
     const equipments = [
       {
         IdEquipment: 2,
-        IdEquipmentExternal: "23984",
+        IdEquipmentExternal: eqpCode,
         Name: "Teste",
         Altitude: null,
         Organ_Id: 2,
@@ -124,7 +125,6 @@ describe("# Pluviometer-Measures-Data-Miner", () => {
         UpdatedAt: null,
       },
     ];
-
     const pluviometerReadRepositoryInMemorySpy = jest.spyOn(
       pluviometerReadRepositoryInMemory,
       "create"
@@ -134,9 +134,9 @@ describe("# Pluviometer-Measures-Data-Miner", () => {
       equipments[0]
     );
     // Irá ser responsabilidade de um serviço principal
-    const lastDate = new FuncemeDataMinerDTO(Date.now());
+    const request = new FuncemeScrapperWorkerDTO();
 
-    await service.execute(lastDate);
+    await service.execute(request);
 
     expect(pluviometerReadRepositoryInMemorySpy).toHaveBeenCalled();
 
@@ -155,16 +155,15 @@ describe("# Pluviometer-Measures-Data-Miner", () => {
     expect(logs).toEqual([
       {
         type: "info",
-        message:
-          "Iniciando busca de dados de medições de pluviômetros da FUNCEME",
+        message: `Iniciando busca de dados de medições de ${EQUIPMENT_TYPE.PLUVIOMETERS} da FUNCEME`,
       },
       {
         type: "info",
-        message: "Sucesso ao obter dados de medição do pluviômetro 23984",
+        message: `Sucesso ao obter dados de medição de ${EQUIPMENT_TYPE.PLUVIOMETERS} com código ${eqpCode}`,
       },
       {
         type: "info",
-        message: "Sucesso ao salvar leituras de pluviômetros da FUNCEME",
+        message: "Sucesso ao salvar leituras",
       },
     ]);
   });
@@ -196,9 +195,9 @@ describe("# Pluviometer-Measures-Data-Miner", () => {
     );
 
     // Irá ser responsabilidade de um serviço principal
-    const lastDate = new FuncemeDataMinerDTO(Date.now());
+    const request = new FuncemeScrapperWorkerDTO();
 
-    await service.execute(lastDate);
+    await service.execute(request);
 
     expect(pluviometerReadRepositoryInMemorySpy).toHaveBeenCalled();
 
@@ -217,16 +216,15 @@ describe("# Pluviometer-Measures-Data-Miner", () => {
     expect(logs).toMatchObject([
       {
         type: "info",
-        message:
-          "Iniciando busca de dados de medições de pluviômetros da FUNCEME",
+        message: `Iniciando busca de dados de medições de ${EQUIPMENT_TYPE.PLUVIOMETERS} da FUNCEME`,
       },
       {
         type: "warning",
-        message: `Não foi possível obter dados de medição do pluviômetro ${equipmentCode}, salvando dados sem medições.`,
+        message: `Não foi possível obter dados de medição ${equipmentCode} de ${EQUIPMENT_TYPE.PLUVIOMETERS}, salvando dados sem medições.`,
       },
       {
         type: "info",
-        message: "Sucesso ao salvar leituras de pluviômetros da FUNCEME",
+        message: "Sucesso ao salvar leituras",
       },
     ]);
   });
