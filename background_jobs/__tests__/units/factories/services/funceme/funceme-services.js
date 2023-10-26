@@ -10,7 +10,7 @@ import {
   PluviometerParser,
   StationParser,
 } from "../../../../../src/modules/funceme/core/parser/index.js";
-export class FuncemeServicesBuilder {
+export class FuncemeServicesFactory {
   FetchFTPData;
   MetereologicalEquipmentRepository;
   PluviometerReadRepository;

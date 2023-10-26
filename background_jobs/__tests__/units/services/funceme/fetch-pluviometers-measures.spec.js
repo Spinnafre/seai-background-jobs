@@ -9,7 +9,7 @@ import {
 } from "@jest/globals";
 
 import { FetchFTPData } from "../../../../src/modules/funceme/services/fetch-ftp-data.js";
-import { FuncemeServicesBuilder } from "../../factories/services/funceme/funceme-services.js";
+import { FuncemeServicesFactory } from "../../factories/services/funceme/funceme-services.js";
 import { MetereologicalEquipmentRepositoryInMemory } from "../../mock/repositories/inMemory/entities/metereologicalEquipment.js";
 import { PluviometerReadRepositoryInMemory } from "../../mock/repositories/inMemory/entities/pluviometerRead.js";
 import { FuncemeScrapperWorkerDTO } from "../../../../src/workers/handlers/funceme/dto.js";
@@ -39,7 +39,7 @@ describe("# Pluviometer-Measures-Data-Miner", () => {
       new MetereologicalEquipmentRepositoryInMemory();
     pluviometerReadRepositoryInMemory = new PluviometerReadRepositoryInMemory();
 
-    service = new FuncemeServicesBuilder({
+    service = new FuncemeServicesFactory({
       FetchFTPData: fetchFtpData,
       MetereologicalEquipmentRepository:
         metereologicalEquipmentRepositoryInMemory,

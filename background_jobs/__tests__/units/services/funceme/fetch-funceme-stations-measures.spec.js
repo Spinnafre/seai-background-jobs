@@ -13,7 +13,7 @@ import {
   MetereologicalEquipmentRepositoryInMemory,
   StationReadRepositoryInMemory,
 } from "../../mock/repositories/inMemory/entities/index.js";
-import { FuncemeServicesBuilder } from "../../factories/services/funceme/funceme-services.js";
+import { FuncemeServicesFactory } from "../../factories/services/funceme/funceme-services.js";
 import { FetchFTPData } from "../../../../src/modules/funceme/services/fetch-ftp-data.js";
 import { FuncemeScrapperWorkerDTO } from "../../../../src/workers/handlers/funceme/dto.js";
 import { EQUIPMENT_TYPE } from "../../../../src/modules/funceme/config/equipments-types.js";
@@ -42,7 +42,7 @@ describe("# Station-Measures-Data-Miner", () => {
       new MetereologicalEquipmentRepositoryInMemory();
     stationReadRepository = new StationReadRepositoryInMemory();
 
-    service = new FuncemeServicesBuilder({
+    service = new FuncemeServicesFactory({
       FetchFTPData: fetchFtpData,
       MetereologicalEquipmentRepository: metereologicalEquipmentRepository,
       StationReadRepository: stationReadRepository,
