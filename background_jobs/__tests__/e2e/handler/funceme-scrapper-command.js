@@ -1,21 +1,14 @@
-import { config } from "dotenv";
-config({
-  path: "../../../.env",
-});
+import "dotenv/config.js";
 
-import { FuncemeScrapperCommandFactory } from "../../../src/jobs/scrapper/funceme/factories/command-handler/funceme-scrapper-command-factory.js";
+import { makeFetchFuncemeMeasuresHandler } from "../../../src/workers/factories/handlers/fetch-funceme-measures.js";
 
-const funcemeScrapperCommand = FuncemeScrapperCommandFactory();
+const funcemeScrapperCommand = makeFetchFuncemeMeasuresHandler();
 
 try {
-  await funcemeScrapperCommand.handler({
-    id: 1,
-    data: {
-      date: new Date("2023-04-16"),
-    },
-  });
+  await funcemeScrapperCommand.handler();
 
   process.exit();
 } catch (error) {
+  console.error(error);
   process.exit(1);
 }

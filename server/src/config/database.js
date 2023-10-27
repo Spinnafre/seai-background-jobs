@@ -1,5 +1,6 @@
-module.exports = {
-  node_env: process.env.NODE_ENV,
+import { serverConfig } from "../config/server.js";
+
+const configs = {
   jobs: {
     development: {
       // client: "pg",
@@ -24,4 +25,8 @@ module.exports = {
       max: 8,
     },
   },
+};
+
+export const DB_CONFIG = {
+  JOBS_DB: configs.jobs[serverConfig.ENV],
 };

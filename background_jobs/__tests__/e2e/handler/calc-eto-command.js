@@ -1,21 +1,12 @@
-import { config } from "dotenv";
-config({
-  path: "../../../.env",
-});
+import { makeCalcEtoWorkerHandler } from "../../../src/workers/factories/handlers/calc-eto.js";
 
-import { CalcEtoHandlerFactory } from "../../../src/jobs/calc_eto/factories/handler/calc-eto-handler-factory.js";
-
-const handler = CalcEtoHandlerFactory();
+const handler = makeCalcEtoWorkerHandler();
 
 try {
-  await handler.handler({
-    id: 1,
-    data: {
-      date: "2023-04-10",
-    },
-  });
+  await handler.handler();
 
   process.exit();
 } catch (error) {
+  console.error(error);
   process.exit(1);
 }
