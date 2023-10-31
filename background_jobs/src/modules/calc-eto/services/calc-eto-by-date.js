@@ -171,7 +171,7 @@ export class CalcETOByDate extends ServiceProtocol {
           msg: "Salvando dados de ETO...",
         });
 
-        await this.#etoRepository.deleteByTime(date.getDate());
+        // await this.#etoRepository.deleteByTime(date.getDate());
 
         await this.#etoRepository.add(stationsEto);
 

@@ -129,7 +129,7 @@ export class FetchFuncemeMeasures extends ServiceProtocol {
     });
 
     // yyyy-mm-dd
-    await this.equipmentMeasuresRepository.deleteByTime(request.getDate());
+    // await this.equipmentMeasuresRepository.deleteByTime(request.getDate());
 
     await this.equipmentMeasuresRepository.create(toPersistency);
 
