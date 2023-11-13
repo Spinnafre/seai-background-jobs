@@ -6,10 +6,10 @@ export class LogRepository {
   constructor() {
     this.#connection = connections.logs;
   }
-  async create(logs, tableName) {
+  async create({ logs, tableName, operation }) {
     const data = logs.map((log) => {
-      // Operation: "",
       return {
+        Operation: operation,
         Message: log.message,
         Status: log.type,
       };

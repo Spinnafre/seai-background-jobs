@@ -30,7 +30,12 @@ export class CalcETOLogger extends DbLogger {
     Object.freeze(this);
   }
   async save(logs) {
-    await this.logRepository.create(logs, "Calc_Et0");
+    await this.logRepository.create({
+      logs,
+      tableName: "ETL",
+      operation: "Calc ETO",
+    });
+    // await this.logRepository.create(logs, "Calc_Et0");
   }
 }
 
@@ -40,6 +45,10 @@ export class FuncemeDataMinerLogger extends DbLogger {
     Object.freeze(this);
   }
   async save(logs) {
-    await this.logRepository.create(logs, "Funceme_Data_Miner");
+    await this.logRepository.create({
+      logs,
+      tableName: "ETL",
+      operation: "Equipments measures",
+    });
   }
 }

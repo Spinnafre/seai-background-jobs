@@ -1,23 +1,33 @@
 import { FuncemeScrapperWorkerDTO } from "./dto.js";
 
-export class FuncemeFTPDataMinerWorker {
-  static name_queue = "funceme-scrapper";
-  static worker_name = "FuncemeFTPDataMinerWorker";
-  #controller = null;
+export class FuncemeFTPWorker {
+  static name_queue = "funceme-etl";
+  static worker_name = "FuncemeETL";
 
-  constructor(controller) {
-    this.#controller = controller;
-    this.name_queue = FuncemeFTPDataMinerWorker.name_queue;
+  #fetchData = null;
+  #calcEto = null;
+
+  constructor(fetchData, calcEto) {
+    this.#fetchData = fetchData;
+    this.#calcEto = calcEto;
+    this.name_queue = FuncemeFTPWorker.name_queue;
   }
 
   async handler(payload) {
     const dto = new FuncemeScrapperWorkerDTO(payload);
 
-    const resultOrError = await this.#controller.handle(dto);
+    const fetchedDataOrError = await this.#fetchData.handle(dto);
 
-    if (resultOrError.isError()) {
-      throw resultOrError.error();
+    if (fetchedDataOrError.isError()) {
+      throw fetchedDataOrError.error();
     }
+
+    const calcEtoOrError = await this.#calcEto.handle(dto);
+
+    if (calcEtoOrError.isError()) {
+      throw calcEtoOrError.error();
+    }
+
     return;
   }
 }
