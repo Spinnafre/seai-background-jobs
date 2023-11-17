@@ -39,7 +39,9 @@ export class CalcETOByDate extends ServiceProtocol {
         msg: "Não há equipamentos de estação cadastrados.",
       });
 
-      this.logs.addErrorLog("Não há equipamentos de estação cadastrados.");
+      this.logs.addErrorLog({
+        message: "Não há equipamentos de estação cadastrados.",
+      });
 
       return Left.create(
         new Error(`Não há equipamentos de estação cadastrados.`)
@@ -59,9 +61,14 @@ export class CalcETOByDate extends ServiceProtocol {
           msg: " Estação está sem dados de medições.",
         });
 
-        this.logs.addWarningLog(
-          `Não há dados de medições da estação ${station.code} de ${station.location}`
-        );
+        this.logs.addWarningLog({
+          message: `Não há dados de medições da estação ${station.code} de ${
+            station.location
+          } na data de ${date.getDateToQuery()}`,
+          raw: {
+            equipment: station.id,
+          },
+        });
 
         continue;
       }
@@ -83,9 +90,10 @@ export class CalcETOByDate extends ServiceProtocol {
         } = stationRead;
 
         if (averageAtmosphericTemperature === null) {
-          this.logs.addWarningLog(
-            `Não irá computar os dados de ET0 pois não há dados de temperatura atmosférica média da estação ${station.code} de ${station.location}`
-          );
+          this.logs.addWarningLog({
+            message: `Não irá computar os dados de ET0 pois não há dados de temperatura atmosférica média da estação ${station.code} de ${station.location}`,
+            raw: { equipment: station.id },
+          });
 
           continue;
         }
@@ -94,33 +102,38 @@ export class CalcETOByDate extends ServiceProtocol {
           minAtmosphericTemperature === null ||
           maxAtmosphericTemperature === null
         ) {
-          this.logs.addWarningLog(
-            `Não há dados de temperatura máxima ou mínima da estação ${station.code} de ${station.location}, portanto os valores irão serem estimados.`
-          );
+          this.logs.addWarningLog({
+            message: `Não há dados de temperatura máxima ou mínima da estação ${station.code} de ${station.location}, portanto os valores irão serem estimados.`,
+            raw: { equipment: station.id },
+          });
         }
 
         if (totalRadiation === null) {
-          this.logs.addWarningLog(
-            `Não há dados de radiação solar média da estação ${station.code} de ${station.location}, portanto irá ser estimado o valor da radiação solar.`
-          );
+          this.logs.addWarningLog({
+            message: `Não há dados de radiação solar média da estação ${station.code} de ${station.location}, portanto irá ser estimado o valor da radiação solar.`,
+            raw: { equipment: station.id },
+          });
         }
 
         if (atmosphericPressure === null) {
-          this.logs.addWarningLog(
-            `Não há dados de pressão atmosférica da estação ${station.code} de ${station.location}, portanto o valor irá ser estimado.`
-          );
+          this.logs.addWarningLog({
+            message: `Não há dados de pressão atmosférica da estação ${station.code} de ${station.location}, portanto o valor irá ser estimado.`,
+            raw: { equipment: station.id },
+          });
         }
 
         if (windVelocity === null) {
-          this.logs.addWarningLog(
-            `Não há dados da velocidade média do vento da estação ${station.code} de ${station.location}, portanto irá ser adotado o valor de referência de 2 m/s.`
-          );
+          this.logs.addWarningLog({
+            message: `Não há dados da velocidade média do vento da estação ${station.code} de ${station.location}, portanto irá ser adotado o valor de referência de 2 m/s.`,
+            raw: { equipment: station.id },
+          });
         }
 
         if (averageRelativeHumidity === null) {
-          this.logs.addWarningLog(
-            `Não há dados de umidade relativa média da estação ${station.code} de ${station.location}, portanto irá ser estimado o valor da umidade média.`
-          );
+          this.logs.addWarningLog({
+            message: `Não há dados de umidade relativa média da estação ${station.code} de ${station.location}, portanto irá ser estimado o valor da umidade média.`,
+            raw: { equipment: station.id },
+          });
         }
 
         const eto = CalcEto({
@@ -144,40 +157,48 @@ export class CalcETOByDate extends ServiceProtocol {
         });
 
         if ((eto === null) | (eto === undefined)) {
-          this.logs.addErrorLog(
-            `Não foi possível calcular ET0 da estação ${station.code} de ${station.location} pois não há dados de temperatura média.`
-          );
+          this.logs.addErrorLog({
+            message: `Não foi possível calcular ET0 da estação ${station.code} de ${station.location} pois não há dados de temperatura média.`,
+            raw: { equipment: station.id },
+          });
 
           continue;
         }
 
-        this.logs.addInfoLog(
-          `Sucesso ao calcular dados de ET0 da estação ${station.code} de ${station.location}`
-        );
+        this.logs.addInfoLog({
+          message: `Sucesso ao calcular dados de ET0 da estação ${station.code} de ${station.location}`,
+          raw: { equipment: station.id },
+        });
 
         stationsEto.push({
           idRead,
           eto,
         });
       }
+    }
 
-      if (stationsEto.length === 0) {
-        this.logs.addWarningLog(`Não foi possível calcular ET0 do dia.`);
-        return Left.create(new Error(`Não foi possível calcular ET0 do dia.`));
-      }
+    if (stationsEto.length === 0) {
+      this.logs.addWarningLog({
+        message: `Não foi possível calcular ET0 da data ${date.getDateToQuery()}.`,
+      });
+      return Left.create(
+        new Error(
+          `Não foi possível calcular ET0 da data ${date.getDateToQuery()}.`
+        )
+      );
+    }
 
-      if (stationsEto.length) {
-        Logger.info({
-          msg: "Salvando dados de ETO...",
-        });
+    if (stationsEto.length) {
+      Logger.info({
+        msg: "Salvando dados de ETO...",
+      });
 
-        // await this.#etoRepository.deleteByTime(date.getDate());
+      // await this.#etoRepository.deleteByTime(date.getDate());
 
-        await this.#etoRepository.add(stationsEto);
+      await this.#etoRepository.add(stationsEto);
 
-        this.logs.addInfoLog(`Sucesso ao calcular dados de ET0 do dia.`);
-        return Right.create();
-      }
+      // this.logs.addInfoLog(`Sucesso ao calcular dados de ET0 do dia.`);
+      return Right.create();
     }
   }
 }

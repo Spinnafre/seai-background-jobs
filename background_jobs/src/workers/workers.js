@@ -1,6 +1,5 @@
-import { makeCalcEtoWorkerHandler } from "./factories/handlers/calc-eto.js";
 import { makeFetchFuncemeMeasuresHandler } from "./factories/handlers/fetch-funceme-measures.js";
-import { CalcET0Worker, FuncemeFTPWorker } from "./handlers/index.js";
+import { FuncemeFTPWorker } from "./handlers/index.js";
 
 export default [
   {

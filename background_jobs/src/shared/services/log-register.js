@@ -30,10 +30,24 @@ export class CalcETOLogger extends DbLogger {
     Object.freeze(this);
   }
   async save(logs) {
+    const toPersistency = logs.map((log) => {
+      const logData = {
+        Operation: "Calc ETO",
+        Message: log.message,
+        Status: log.type,
+      };
+
+      if (Reflect.has(log, "raw") && Reflect.has(log.raw, "equipment")) {
+        Object.assign(logData, {
+          FK_Equipment: log.raw.equipment,
+        });
+      }
+      return logData;
+    });
+
     await this.logRepository.create({
-      logs,
+      logs: toPersistency,
       tableName: "ETL",
-      operation: "Calc ETO",
     });
     // await this.logRepository.create(logs, "Calc_Et0");
   }
@@ -45,10 +59,24 @@ export class FuncemeDataMinerLogger extends DbLogger {
     Object.freeze(this);
   }
   async save(logs) {
+    const toPersistency = logs.map((log) => {
+      const logData = {
+        Operation: "Equipments measures",
+        Message: log.message,
+        Status: log.type,
+      };
+
+      if (Reflect.has(log, "raw") && Reflect.has(log.raw, "equipment")) {
+        Object.assign(logData, {
+          FK_Equipment: log.raw.equipment,
+        });
+      }
+      return logData;
+    });
+
     await this.logRepository.create({
-      logs,
+      logs: toPersistency,
       tableName: "ETL",
-      operation: "Equipments measures",
     });
   }
 }

@@ -1,4 +1,4 @@
-// npm run test:dev -i tests/handlers/funceme-scrapper-command.spec.js
+// npm run test:dev -i __tests__/units/controllers/funceme-scrapper-command.spec.js
 import { beforeAll, describe, expect, jest, test } from "@jest/globals";
 
 import { ConnectionError } from "../../../src/jobs/scrapper/funceme/command-handler/errors/ConnectionError.js";

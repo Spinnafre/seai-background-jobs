@@ -18,7 +18,7 @@ const databaseCredentials = {
         database: "equipments",
       },
       pool: {
-        min: 2,
+        min: 0,
         max: 10,
       },
     },
@@ -32,7 +32,7 @@ const databaseCredentials = {
         database: "logs",
       },
       pool: {
-        min: 2,
+        min: 0,
         max: 10,
       },
     },
@@ -56,7 +56,7 @@ const databaseCredentials = {
         database: "equipments",
       },
       pool: {
-        min: 2,
+        min: 0,
         max: 10,
       },
     },
@@ -70,7 +70,7 @@ const databaseCredentials = {
         database: "logs",
       },
       pool: {
-        min: 2,
+        min: 0,
         max: 10,
       },
     },
@@ -94,7 +94,7 @@ const databaseCredentials = {
         database: "equipments",
       },
       pool: {
-        min: 2,
+        min: 0,
         max: 10,
       },
     },
@@ -108,7 +108,7 @@ const databaseCredentials = {
         database: "logs",
       },
       pool: {
-        min: 2,
+        min: 0,
         max: 10,
       },
     },
