@@ -26,10 +26,10 @@ export class CalcETOPerDayController {
         obj: error,
       });
 
-      await this.dbLogger.add({
-        message: error.message,
-        type: "error",
-      });
+      // await this.dbLogger.add({
+      //   message: error.message,
+      //   type: "error",
+      // });
 
       //Essencial para o PG-BOSS entender que ocorreu um erro
       return Left.create(error);
