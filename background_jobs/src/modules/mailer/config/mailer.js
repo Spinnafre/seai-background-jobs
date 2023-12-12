@@ -1,14 +1,10 @@
 export const mailerConfig = {
-  host: process.env.MAIL_HOST,
-  port: Number(process.env.MAIL_PORT),
   auth: {
     username: process.env.MAIL_USERNAME,
     password: process.env.MAIL_PASSWORD,
   },
-  from: process.env.MAILER_FROM || "",
-  to: "",
-  subject: "",
-  text: "",
-  html: "",
-  attachments: [],
+  port: Number(process.env.MAIL_PORT),
+  host: process.env.MAIL_HOST,
+  from: process.env.MAIL_FROM,
+  to: "admin@gmail.com",
 };

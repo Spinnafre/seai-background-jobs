@@ -1,6 +1,4 @@
 import nodemailer from "nodemailer";
-import hbs from "nodemailer-express-handlebars";
-import { resolve } from "node:path";
 
 export class NodemailerAdapter {
   async send(options) {
@@ -13,25 +11,24 @@ export class NodemailerAdapter {
       },
     });
 
-    transporter.use(
-      "compile",
-      hbs({
-        viewEngine: {
-          defaultLayout: undefined,
-          partialsDir: resolve("./src/jobs/mailer/resources/mail"),
-        },
-        viewPath: resolve("./src/jobs/mailer/resources/mail"),
-        extName: ".html",
-      })
-    );
+    console.log(options);
 
-    const info = await transporter.sendMail({
+    const command = {
       from: options.from,
       to: options.to,
       subject: options.subject,
-      template: options.template,
-      context: { ...options.context },
-    });
+      text: options.text,
+      html: options.html,
+      attachments: options.attachments,
+    };
+
+    if (options.cc) {
+      Object.assign(command, {
+        cc: options.cc,
+      });
+    }
+
+    const info = await transporter.sendMail(command);
 
     console.log("Message sent: %s", info.messageId);
   }

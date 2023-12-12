@@ -1,5 +1,13 @@
-import { makeFetchFuncemeMeasuresHandler } from "./factories/handlers/fetch-funceme-measures.js";
-import { FuncemeFTPWorker } from "./handlers/index.js";
+import {
+  makeCalcEtoWorkerHandler,
+  makeFetchFuncemeMeasuresHandler,
+  makeSendNewsletterHandler,
+} from "./factories/handlers/index.js";
+import {
+  FuncemeFTPWorker,
+  SendNewsletterWorker,
+  CalcET0Worker,
+} from "./handlers/index.js";
 
 export default [
   {
@@ -12,13 +20,22 @@ export default [
       },
     ],
   },
-  // {
-  //   queue_name: CalcET0Worker.name_queue,
-  //   workers: [
-  //     {
-  //       name: CalcET0Worker.worker_name,
-  //       process: (command) => makeCalcEtoWorkerHandler().handler(command),
-  //     },
-  //   ],
-  // },
+  {
+    queue_name: CalcET0Worker.name_queue,
+    workers: [
+      {
+        name: CalcET0Worker.worker_name,
+        process: (command) => makeCalcEtoWorkerHandler().handler(command),
+      },
+    ],
+  },
+  {
+    queue_name: SendNewsletterWorker.name_queue,
+    workers: [
+      {
+        name: SendNewsletterWorker.worker_name,
+        process: (command) => makeSendNewsletterHandler().handler(command),
+      },
+    ],
+  },
 ];
