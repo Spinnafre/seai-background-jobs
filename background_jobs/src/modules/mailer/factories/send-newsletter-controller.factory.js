@@ -1,6 +1,6 @@
-import { SendNewsLetterController } from "../controller/send-newsletter";
-import { SendNewsletterUseCaseFactory } from "./send-newsletter-usecase-factory";
+import { SendNewsLetterController } from "../controller/send-newsletter.js";
+import { SendNewsletterUseCaseFactory } from "./send-newsletter-usecase-factory.js";
 
-export const SendNewsletterControllerUseCaseFactory = () => {
+export const SendNewsletterControllerFactory = () => {
   return new SendNewsLetterController(SendNewsletterUseCaseFactory());
 };

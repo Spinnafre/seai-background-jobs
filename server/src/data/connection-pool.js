@@ -24,6 +24,7 @@ class PgDAO {
   }
   static create() {
     const { Pool } = Pg;
+
     const connection = new Pool({
       database: DB_CONFIG.JOBS_DB.database,
       port: Number(DB_CONFIG.JOBS_DB.port),

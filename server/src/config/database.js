@@ -15,10 +15,10 @@ const configs = {
     },
     production: {
       // client: "pg",
-      host: process.env.DB_JOB_HOST_PORT,
-      port: process.env.DB_JOB_PORT_PORT,
-      user: process.env.DB_JOB_USER_NAME_PORT,
-      password: process.env.DB_JOB_PASSWORD_PORT,
+      host: process.env.DB_JOB_HOST_PROD,
+      port: process.env.DB_JOB_PORT_PROD,
+      user: process.env.DB_JOB_USER_NAME_PROD,
+      password: process.env.DB_JOB_PASSWORD_PROD,
       database: "postgres",
       connectionTimeoutMillis: 30000,
       idleTimeoutMillis: 15000,
@@ -26,6 +26,9 @@ const configs = {
     },
   },
 };
+console.log("kkkkk ", process.env);
+console.log("hihihi ", serverConfig.ENV);
+console.log(configs.jobs[serverConfig.ENV]);
 
 export const DB_CONFIG = {
   JOBS_DB: configs.jobs[serverConfig.ENV],

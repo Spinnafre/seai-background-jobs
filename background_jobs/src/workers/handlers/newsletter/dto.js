@@ -1,4 +1,4 @@
-import { WorkerHandlerDTO } from "../../../shared/workers/handlerDTO";
+import { WorkerHandlerDTO } from "../../../shared/workers/handlerDTO.js";
 
 export class NewsletterMailerDTO extends WorkerHandlerDTO {
   constructor(payload) {

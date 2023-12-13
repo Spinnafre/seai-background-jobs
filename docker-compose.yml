@@ -13,20 +13,20 @@ services:
     networks:
       - back-tier
       - custom-proxy
-  # jobs-api:
-  #   build: ./server
-  #   container_name: "jobs_server"
-  #   volumes:
-  #     - ./server:/usr/src/app
-  #     - nodemodules_api:/usr/src/app/node_modules
-  #   depends_on:
-  #     - jobs_database
-  #   ports:
-  #     - "3333:80"
-  #   restart: on-failure
-  #   networks:
-  #     - back-tier
-  #     - custom-proxy
+  jobs-api:
+    build: ./server
+    container_name: "jobs_server"
+    volumes:
+      - ./server:/usr/src/app
+      - nodemodules_api:/usr/src/app/node_modules
+    depends_on:
+      - jobs_database
+    ports:
+      - "3333:3333"
+    restart: on-failure
+    networks:
+      - back-tier
+      - custom-proxy
 
   jobs_database:
     image: postgres:14.2

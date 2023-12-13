@@ -1,13 +1,20 @@
 import express from "express";
 
 import cors from "cors";
+console.log("ENV ==== ", process.env);
 import { connection } from "./data/connection-pool.js";
 import { Logger } from "./lib/logger/logger.js";
 
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+
+app.use((request, response, next) => {
+  response.set("access-control-allow-origin", "*");
+  response.set("access-control-allow-headers", "*");
+  response.set("access-control-allow-methods", "*");
+  next();
+});
 
 /*
 app.post("/send-forgot-email", async (req, res) => {

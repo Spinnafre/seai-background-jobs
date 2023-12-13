@@ -22,6 +22,7 @@ COPY ["./src","/usr/src/app/src/"]
 COPY [".env","/usr/src/app/"]
 
 
+EXPOSE 3333
 # HEALTHCHECK --interval=30s \
 #     CMD node healthcheck.js
 
