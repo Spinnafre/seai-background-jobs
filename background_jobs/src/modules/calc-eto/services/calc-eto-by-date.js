@@ -6,13 +6,11 @@ import { CalcEto } from "../domain/calc-eto.js";
 export class CalcETOByDate extends ServiceProtocol {
   #equipmentRepository;
   #stationReadsRepository;
-  #etoRepository;
 
-  constructor(equipmentRepository, etoRepository, stationReadsRepository) {
+  constructor(equipmentRepository, stationReadsRepository) {
     super();
     this.#equipmentRepository = equipmentRepository;
     this.#stationReadsRepository = stationReadsRepository;
-    this.#etoRepository = etoRepository;
   }
 
   /**
