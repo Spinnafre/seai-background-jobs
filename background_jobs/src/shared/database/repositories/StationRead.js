@@ -70,6 +70,7 @@ export class StationReadRepository {
         maxAtmosphericTemperature: stationRead.MaxAtmosphericTemperature,
         atmosphericPressure: stationRead.AtmosphericPressure,
         windVelocity: stationRead.WindVelocity,
+        et0: stationRead.Et0,
       };
     });
   }
@@ -80,6 +81,27 @@ export class StationReadRepository {
 where TO_CHAR(rs."Time" :: DATE, 'yyyy-mm-dd') = ?`,
       [time]
     );
+  }
+
+  async updateEto(reads = []) {
+    const trx = await this.#connection.transaction();
+    try {
+      await Promise.all(
+        reads.map((read) => {
+          return this.#connection("ReadStations")
+            .where("IdRead", read.idRead)
+            .update({
+              Et0: read.eto,
+            })
+            .transacting(trx); // This makes every update be in the same transaction
+        })
+      );
+
+      await trx.commit();
+    } catch (error) {
+      console.error(error);
+      await trx.rollback();
+    }
   }
 
   async deleteByDateTime(time, hour) {
