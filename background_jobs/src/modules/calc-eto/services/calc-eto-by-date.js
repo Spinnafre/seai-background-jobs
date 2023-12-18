@@ -179,11 +179,12 @@ export class CalcETOByDate extends ServiceProtocol {
       this.logs.addWarningLog({
         message: `Não foi possível calcular ET0 da data ${date.getDateToQuery()}.`,
       });
-      return Left.create(
-        new Error(
-          `Não foi possível calcular ET0 da data ${date.getDateToQuery()}.`
-        )
-      );
+      // return Left.create(
+      //   new Error(
+      //     `Não foi possível calcular ET0 da data ${date.getDateToQuery()}.`
+      //   )
+      // );
+      return Right.create();
     }
 
     if (stationsEto.length) {
