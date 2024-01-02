@@ -11,8 +11,6 @@ export class NodemailerAdapter {
       },
     });
 
-    console.log(options);
-
     const command = {
       from: options.from,
       to: options.to,

@@ -13,6 +13,7 @@ export class SendNewsLetterController {
   async handle(request) {
     try {
       const idNews = request.getNewsId();
+      console.log("IDDD", idNews);
 
       const resultOrError = await this.useCase.execute(idNews);
 

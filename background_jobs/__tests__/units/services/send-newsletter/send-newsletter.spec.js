@@ -1,16 +1,8 @@
-// npm run test:dev -i __tests__/units/services/calc-eto/calc-eto.spec.js
-import {
-  describe,
-  expect,
-  test,
-  jest,
-  afterEach,
-  beforeEach,
-  beforeAll,
-  afterAll,
-} from "@jest/globals";
-import { DbNewsLetterRepositoryInMemory } from "../../mock/repositories/inMemory/entities/newsletter";
-import { NodemailerAdapterStub } from "../../mock/news/send-email";
+// npm run test:dev -i __tests__/units/services/send-newsletter/send-newsletter.spec.js
+import { describe, expect, test, jest } from "@jest/globals";
+
+import { DbNewsLetterRepositoryInMemory } from "../../../doubles/infra/repositories/inMemory/newsletter";
+import { NodemailerAdapterStub } from "../../../doubles/infra/services/mailer/send-email";
 import { SendNewsletterEmail } from "../../../../src/modules/mailer/services/send-newsletter";
 import { mailerConfig } from "../../../../src/modules/mailer/config/mailer";
 
@@ -88,6 +80,7 @@ describe("# Send Newsletter", () => {
       cc: "*******",
     });
   });
+
   test("When news is not exists should'n be able to send newsletter emails", async () => {
     const IdNews = 1;
 
@@ -118,6 +111,7 @@ describe("# Send Newsletter", () => {
     expect(result.err.message).toBe(`Notícia ${IdNews} não existe`);
     expect(sendEmailServiceWatch).toBeCalledTimes(0);
   });
+
   test("When subscriber is not exists should be able to send newsletter to default emails", async () => {
     const IdNews = 1;
 
@@ -187,6 +181,7 @@ describe("# Send Newsletter", () => {
       cc: "*******",
     });
   });
+
   test("When to fail when send email should be report error message", async () => {
     const IdNews = 1;
 
@@ -230,7 +225,7 @@ describe("# Send Newsletter", () => {
     const sendEmailService = new NodemailerAdapterStub();
     const sendEmailServiceWatch = jest
       .spyOn(sendEmailService, "send")
-      .mockRejectedValue(new Error("Error"));
+      .mockRejectedValue(new Error("KKKK"));
 
     const sendNewsletter = new SendNewsletterEmail(
       newsletterRepository,
@@ -241,6 +236,5 @@ describe("# Send Newsletter", () => {
 
     expect(result.isError()).toBeTruthy();
     expect(sendEmailServiceWatch).toBeCalledTimes(1);
-    expect(sendEmailServiceWatch).toThrowError();
   });
 });

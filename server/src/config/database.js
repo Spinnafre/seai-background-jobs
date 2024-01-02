@@ -26,9 +26,6 @@ const configs = {
     },
   },
 };
-console.log("kkkkk ", process.env);
-console.log("hihihi ", serverConfig.ENV);
-console.log(configs.jobs[serverConfig.ENV]);
 
 export const DB_CONFIG = {
   JOBS_DB: configs.jobs[serverConfig.ENV],

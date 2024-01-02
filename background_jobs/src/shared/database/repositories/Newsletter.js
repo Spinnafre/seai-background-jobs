@@ -48,8 +48,7 @@ export class DbNewsLetterRepository {
     const result = await connections.newsletter.raw(
       `
             SELECT s."Email"  FROM "Subscriber" s 
-    `,
-      [id]
+    `
     );
 
     if (!result.rows.length) {

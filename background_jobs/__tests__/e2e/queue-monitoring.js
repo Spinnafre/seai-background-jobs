@@ -11,6 +11,7 @@ import {
 
 async function register() {
   console.log(process.env);
+
   const today = new Date();
   await BackgroundJobsManager.connectToQueue();
 

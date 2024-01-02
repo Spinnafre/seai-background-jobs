@@ -31,10 +31,10 @@ class PgDAO {
       host: DB_CONFIG.JOBS_DB.host,
       password: DB_CONFIG.JOBS_DB.password,
       user: DB_CONFIG.JOBS_DB.user,
-      idleTimeoutMillis: 20000,
-      max: 20,
-      min: 2,
+      idleTimeoutMillis: 30000,
+      max: 10,
       connectionTimeoutMillis: 2000,
+      allowExitOnIdle: false,
     });
 
     const pgDao = new PgDAO(connection);

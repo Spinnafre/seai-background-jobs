@@ -27,7 +27,7 @@ export class SendNewsletterEmail {
         });
       }
 
-      const contentBuffer = news.Data.data;
+      const contentBuffer = news.Data;
 
       const buffer = Buffer.from(contentBuffer); // converte para buffer de dados binários crús (chunk of data)
 
@@ -35,11 +35,13 @@ export class SendNewsletterEmail {
 
       const html = await toHTML(blob);
 
-      const mailList = subscribers.length
-        ? [...subscribers.map((data) => data.Email), ...[mailerConfig.to]].join(
-            ","
-          )
-        : [mailerConfig.to].join(",");
+      const mailList =
+        subscribers && subscribers.length
+          ? [
+              ...subscribers.map((data) => data.Email),
+              ...[mailerConfig.to],
+            ].join(",")
+          : [mailerConfig.to].join(",");
 
       Logger.info("Enviando newsletter...");
 
@@ -61,7 +63,7 @@ export class SendNewsletterEmail {
       return Right.create("Sucesso ao enviar notícia");
     } catch (error) {
       Logger.error({
-        msg: "Falha ao realizar serialização de dados provindos do FTP.",
+        msg: "Falha ao enviar notícias.",
         obj: error,
       });
 

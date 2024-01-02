@@ -1,5 +1,8 @@
-import { CalcETOLogger, FuncemeDataMinerLogger } from "../../../../src/shared/services/log-register.js";
-import { LogsRepositoryInMemory } from "../../mock/repositories/inMemory/entities/logs.js";
+import {
+  CalcETOLogger,
+  FuncemeDataMinerLogger,
+} from "../../../../../src/shared/services/log-register.js";
+import { LogsRepositoryInMemory } from "../../../mock/repositories/inMemory/entities/logs.js";
 
 export class DatabaseLoggerInMemoryFactory {
   static makeFuncemeLogger() {
