@@ -1,4 +1,5 @@
 // npm run test:dev -i __tests__/units/services/funceme/fetch-funceme-stations-measures.spec.js
+
 import {
   afterEach,
   beforeEach,
@@ -8,15 +9,12 @@ import {
   test,
 } from "@jest/globals";
 
-import { FTPClientAdapterMock } from "../../mock/funceme/ftp/connection.js";
-import {
-  MetereologicalEquipmentRepositoryInMemory,
-  StationReadRepositoryInMemory,
-} from "../../mock/repositories/inMemory/entities/index.js";
 import { FuncemeServicesFactory } from "../../factories/services/funceme/funceme-services.js";
 import { FetchFTPData } from "../../../../src/modules/funceme/services/fetch-ftp-data.js";
 import { FuncemeScrapperWorkerDTO } from "../../../../src/workers/handlers/funceme/dto.js";
 import { EQUIPMENT_TYPE } from "../../../../src/modules/funceme/config/equipments-types.js";
+import { StationReadRepositoryInMemory,MetereologicalEquipmentRepositoryInMemory } from "../../../doubles/infra/repositories/inMemory";
+import { FTPClientAdapterMock } from "../../../doubles/infra/services/ftp/ftp-stub.js";
 
 describe("# Station-Measures-Data-Miner", () => {
   let ftpAdapterMock = null;
@@ -91,11 +89,21 @@ describe("# Station-Measures-Data-Miner", () => {
       equipments[1]
     );
 
+    const ftpMocked = jest.spyOn(ftpAdapterMock,'getFolderContentDescription').mockResolvedValue([
+      {
+        type:'-',
+        name:'stn_data_2023.tar.gz',
+        size:100,
+        date: new Date()
+      }
+    ])
+
     const dto = new FuncemeScrapperWorkerDTO();
 
     await service.execute(dto);
 
     const logs = service.getLogs();
+    console.log(stationReadRepositorySpy.mock.calls[0])
 
     expect(stationReadRepositorySpy).toHaveBeenCalled();
 

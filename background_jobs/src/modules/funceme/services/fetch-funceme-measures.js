@@ -68,6 +68,7 @@ export class FetchFuncemeMeasures extends ServiceProtocol {
     Logger.info({
       msg: `Iniciando busca de dados pelo FTP da FUNCEME pela data ${request.getDate()}`,
     });
+
     const equipments =
       await this.metereologicalEquipmentsRepository.getEquipments({
         organName: "FUNCEME",
@@ -88,8 +89,27 @@ export class FetchFuncemeMeasures extends ServiceProtocol {
 
     const equipmentsCodes = equipments.map((eqp) => eqp.code);
 
+    const fileDescription = await this.fetchFtpData.getFileDescriptions(this.directory.folder,request.getYear());
+
+    console.log('fileDescription ::: ',fileDescription)
+
+    if(fileDescription == null){
+      Logger.error({
+        msg:`Não foi possível encontrar arquivo de ${this.equipmentType} da pasta ${this.directory.folder}`
+      })
+      return Left.create(new Error(`Não foi possível encontrar arquivo de ${this.equipmentType} da pasta ${this.directory.folder}`))
+    }
+
+    Logger.info({
+      obj: fileDescription,
+      msg:`Sucesso ao obter arquivos do diretório ${this.directory.folder}`
+    })
+
     const rawMeasuresOrError = await this.fetchFtpData.getDataFromDirectory(
-      this.directory
+      {
+        folder:this.directory.folder,
+        fileName: fileDescription.name
+      }
     );
 
     if (rawMeasuresOrError.isError()) {

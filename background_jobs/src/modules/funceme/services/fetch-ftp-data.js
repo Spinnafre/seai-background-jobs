@@ -26,6 +26,35 @@ export class FetchFTPData {
     }
   }
 
+  async getFileDescriptions(folder,fileName=null){
+    const filesDescriptionsFromFolder = await this.ftpConnection.getFolderContentDescription(folder);
+    // console.log(filesDescriptionsFromFolder)
+    if(filesDescriptionsFromFolder.length === 0){
+      return null
+    }
+
+    if(!fileName){
+      return filesDescriptionsFromFolder
+    }
+
+    const fileDescription = filesDescriptionsFromFolder.filter(file =>{
+      return file.name.includes(fileName)
+    })
+
+    if(fileDescription.length === 0){
+      return null
+    }
+
+    const {type,name,size,date} = fileDescription[0]
+
+    return {
+      type,
+      name,
+      date,
+      size
+    }
+  }
+
   async getDataFromDirectory({ folder, fileName }) {
     Logger.info(
       `Iniciando extração de dados do diretório ${folder}/${fileName}`

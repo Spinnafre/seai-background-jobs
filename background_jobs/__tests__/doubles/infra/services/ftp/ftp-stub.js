@@ -26,6 +26,12 @@ class FTPClientAdapterMock {
     });
   }
 
+  async getFolderContentDescription(folder){
+    return new Promise((resolve, reject) => {
+      resolve(true);
+    });
+  }
+
   getFile(folder, file) {
     console.log("path: ", pathToFileURL(import.meta.url).pathname);
     console.log(`[🔍] Getting stream from path ${folder}/${file}`);
