@@ -8,21 +8,24 @@ import {
   test,
 } from "@jest/globals";
 
-import { FetchFTPData } from "../../../../src/modules/funceme/services/fetch-ftp-data.js";
 import { FuncemeServicesFactory } from "../../factories/services/funceme/funceme-services.js";
-import { MetereologicalEquipmentRepositoryInMemory } from "../../mock/repositories/inMemory/entities/metereologicalEquipment.js";
-import { PluviometerReadRepositoryInMemory } from "../../mock/repositories/inMemory/entities/pluviometerRead.js";
-import { FuncemeScrapperWorkerDTO } from "../../../../src/workers/handlers/funceme/dto.js";
-import { FTPClientAdapterMock } from "../../mock/funceme/ftp/connection.js";
-import { EQUIPMENT_TYPE } from "../../../../src/modules/funceme/config/equipments-types.js";
+import { FetchFTPData } from "../../../../src/modules/funceme/services/fetch-ftp-data.js";
 
-let fetchFtpData = null;
-let metereologicalEquipmentRepositoryInMemory = null;
-let pluviometerReadRepositoryInMemory = null;
-let service = null;
-let ftpClientAdapter = null;
+import {
+  PluviometerReadRepositoryInMemory,
+  MetereologicalEquipmentRepositoryInMemory,
+} from "../../../doubles/infra/repositories/inMemory";
+
+import { FuncemeScrapperWorkerDTO } from "../../../../src/workers/handlers/funceme/dto.js";
+import { FTPClientAdapterMock } from "../../../doubles/infra/services/ftp/ftp-stub.js";
 
 describe("# Pluviometer-Measures-Data-Miner", () => {
+  let fetchFtpData = null;
+  let metereologicalEquipmentRepositoryInMemory = null;
+  let pluviometerReadRepositoryInMemory = null;
+  let service = null;
+  let ftpAdapterMock = null;
+
   beforeEach(() => {
     jest.useFakeTimers("modern");
   });
@@ -32,8 +35,8 @@ describe("# Pluviometer-Measures-Data-Miner", () => {
   });
 
   beforeEach(() => {
-    ftpClientAdapter = new FTPClientAdapterMock();
-    fetchFtpData = new FetchFTPData(ftpClientAdapter);
+    ftpAdapterMock = new FTPClientAdapterMock();
+    fetchFtpData = new FetchFTPData(ftpAdapterMock);
 
     metereologicalEquipmentRepositoryInMemory =
       new MetereologicalEquipmentRepositoryInMemory();
@@ -47,8 +50,70 @@ describe("# Pluviometer-Measures-Data-Miner", () => {
     }).makeFetchFuncemePluviometerMeasures();
   });
 
+  test("When FTP folder not exists should be able to exit with error", async function () {
+    jest.setSystemTime(new Date(1920, 4, 2));
+
+    const eqpCode = "23984";
+
+    const equipments = [
+      {
+        IdEquipment: 2,
+        IdEquipmentExternal: eqpCode,
+        Name: "Teste",
+        Altitude: null,
+        Organ_Id: 2,
+        Organ: "FUNCEME",
+        Type: "pluviometer",
+        CreatedAt: new Date(),
+        UpdatedAt: null,
+      },
+    ];
+
+    const pluviometerRepositorySpy = jest.spyOn(
+      pluviometerReadRepositoryInMemory,
+      "create"
+    );
+
+    await metereologicalEquipmentRepositoryInMemory.createMetereologicalEquipment(
+      equipments[0]
+    );
+
+    jest
+      .spyOn(ftpAdapterMock, "getFolderContentDescription")
+      .mockResolvedValue([
+        {
+          type: "-",
+          name: "stn_data_XXX.tar.gz",
+          size: 100,
+          date: new Date(),
+        },
+      ]);
+
+    const dto = new FuncemeScrapperWorkerDTO();
+
+    await service.execute(dto);
+
+    const logs = service.getLogs();
+
+    expect(pluviometerRepositorySpy).not.toBeCalled();
+
+    const measures = await pluviometerReadRepositoryInMemory.list();
+
+    expect(measures.length).toBe(0);
+
+    expect(logs).toEqual([
+      {
+        type: "error",
+        message:
+          "Não foi possível encontrar arquivo de pluviometer da pasta pluviometros",
+      },
+    ]);
+  });
+
   test("When has equipments but measures not exists, should be able to save measures data with null", async function () {
-    jest.setSystemTime(new Date(1900, 5, 12));
+    const year = 2023;
+    jest.setSystemTime(new Date(year, 11, 12));
+
     const equipments = [
       {
         IdEquipment: 2,
@@ -67,6 +132,17 @@ describe("# Pluviometer-Measures-Data-Miner", () => {
       pluviometerReadRepositoryInMemory,
       "create"
     );
+
+    jest
+      .spyOn(ftpAdapterMock, "getFolderContentDescription")
+      .mockResolvedValue([
+        {
+          type: "-",
+          name: `prec_data_${year}.tar.gz`,
+          size: 100,
+          date: new Date(),
+        },
+      ]);
 
     await metereologicalEquipmentRepositoryInMemory.createMetereologicalEquipment(
       equipments[0]
@@ -93,22 +169,20 @@ describe("# Pluviometer-Measures-Data-Miner", () => {
 
     expect(logs).toEqual([
       {
-        type: "info",
-        message: `Iniciando busca de dados de medições de ${EQUIPMENT_TYPE.PLUVIOMETERS} da FUNCEME`,
-      },
-      {
         type: "warning",
-        message: `Não foi possível obter dados de medição 23984 de ${EQUIPMENT_TYPE.PLUVIOMETERS}, salvando dados sem medições.`,
-      },
-      {
-        type: "info",
-        message: "Sucesso ao salvar leituras",
+        message: `Não foi possível obter dados de medições do equipamento ${
+          equipments[0].IdEquipmentExternal
+        } do dia ${request.getDate()}, salvando dados sem medições.`,
+        raw: {
+          equipment: equipments[0].IdEquipment,
+        },
       },
     ]);
   });
 
   test("When has pluviometer measures in funceme files, should create log with success and save data with measures", async function () {
-    jest.setSystemTime(new Date(2023, 1, 25));
+    const year = 2023;
+    jest.setSystemTime(new Date(year, 1, 25));
 
     const eqpCode = "23978";
 
@@ -125,10 +199,22 @@ describe("# Pluviometer-Measures-Data-Miner", () => {
         UpdatedAt: null,
       },
     ];
+
     const pluviometerReadRepositoryInMemorySpy = jest.spyOn(
       pluviometerReadRepositoryInMemory,
       "create"
     );
+
+    jest
+      .spyOn(ftpAdapterMock, "getFolderContentDescription")
+      .mockResolvedValue([
+        {
+          type: "-",
+          name: `prec_data_${year}.tar.gz`,
+          size: 100,
+          date: new Date(),
+        },
+      ]);
 
     await metereologicalEquipmentRepositoryInMemory.createMetereologicalEquipment(
       equipments[0]
@@ -155,22 +241,20 @@ describe("# Pluviometer-Measures-Data-Miner", () => {
     expect(logs).toEqual([
       {
         type: "info",
-        message: `Iniciando busca de dados de medições de ${EQUIPMENT_TYPE.PLUVIOMETERS} da FUNCEME`,
-      },
-      {
-        type: "info",
-        message: `Sucesso ao obter dados de medição de ${EQUIPMENT_TYPE.PLUVIOMETERS} com código ${eqpCode}`,
-      },
-      {
-        type: "info",
-        message: "Sucesso ao salvar leituras",
+        message: `Sucesso ao obter dados de medições do equipamento ${eqpCode}`,
+        raw: {
+          equipment: equipments[0].IdEquipment,
+        },
       },
     ]);
   });
 
   test("When pluviometers codes not exists in funceme stations files, should create log with error and save data without measures", async function () {
-    jest.setSystemTime(new Date(2023, 3, 4));
+    const year = 2023;
+    jest.setSystemTime(new Date(year, 3, 4));
+
     const equipmentCode = "@3123123s";
+
     const equipments = [
       {
         IdEquipment: 2,
@@ -184,6 +268,17 @@ describe("# Pluviometer-Measures-Data-Miner", () => {
         UpdatedAt: null,
       },
     ];
+
+    jest
+      .spyOn(ftpAdapterMock, "getFolderContentDescription")
+      .mockResolvedValue([
+        {
+          type: "-",
+          name: `prec_data_${year}.tar.gz`,
+          size: 100,
+          date: new Date(),
+        },
+      ]);
 
     const pluviometerReadRepositoryInMemorySpy = jest.spyOn(
       pluviometerReadRepositoryInMemory,
@@ -215,16 +310,11 @@ describe("# Pluviometer-Measures-Data-Miner", () => {
 
     expect(logs).toMatchObject([
       {
-        type: "info",
-        message: `Iniciando busca de dados de medições de ${EQUIPMENT_TYPE.PLUVIOMETERS} da FUNCEME`,
-      },
-      {
         type: "warning",
-        message: `Não foi possível obter dados de medição ${equipmentCode} de ${EQUIPMENT_TYPE.PLUVIOMETERS}, salvando dados sem medições.`,
-      },
-      {
-        type: "info",
-        message: "Sucesso ao salvar leituras",
+        message: `Não foi possível obter dados de medições do equipamento ${equipmentCode} do dia ${request.getDate()}, salvando dados sem medições.`,
+        raw: {
+          equipment: equipments[0].IdEquipment,
+        },
       },
     ]);
   });
