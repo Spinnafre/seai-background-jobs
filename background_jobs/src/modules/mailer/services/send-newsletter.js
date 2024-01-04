@@ -27,6 +27,8 @@ export class SendNewsletterEmail {
         });
       }
 
+      console.log(news);
+
       const contentBuffer = news.Data;
 
       const buffer = Buffer.from(contentBuffer); // converte para buffer de dados binários crús (chunk of data)

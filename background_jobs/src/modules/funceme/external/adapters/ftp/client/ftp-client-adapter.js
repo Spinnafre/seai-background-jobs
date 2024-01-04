@@ -39,14 +39,17 @@ export class FTPClientAdapter {
     });
   }
 
-  async getFolderContentDescription(folder){
-    return new Promise((resolve,reject)=>{
-      this.connection.list(folder,(err,files)=>{
-        if(err) return reject(err);
-        
+  async getFolderContentDescription(folder) {
+    return new Promise((resolve, reject) => {
+      this.connection.cwd("/", (error) => {
+        if (error) reject(error);
+      });
+      this.connection.list(folder, (err, files) => {
+        if (err) return reject(err);
+
         resolve(files);
-      })
-    })
+      });
+    });
   }
 
   async connect({ host, user, password }) {
