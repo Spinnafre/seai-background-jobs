@@ -59,7 +59,6 @@ export class FetchFuncemeMeasures extends ServiceProtocol {
     );
 
     const filteredByDate = this.filterByDate(filteredByEquipments, params.date);
-
     return filteredByDate;
   }
 
@@ -89,28 +88,37 @@ export class FetchFuncemeMeasures extends ServiceProtocol {
 
     const equipmentsCodes = equipments.map((eqp) => eqp.code);
 
-    const fileDescription = await this.fetchFtpData.getFileDescriptions(this.directory.folder,request.getYear());
+    const fileDescription = await this.fetchFtpData.getFileDescriptions(
+      this.directory.folder,
+      request.getYear()
+    );
 
-    console.log('fileDescription ::: ',fileDescription)
+    if (fileDescription == null) {
+      const errorMSG = new Error(
+        `Não foi possível encontrar arquivo de ${this.equipmentType} da pasta ${this.directory.folder}`
+      );
 
-    if(fileDescription == null){
       Logger.error({
-        msg:`Não foi possível encontrar arquivo de ${this.equipmentType} da pasta ${this.directory.folder}`
-      })
-      return Left.create(new Error(`Não foi possível encontrar arquivo de ${this.equipmentType} da pasta ${this.directory.folder}`))
+        msg: errorMSG.message,
+        obj: errorMSG,
+      });
+
+      this.logs.addErrorLog({
+        message: errorMSG.message,
+      });
+
+      return Left.create(errorMSG);
     }
 
     Logger.info({
       obj: fileDescription,
-      msg:`Sucesso ao obter arquivos do diretório ${this.directory.folder}`
-    })
+      msg: `Sucesso ao obter arquivos do diretório ${this.directory.folder}`,
+    });
 
-    const rawMeasuresOrError = await this.fetchFtpData.getDataFromDirectory(
-      {
-        folder:this.directory.folder,
-        fileName: fileDescription.name
-      }
-    );
+    const rawMeasuresOrError = await this.fetchFtpData.getDataFromDirectory({
+      folder: this.directory.folder,
+      fileName: fileDescription.name,
+    });
 
     if (rawMeasuresOrError.isError()) {
       this.logs.addErrorLog(rawMeasuresOrError.error());

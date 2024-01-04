@@ -26,33 +26,34 @@ export class FetchFTPData {
     }
   }
 
-  async getFileDescriptions(folder,fileName=null){
-    const filesDescriptionsFromFolder = await this.ftpConnection.getFolderContentDescription(folder);
-    // console.log(filesDescriptionsFromFolder)
-    if(filesDescriptionsFromFolder.length === 0){
-      return null
+  async getFileDescriptions(folder, fileName = null) {
+    const filesDescriptionsFromFolder =
+      await this.ftpConnection.getFolderContentDescription(folder);
+
+    if (filesDescriptionsFromFolder.length === 0) {
+      return null;
     }
 
-    if(!fileName){
-      return filesDescriptionsFromFolder
+    if (!fileName) {
+      return filesDescriptionsFromFolder;
     }
 
-    const fileDescription = filesDescriptionsFromFolder.filter(file =>{
-      return file.name.includes(fileName)
-    })
+    const fileDescription = filesDescriptionsFromFolder.filter((file) => {
+      return file.name.includes(fileName);
+    });
 
-    if(fileDescription.length === 0){
-      return null
+    if (fileDescription.length === 0) {
+      return null;
     }
 
-    const {type,name,size,date} = fileDescription[0]
+    const { type, name, size, date } = fileDescription[0];
 
     return {
       type,
       name,
       date,
-      size
-    }
+      size,
+    };
   }
 
   async getDataFromDirectory({ folder, fileName }) {

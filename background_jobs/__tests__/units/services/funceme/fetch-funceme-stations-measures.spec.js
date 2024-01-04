@@ -12,8 +12,12 @@ import {
 import { FuncemeServicesFactory } from "../../factories/services/funceme/funceme-services.js";
 import { FetchFTPData } from "../../../../src/modules/funceme/services/fetch-ftp-data.js";
 import { FuncemeScrapperWorkerDTO } from "../../../../src/workers/handlers/funceme/dto.js";
-import { EQUIPMENT_TYPE } from "../../../../src/modules/funceme/config/equipments-types.js";
-import { StationReadRepositoryInMemory,MetereologicalEquipmentRepositoryInMemory } from "../../../doubles/infra/repositories/inMemory";
+
+import {
+  StationReadRepositoryInMemory,
+  MetereologicalEquipmentRepositoryInMemory,
+} from "../../../doubles/infra/repositories/inMemory";
+
 import { FTPClientAdapterMock } from "../../../doubles/infra/services/ftp/ftp-stub.js";
 
 describe("# Station-Measures-Data-Miner", () => {
@@ -24,7 +28,6 @@ describe("# Station-Measures-Data-Miner", () => {
 
   beforeEach(() => {
     jest.useFakeTimers("modern");
-    // jest.setSystemTime(new Date(2023, 3, 2));
   });
 
   afterEach(() => {
@@ -47,7 +50,7 @@ describe("# Station-Measures-Data-Miner", () => {
     }).makeFetchFuncemeStationsMeasures();
   });
 
-  test("When has equipments but measures not exists, should be able to save measures data with null", async function () {
+  test("When FTP folder not exists should be able to exit with error", async function () {
     jest.setSystemTime(new Date(1920, 4, 2));
 
     const stationCode = "B8524E9A";
@@ -89,21 +92,82 @@ describe("# Station-Measures-Data-Miner", () => {
       equipments[1]
     );
 
-    const ftpMocked = jest.spyOn(ftpAdapterMock,'getFolderContentDescription').mockResolvedValue([
-      {
-        type:'-',
-        name:'stn_data_2023.tar.gz',
-        size:100,
-        date: new Date()
-      }
-    ])
+    const ftpMocked = jest
+      .spyOn(ftpAdapterMock, "getFolderContentDescription")
+      .mockResolvedValue([
+        {
+          type: "-",
+          name: "stn_data_XXX.tar.gz",
+          size: 100,
+          date: new Date(),
+        },
+      ]);
 
     const dto = new FuncemeScrapperWorkerDTO();
 
     await service.execute(dto);
 
     const logs = service.getLogs();
-    console.log(stationReadRepositorySpy.mock.calls[0])
+
+    expect(stationReadRepositorySpy).not.toBeCalled();
+
+    const stationsMeasures = await stationReadRepository.list();
+
+    expect(stationsMeasures.length).toBe(0);
+
+    expect(logs).toEqual([
+      {
+        type: "error",
+        message: "Não foi possível encontrar arquivo de station da pasta pcds",
+      },
+    ]);
+  });
+
+  test("When has equipments but measures is empty, should be able to save measures data with null", async function () {
+    const year = 2023;
+    jest.setSystemTime(new Date(year, 11, 2));
+
+    const stationCode = "B8524E9A";
+
+    const equipments = [
+      {
+        IdEquipment: 1,
+        IdEquipmentExternal: stationCode,
+        Name: "Fortaleza",
+        Altitude: 35,
+        Organ_Id: 2,
+        Organ: "FUNCEME",
+        Type: "station",
+        CreatedAt: new Date(),
+        UpdatedAt: null,
+      },
+    ];
+
+    const stationReadRepositorySpy = jest.spyOn(
+      stationReadRepository,
+      "create"
+    );
+
+    await metereologicalEquipmentRepository.createMetereologicalEquipment(
+      equipments[0]
+    );
+
+    const ftpMocked = jest
+      .spyOn(ftpAdapterMock, "getFolderContentDescription")
+      .mockResolvedValue([
+        {
+          type: "-",
+          name: `stn_data_${year}.tar.gz`,
+          size: 100,
+          date: new Date(),
+        },
+      ]);
+
+    const dto = new FuncemeScrapperWorkerDTO();
+
+    await service.execute(dto);
+
+    const logs = service.getLogs();
 
     expect(stationReadRepositorySpy).toHaveBeenCalled();
 
@@ -127,22 +191,18 @@ describe("# Station-Measures-Data-Miner", () => {
 
     expect(logs).toEqual([
       {
-        type: "info",
-        message: `Iniciando busca de dados de medições de ${EQUIPMENT_TYPE.STATIONS} da FUNCEME`,
-      },
-      {
         type: "warning",
-        message: `Não foi possível obter dados de medição ${stationCode} de ${EQUIPMENT_TYPE.STATIONS}, salvando dados sem medições.`,
-      },
-      {
-        type: "info",
-        message: "Sucesso ao salvar leituras",
+        message: `Não foi possível obter dados de medições do equipamento ${stationCode} do dia ${dto.getDate()}, salvando dados sem medições.`,
+        raw: {
+          equipment: equipments[0].IdEquipment,
+        },
       },
     ]);
   });
 
   test("When has stations measures in funceme stations files, should create log with success and save stations with measures", async function () {
-    jest.setSystemTime(new Date(2023, 0, 2));
+    const year = 2023;
+    jest.setSystemTime(new Date(year, 0, 2));
 
     const equipmentCode = "B8524E9A";
 
@@ -158,18 +218,18 @@ describe("# Station-Measures-Data-Miner", () => {
         CreatedAt: new Date(),
         UpdatedAt: null,
       },
-      {
-        IdEquipment: 2,
-        IdEquipmentExternal: "A205",
-        Name: "Teste",
-        Altitude: null,
-        Organ_Id: 2,
-        Organ: "FUNCEME",
-        Type: "pluviometer",
-        CreatedAt: new Date(),
-        UpdatedAt: null,
-      },
     ];
+
+    const ftpMocked = jest
+      .spyOn(ftpAdapterMock, "getFolderContentDescription")
+      .mockResolvedValue([
+        {
+          type: "-",
+          name: `stn_data_${year}.tar.gz`,
+          size: 100,
+          date: new Date(),
+        },
+      ]);
 
     const stationReadRepositorySpy = jest.spyOn(
       stationReadRepository,
@@ -178,9 +238,6 @@ describe("# Station-Measures-Data-Miner", () => {
 
     await metereologicalEquipmentRepository.createMetereologicalEquipment(
       equipments[0]
-    );
-    await metereologicalEquipmentRepository.createMetereologicalEquipment(
-      equipments[1]
     );
 
     const dto = new FuncemeScrapperWorkerDTO();
@@ -214,20 +271,19 @@ describe("# Station-Measures-Data-Miner", () => {
     expect(logs).toEqual([
       {
         type: "info",
-        message: `Iniciando busca de dados de medições de ${EQUIPMENT_TYPE.STATIONS} da FUNCEME`,
-      },
-      {
-        type: "info",
-        message: `Sucesso ao obter dados de medição de ${EQUIPMENT_TYPE.STATIONS} com código ${equipmentCode}`,
-      },
-      {
-        type: "info",
-        message: `Sucesso ao salvar leituras`,
+        message: `Sucesso ao obter dados de medições do equipamento ${equipmentCode}`,
+        raw: {
+          equipment: equipments[0].IdEquipment,
+        },
       },
     ]);
   });
+
   test("When stations codes not exists in funceme stations files, should create log with error and save stations without measures", async function () {
-    jest.setSystemTime(new Date(2023, 7, 2));
+    const year = 2023;
+
+    jest.setSystemTime(new Date(year, 7, 2));
+
     const equipments = [
       {
         IdEquipment: 1,
@@ -246,6 +302,17 @@ describe("# Station-Measures-Data-Miner", () => {
       stationReadRepository,
       "create"
     );
+
+    jest
+      .spyOn(ftpAdapterMock, "getFolderContentDescription")
+      .mockResolvedValue([
+        {
+          type: "-",
+          name: `stn_data_${year}.tar.gz`,
+          size: 100,
+          date: new Date(),
+        },
+      ]);
 
     await metereologicalEquipmentRepository.createMetereologicalEquipment(
       equipments[0]
@@ -279,16 +346,13 @@ describe("# Station-Measures-Data-Miner", () => {
 
     expect(service.getLogs()).toEqual([
       {
-        type: "info",
-        message: `Iniciando busca de dados de medições de ${EQUIPMENT_TYPE.STATIONS} da FUNCEME`,
-      },
-      {
         type: "warning",
-        message: `Não foi possível obter dados de medição AA@!@#925 de ${EQUIPMENT_TYPE.STATIONS}, salvando dados sem medições.`,
-      },
-      {
-        type: "info",
-        message: "Sucesso ao salvar leituras",
+        message: `Não foi possível obter dados de medições do equipamento ${
+          equipments[0].IdEquipmentExternal
+        } do dia ${dto.getDate()}, salvando dados sem medições.`,
+        raw: {
+          equipment: equipments[0].IdEquipment,
+        },
       },
     ]);
   });
