@@ -16,87 +16,70 @@ app.use((request, response, next) => {
   next();
 });
 
-/*
-app.post("/send-forgot-email", async (req, res) => {
-  const { user_email, login, token } = req.query;
-
+app.get("/jobs/states", async (req, res) => {
   try {
-    const command = {
-      to: user_email,
-      subject: "Redefinição de senha",
-      context: { email: user_email, token, login },
-      templateName: "forgot_password",
-    };
-
-    await pool.query(
-      `
-      INSERT INTO pgboss.job (
-        "name",
-        priority,
-        "data",
-        retrylimit,
-        retrydelay
-        ) VALUES($1,$2,$3,$4,$5)`,
-      ["mailer", 0, command, 3, 15000]
-    );
-
+    const result = await connection.fetchJobsStates();
+    const jobs = result.map((raw) => raw.state);
     return res.status(200).json({
-      message: "Recebemos o seu email, enviaremos o email assim que possível.",
+      status: "success",
+      data: jobs,
     });
   } catch (error) {
-    console.error(error);
-    return res.status(400).json({
-      message: "Falha ao enviar email de recuperação de senha",
+    Logger.error({
+      msg: "Falha ao buscar lista de stados dos JOBS",
+      obj: error,
+    });
+
+    return res.status(404).json({
+      status: "error",
+      message: "Internal server error",
     });
   }
-});
-
-app.post("/send-new-user-email", async (req, res) => {
-  const { user_email, token } = req.query;
-
-  try {
-    const command = {
-      to: user_email,
-      subject: "Cadastro de usuário",
-      context: { email: user_email, token },
-      templateName: "create_user_account",
-    };
-
-    await pool.query(
-      `
-      INSERT INTO pgboss.job (
-        "name",
-        priority,
-        "data",
-        retrylimit,
-        retrydelay
-        ) VALUES($1,$2,$3,$4,$5)`,
-      ["mailer", 0, command, 3, 15000]
-    );
-
-    return res.status(200).json({
-      message: "Recebemos o seu email, enviaremos o email assim que possível.",
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(400).json({
-      message: "Falha ao enviar email de cadastro de usuário",
-    });
-  }
-});
-
-
-*/
-app.post("/jobs/schedule", async (req, res) => {
-  return res.status(200).json({
-    message: "TODO",
-  });
 });
 
 app.put("/jobs/schedule", async (req, res) => {
   return res.status(200).json({
     message: "TODO",
   });
+});
+
+app.delete("/jobs/schedule", async (req, res) => {
+  try {
+    if (Reflect.has(req.query, "name") === false) {
+      return res.status(404).json({
+        status: "error",
+        message: "'name' is required",
+      });
+    }
+
+    const scheduleName = req.query.name;
+
+    const schedule = await connection.fetchScheduleByQueueName(scheduleName);
+
+    if (schedule == null) {
+      return res.status(400).json({
+        mstatus: "error",
+        message: `Schedule ${scheduleName} not exists`,
+      });
+    }
+
+    await connection.deleteSchedule(scheduleName);
+
+    return res.status(200).json({
+      mstatus: "success",
+      message: `Schedule ${scheduleName} deleted successfully`,
+    });
+  } catch (error) {
+    Logger.error({
+      msg: `Falha ao deleter job`,
+      obj: error,
+    });
+
+    return res.status(404).json({
+      status: "error",
+      message: `Falha ao realizar a operação.`,
+    });
+  }
 });
 
 app.get("/jobs/schedule", async (req, res) => {
@@ -139,13 +122,65 @@ app.get("/jobs/schedule", async (req, res) => {
   }
 });
 
-app.put("/jobs/queue", async (req, res) => {
-  return res.status(200).json({
-    message: "TODO",
-  });
+app.post("/jobs/schedule", async (req, res) => {
+  try {
+    const { data } = req.body;
+
+    const errors = [];
+
+    if (data === undefined || data === null) {
+      errors.push("The params 'data' not exists");
+    }
+
+    if (errors.length) {
+      return res.status(400).json({
+        status: "error",
+        data: errors.join(" , "),
+      });
+    }
+
+    const defaultScheduleOptions = {
+      tz: "America/Fortaleza",
+      priority: 1,
+      retryDelay: 60,
+      retryLimit: 3,
+    };
+
+    const dto = {
+      queue: data.queue,
+      cron: data.cron,
+      timezone: defaultScheduleOptions.tz,
+      data: data.data ? JSON.stringify(data.data) : null,
+      options: defaultScheduleOptions,
+    };
+
+    if (data.options) {
+      Object.assign(dto.options, {
+        priority: data.priority,
+        retryDelay: data.retryDelay,
+        retryLimit: data.retryLimit,
+      });
+    }
+
+    const result = await connection.schedule(dto);
+
+    return res.status(201).json({
+      status: "success",
+      data: result,
+    });
+  } catch (error) {
+    Logger.error({
+      msg: "Falha ao buscar dados de JOBS",
+      obj: error,
+    });
+    return res.status(404).json({
+      status: "error",
+      message: "Internal server error",
+    });
+  }
 });
 
-app.post("/jobs/queue", async (req, res) => {
+app.post("/jobs", async (req, res) => {
   try {
     const { jobs } = req.body;
 
@@ -194,15 +229,23 @@ app.post("/jobs/queue", async (req, res) => {
   }
 });
 
-app.get("/jobs/queue", async (req, res) => {
+app.get("/jobs", async (req, res) => {
   try {
     const { queue, state, page } = req.query;
 
     const errors = [];
 
-    const hasValidStates =
-      state &&
-      [
+    if (typeof page !== "number" && page < 0) {
+      errors.push("Página deve ser númerico e não deve ser menor do que 0");
+    }
+
+    const dto = {
+      queue: queue || null,
+      page: page < 0 ? 0 : page,
+    };
+
+    if (req.query.state) {
+      const hasValidStates = [
         "created",
         "expired",
         "completed",
@@ -210,14 +253,15 @@ app.get("/jobs/queue", async (req, res) => {
         "active",
         "failed",
         "cancelled",
-      ].includes(state);
+      ].includes(req.query.state);
 
-    if (hasValidStates == false) {
-      errors.push("Estado de jobs não é válido");
-    }
-
-    if (typeof page !== "number" && page < 0) {
-      errors.push("Página deve ser númerico e não deve ser menor do que 0");
+      if (hasValidStates == false) {
+        errors.push("Estado de jobs não é válido");
+      } else {
+        Object.assign(dto, {
+          state: req.query.state || "created",
+        });
+      }
     }
 
     if (errors.length) {
@@ -227,13 +271,7 @@ app.get("/jobs/queue", async (req, res) => {
       });
     }
 
-    const dto = {
-      queue: queue || null,
-      state: state || "created",
-      page: page < 0 ? 0 : page,
-    };
-
-    const result = await connection.fetchCreatedJobs(dto);
+    const result = await connection.fetchJobs(dto);
 
     return res.status(200).json({
       status: "success",

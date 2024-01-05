@@ -119,14 +119,67 @@ class PgDAO {
     await this.#connection.end();
   }
 
-  async schedule(name_queue, cron, data, options) {
-    // await PgDAO.instance.schedule(name_queue, cron, data, options);
+  async createSchedule(request) {
+    const { queue, cron, timezone, data, options } = request;
+
+    await this.#connection.query(
+      `
+      INSERT INTO pgboss.schedule
+      ("name", cron, timezone, "data", "options", updated_on)
+      VALUES($1, $2, $3, $4, $5, now());
+    `,
+      [queue, cron, timezone, data, options]
+    );
+  }
+
+  async deleteSchedule(queueName) {
+    await this.#connection.query(
+      `
+      DELETE FROM pgboss.schedule
+      WHERE "name"= $1;
+    `,
+      [queueName]
+    );
+  }
+
+  async updateSchedule(request) {
+    const { queue, cron, timezone, data, options } = request;
+
+    await this.#connection.query(
+      `
+      UPDATE pgboss.schedule
+      SET cron=$2, timezone=$3, "data"=$4, "options"=$5
+      WHERE "name"=$1;
+    `,
+      [queue, cron, timezone, data, options]
+    );
+  }
+
+  async fetchScheduleByQueueName(queue) {
+    const { rows } = await this.#connection.query(
+      `
+      SELECT "name", cron, timezone, "data", "options", created_on, updated_on
+      FROM pgboss.schedule
+      WHERE "name"=$1;
+    `,
+      [queue]
+    );
+
+    console.log("schedule :: ", rows);
+
+    if (!rows.length) {
+      return null;
+    }
+
+    const schedule = rows[0];
+
+    return schedule;
   }
 
   async fetchJobsStates() {
-    const { rows } = await this.#connection.query(
+    const { rows, rowCount } = await this.#connection.query(
       `SELECT     
-       e.enumlabel AS states
+       e.enumlabel AS state
         FROM
             pg_type t
         JOIN pg_enum e ON
@@ -137,68 +190,88 @@ class PgDAO {
             t.typname = 'job_state';`
     );
 
-    return {
-      states: rows,
-    };
+    return rows;
   }
 
   async fetchCronJobs({ page, queue }) {
-    const args = [page];
-    const whereSql = [];
+    const limit = 50;
+    const pageNumber = Number(page) || 1;
+    const pageOffset = pageNumber ? (pageNumber - 1) * limit : 0;
+    const args = [pageOffset];
+    const whereQueries = [];
+    const whereClause = [];
 
-    const params = [
-      {
-        value: queue,
-        query: `WHERE  "name" = $2`,
-      },
-    ];
+    let baseQuery = `SELECT "name", cron, timezone, "data", "options", created_on, updated_on
+      FROM pgboss.schedule \n`;
 
-    params.forEach((command) => {
-      if (command.value !== null || command.value !== undefined) {
-        whereSql.push(command.query);
-        args.push(command.value);
-      }
-    });
+    if (queue) {
+      whereQueries.push({ query: `"name" = $`, params: queue });
+    }
 
-    const query = `
-      SELECT "name", cron, timezone, "data", "options", created_on, updated_on
-      FROM pgboss.schedule
-      ${whereSql.join("")}
-      LIMIT 50 OFFSET $1`;
-    const { rowCount, rows } = await this.#connection.query(query, args);
+    if (whereQueries.length) {
+      whereQueries.forEach((param) => {
+        if (param.params) {
+          whereClause.push(param.query.concat(args.length + 1));
+          args.push(param.params);
+        }
+      });
+
+      baseQuery += `WHERE ${whereClause.join(" AND ")} \n`;
+    }
+
+    baseQuery += "LIMIT 50 OFFSET $1;";
+
+    console.log(baseQuery);
+
+    const { rowCount, rows } = await this.#connection.query(baseQuery, args);
 
     return {
       count: rowCount,
-      page,
+      page: pageNumber,
+      limit,
       value: rows,
     };
   }
 
-  async fetchCreatedJobs({ page, state, queue }) {
+  async fetchJobs({ page, state, queue }) {
     const whereClause = [`WHERE "name" NOT LIKE '__pgboss%'`];
-    const args = [page];
+    const limit = 50;
+    const pageNumber = Number(page) || 1;
+    const pageOffset = pageNumber ? (pageNumber - 1) * limit : 0;
+    const args = [pageOffset];
 
-    [
-      { query: `"name" = $`, params: queue },
-      { query: `"state" = $`, params: state },
-    ].forEach((param, index) => {
-      if (param.params) {
-        whereClause.push(param.query.concat(args.length + 1));
-        args.push(param.params);
-      }
-    });
+    const whereQueries = [];
 
-    const { rowCount, rows } = await this.#connection.query(
-      `SELECT id, "name", priority, "data", state, retrylimit, retrycount, retrydelay, retrybackoff, startafter, startedon, expirein, createdon, completedon, keepuntil, on_complete, "output"
-      FROM pgboss.job
-      ${whereClause.join(" AND ")}
-      LIMIT 50 OFFSET $1;`,
-      args
-    );
+    if (queue) {
+      whereQueries.push({ query: `"name" = $`, params: queue });
+    }
+
+    if (state) {
+      whereQueries.push({ query: `"state" = $`, params: state });
+    }
+
+    let baseQuery = `SELECT id, "name", priority, "data", state, retrylimit, retrycount, retrydelay, retrybackoff, startafter, startedon, expirein, createdon, completedon, keepuntil, on_complete, "output"
+      FROM pgboss.job \n`;
+
+    if (whereQueries.length) {
+      whereQueries.forEach((param) => {
+        if (param.params) {
+          whereClause.push(param.query.concat(args.length + 1));
+          args.push(param.params);
+        }
+      });
+    }
+
+    baseQuery += `${whereClause.join(" AND ")}`;
+
+    baseQuery += "\n LIMIT 50 OFFSET $1;";
+
+    const { rowCount, rows } = await this.#connection.query(baseQuery, args);
 
     return {
       count: rowCount,
-      page,
+      page: pageNumber,
+      limit,
       value: rows,
     };
   }
