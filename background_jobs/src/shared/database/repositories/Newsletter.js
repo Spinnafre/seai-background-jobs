@@ -1,5 +1,5 @@
 import { connections } from "../connection.js";
-import { DATABASES_NAMES } from "../databases.js";
+import { DATABASES } from "../databases.js";
 
 export class DbNewsLetterRepository {
   async getNewsById(id) {
@@ -15,8 +15,8 @@ export class DbNewsLetterRepository {
           n."UpdatedAt",
           s."Email" ,
           s."Organ" 
-      FROM "${DATABASES_NAMES.NEWSLETTER.NEWS}" n 
-      INNER JOIN "${DATABASES_NAMES.NEWSLETTER.SENDER}" s 
+      FROM "${DATABASES.NEWSLETTER.NEWS}" n 
+      INNER JOIN "${DATABASES.NEWSLETTER.SENDER}" s 
       ON s."Id" = n."Fk_Sender" 
       WHERE n."Id" = ?
     `,

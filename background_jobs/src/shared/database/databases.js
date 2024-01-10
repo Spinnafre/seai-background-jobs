@@ -1,4 +1,4 @@
-export const DATABASES_NAMES = {
+export const DATABASES = {
   GOVERNMENT: "government",
   LOGS: "logs",
   CENSUS: "census",
