@@ -1,6 +1,6 @@
 import { AccountNotificationDTO } from "./dto";
 
-export class SendUserAccountNotification {
+export class SendUserAccountNotificationWorker {
   static name_queue = "account-notification";
   static worker_name = "SendUserAccountNotification";
 
