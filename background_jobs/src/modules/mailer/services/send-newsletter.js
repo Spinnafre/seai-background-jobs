@@ -1,7 +1,7 @@
 import { Logger } from "../../../shared/logger.js";
 import { Left, Right } from "../../../shared/result.js";
-import { mailerConfig } from "../config/mailer.js";
-import { toHTML } from "../helpers/convertToBlob.js";
+import { MAILER_CONFIG } from "../config/mailer.js";
+import { bufferToBlob, blobToHTML } from "../helpers/convertToBlob.js";
 
 export class SendNewsletterEmail {
   constructor(repository, sendMailAdapter) {
@@ -9,8 +9,10 @@ export class SendNewsletterEmail {
     this.sendMail = sendMailAdapter;
   }
 
-  async execute(idNews) {
+  async execute(request) {
     try {
+      const { idNews } = request;
+
       Logger.info(`Iniciando envio de emails da notícia ${idNews}`);
 
       const news = await this.repository.getNewsById(idNews);
@@ -29,33 +31,21 @@ export class SendNewsletterEmail {
 
       console.log(news);
 
-      const contentBuffer = news.Data;
-
-      const buffer = Buffer.from(contentBuffer); // converte para buffer de dados binários crús (chunk of data)
-
-      const blob = new Blob([buffer]);
-
-      const html = await toHTML(blob);
+      const html = await blobToHTML(bufferToBlob(news.Data));
 
       const mailList =
         subscribers && subscribers.length
           ? [
               ...subscribers.map((data) => data.Email),
-              ...[mailerConfig.to],
+              ...[MAILER_CONFIG.to],
             ].join(",")
-          : [mailerConfig.to].join(",");
+          : [MAILER_CONFIG.to].join(",");
 
       Logger.info("Enviando newsletter...");
 
       await this.sendMail.send({
-        host: mailerConfig.host,
-        port: mailerConfig.port,
-        username: mailerConfig.auth.username,
-        password: mailerConfig.auth.password,
-        from: mailerConfig.from,
         to: mailList,
         subject: "NEWSLETTER",
-        text: "TESTANDO NEWSLETTER",
         html,
         cc: "*******",
       });

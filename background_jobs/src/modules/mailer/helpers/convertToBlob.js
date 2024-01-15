@@ -21,7 +21,7 @@ export function blobToBase64(blob) {
   return blob.stream().pipeThrough(new TextDecoderStream());
 }
 
-export function toBlob() {
+function toBlob() {
   return new TransformStream({
     transform(chunk, controller) {
       const dataURL = chunk.toString();
@@ -30,7 +30,13 @@ export function toBlob() {
   });
 }
 
-export async function toHTML(blob) {
+export function bufferToBlob(contentBuffer) {
+  const buffer = Buffer.from(contentBuffer); // converte para buffer de dados binários crús (chunk of data)
+
+  return new Blob([buffer]);
+}
+
+export async function blobToHTML(blob) {
   const readable = blobToBase64(blob).pipeThrough(toBlob());
 
   let html = "";

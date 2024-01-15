@@ -1,4 +1,4 @@
-export const mailerConfig = {
+export const MAILER_CONFIG = {
   auth: {
     username: process.env.MAIL_USERNAME,
     password: process.env.MAIL_PASSWORD,

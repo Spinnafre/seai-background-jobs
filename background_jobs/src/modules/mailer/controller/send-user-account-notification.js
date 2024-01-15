@@ -1,7 +1,7 @@
 import { Logger } from "../../../shared/logger.js";
 import { Left, Right } from "../../../shared/result.js";
 
-export class SendNewsLetterController {
+export class SendUserAccountNotificationController {
   #useCase;
 
   constructor(useCase) {
@@ -10,9 +10,19 @@ export class SendNewsLetterController {
 
   async handle(request) {
     try {
-      const idNews = request.getNewsId();
+      const useCaseDTO = {
+        to: request.getRecipientEmail(),
+        subject: request.getSubject(),
+        action: request.getAction(),
+      };
 
-      const resultOrError = await this.#useCase.execute(idNews);
+      if (request.hasPlainText()) {
+        Object.assign(useCaseDTO, {
+          text: request.getPlainText(),
+        });
+      }
+
+      const resultOrError = await this.#useCase.execute(useCaseDTO);
 
       if (resultOrError.isError()) {
         return Left.create(resultOrError.error().message);
@@ -21,11 +31,9 @@ export class SendNewsLetterController {
       return Right.create();
     } catch (error) {
       Logger.error({
-        msg: "Falha ao executar worker de enviar notícias",
+        msg: "Falha ao executar worker de enviar emails",
         obj: error,
       });
-
-      //Essencial para o PG-BOSS entender que ocorreu um erro
       return Left.create(error);
     }
   }

@@ -1,24 +1,34 @@
 import nodemailer from "nodemailer";
 
-export class NodemailerAdapter {
+export class SendEmailService {
   async send(options) {
     const transporter = nodemailer.createTransport({
-      host: options.host,
-      port: options.port,
+      host: MAILER_CONFIG.host,
+      port: MAILER_CONFIG.port,
       auth: {
-        user: options.username,
-        pass: options.password,
+        user: MAILER_CONFIG.auth.username,
+        pass: MAILER_CONFIG.auth.password,
       },
     });
 
     const command = {
-      from: options.from,
+      from: MAILER_CONFIG.from,
       to: options.to,
       subject: options.subject,
-      text: options.text,
-      html: options.html,
       attachments: options.attachments,
     };
+
+    if (options.text) {
+      Object.assign(command, {
+        text: options.text,
+      });
+    }
+
+    if (options.html) {
+      Object.assign(command, {
+        html: options.html,
+      });
+    }
 
     if (options.cc) {
       Object.assign(command, {
