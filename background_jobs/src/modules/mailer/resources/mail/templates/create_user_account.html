@@ -60,7 +60,7 @@
 <body>
     <div class="Container-Mail">
         <div class="Container-Content">
-            <h1>Criação de conta</h1>
+            <h1>{{subject}}</h1>
             <p>Você está recebendo esta mensagem por que você (ou alguém) criou uma conta no <b>SEAI</b> associada a
                 esse e-mail.<br>
                 Por favor, clique no link abaixo ou copie e cole no seu navegador para realizar o cadastro da sua conta
@@ -72,7 +72,7 @@
                         rel="noopener noreferrer">http://seai.com/create-user-account?action=verify&token={{token}}</a>
                 </li>
             </ul>
-            <p>Se houver algum questionamento você pode entrar em contato com <b>suporteseai@email.com</p>
+            <p>Se houver algum questionamento você pode entrar em contato com <b>{{from}}</p>
 
             <p>Se não reconhece a conta do SEAI <a href="mailto:{{email}}">{{email}}</a> , você pode <a
                     href="https://www.google.com/">clicar aqui</a> para remover seu endereço de email dessa conta.</p>

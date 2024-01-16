@@ -1,6 +1,6 @@
 export const HTML_TEMPLATES = (function () {
-  const dir = "resources/mail/templates";
-  return new Map(
+  const dir = "./resources/mail/templates";
+  return new Map([
     [
       "createUserAccount",
       {
@@ -12,6 +12,6 @@ export const HTML_TEMPLATES = (function () {
       {
         path: `${dir}/forgot_password.html`,
       },
-    ]
-  );
+    ],
+  ]);
 })();

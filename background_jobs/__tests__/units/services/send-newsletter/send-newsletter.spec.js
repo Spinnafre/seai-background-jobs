@@ -4,7 +4,7 @@ import { describe, expect, test, jest } from "@jest/globals";
 import { DbNewsLetterRepositoryInMemory } from "../../../doubles/infra/repositories/inMemory/newsletter";
 import { NodemailerAdapterStub } from "../../../doubles/infra/services/mailer/send-email";
 import { SendNewsletterEmail } from "../../../../src/modules/mailer/services/send-newsletter";
-import { mailerConfig } from "../../../../src/modules/mailer/config/mailer";
+import { MAILER_CONFIG } from "../../../../src/modules/mailer/config/mailer";
 
 describe("# Send Newsletter", () => {
   test("When has news should be able to send newsletter emails", async () => {
@@ -63,12 +63,12 @@ describe("# Send Newsletter", () => {
     expect(result.data).toBe("Sucesso ao enviar notícia");
     expect(sendEmailServiceWatch).toBeCalledTimes(1);
     expect(sendEmailServiceWatch).toBeCalledWith({
-      host: mailerConfig.host,
-      port: mailerConfig.port,
-      username: mailerConfig.auth.username,
-      password: mailerConfig.auth.password,
-      from: mailerConfig.from,
-      to: `test1@gmail.com,${mailerConfig.to}`,
+      host: MAILER_CONFIG.host,
+      port: MAILER_CONFIG.port,
+      username: MAILER_CONFIG.auth.username,
+      password: MAILER_CONFIG.auth.password,
+      from: MAILER_CONFIG.from,
+      to: `test1@gmail.com,${MAILER_CONFIG.to}`,
       subject: "NEWSLETTER",
       text: "TESTANDO NEWSLETTER",
       html:
@@ -161,12 +161,12 @@ describe("# Send Newsletter", () => {
     expect(sendEmailServiceWatch).toBeCalledTimes(1);
     expect(sendEmailServiceWatch).toBeCalledTimes(1);
     expect(sendEmailServiceWatch).toBeCalledWith({
-      host: mailerConfig.host,
-      port: mailerConfig.port,
-      username: mailerConfig.auth.username,
-      password: mailerConfig.auth.password,
-      from: mailerConfig.from,
-      to: `${mailerConfig.to}`,
+      host: MAILER_CONFIG.host,
+      port: MAILER_CONFIG.port,
+      username: MAILER_CONFIG.auth.username,
+      password: MAILER_CONFIG.auth.password,
+      from: MAILER_CONFIG.from,
+      to: `${MAILER_CONFIG.to}`,
       subject: "NEWSLETTER",
       text: "TESTANDO NEWSLETTER",
       html:

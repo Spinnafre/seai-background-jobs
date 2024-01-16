@@ -5,6 +5,6 @@ export const MAILER_CONFIG = {
   },
   port: Number(process.env.MAIL_PORT),
   host: process.env.MAIL_HOST,
-  from: process.env.MAIL_FROM,
+  from: process.env.MAIL_FROM || "test@gmail.com",
   to: "admin@gmail.com",
 };

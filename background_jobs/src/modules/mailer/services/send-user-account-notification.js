@@ -2,10 +2,14 @@ import fs from "node:fs/promises";
 import { Logger } from "../../../shared/logger.js";
 import { Left, Right } from "../../../shared/result.js";
 import { HTML_TEMPLATES } from "../config/resources.js";
+import path from "node:path";
+import { FileNotFoundError } from "../errors/FileNotFound.js";
+import { fileURLToPath } from "node:url";
+import { MAILER_CONFIG } from "../config/mailer.js";
 
 export class SendUserAccountNotification {
-  constructor(sendMailAdapter, htmlTemplateCompiler, templatesFolders = null) {
-    this.sendMail = sendMailAdapter;
+  constructor(sendMailService, htmlTemplateCompiler, templatesFolders = null) {
+    this.sendMail = sendMailService;
     this.htmlTemplateCompiler = htmlTemplateCompiler;
     this.templatesFolders = templatesFolders || HTML_TEMPLATES;
   }
@@ -27,26 +31,33 @@ export class SendUserAccountNotification {
         });
       } else {
         if (this.templatesFolders.has(action) === false) {
-          return Left.create(
-            new Error(
-              `Não foi possível identificar template para para o serviço solicitado`
-            )
+          Logger.error(
+            `Não foi possível identificar template para para o serviço solicitado`
           );
+          return Left.create(new FileNotFoundError(action));
         }
 
-        const { path } = this.templatesFolders.get(action);
+        const templateFolder = this.templatesFolders.get(action);
 
-        Logger.info(`Lendo arquivo  de ${path}...`);
+        Logger.info(`Lendo arquivo  de ${templateFolder.path}...`);
 
-        const templateFile = await fs.readFile(path, {
-          encoding: "utf-8",
-        });
+        const templateFile = await fs.readFile(
+          path.resolve(
+            path.dirname(fileURLToPath(import.meta.url)),
+            "..",
+            templateFolder.path
+          ),
+          {
+            encoding: "utf-8",
+          }
+        );
 
         const html = await this.htmlTemplateCompiler.compile({
           file: templateFile,
           args: {
             email: to,
             subject,
+            from: MAILER_CONFIG.from,
           },
         });
 
