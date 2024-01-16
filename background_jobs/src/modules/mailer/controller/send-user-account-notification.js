@@ -14,6 +14,7 @@ export class SendUserAccountNotificationController {
         to: request.getRecipientEmail(),
         subject: request.getSubject(),
         action: request.getAction(),
+        temporaryAccessToken: request.getTemporaryToken(),
       };
 
       if (request.hasPlainText()) {

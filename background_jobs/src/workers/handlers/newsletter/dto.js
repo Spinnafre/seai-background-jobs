@@ -18,6 +18,7 @@ export class NewsletterMailerDTO extends WorkerHandlerDTO {
     }
 
     super(request);
+    Object.freeze(this);
   }
 
   getNewsId() {

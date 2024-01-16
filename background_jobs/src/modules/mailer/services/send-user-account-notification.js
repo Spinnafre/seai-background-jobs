@@ -16,7 +16,7 @@ export class SendUserAccountNotification {
 
   async execute(request) {
     try {
-      const { to, subject, action } = request;
+      const { to, subject, action, token } = request;
 
       Logger.info(`Iniciando envio de email para  ${to}`);
 
@@ -58,6 +58,7 @@ export class SendUserAccountNotification {
             email: to,
             subject,
             from: MAILER_CONFIG.from,
+            token,
           },
         });
 

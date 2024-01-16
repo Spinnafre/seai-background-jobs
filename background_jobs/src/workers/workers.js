@@ -2,11 +2,13 @@ import {
   makeCalcEtoWorkerHandler,
   makeFetchFuncemeMeasuresHandler,
   makeSendNewsletterHandler,
+  makeSendAccountNotificationHandler,
 } from "./factories/handlers/index.js";
 import {
   FuncemeFTPWorker,
   SendNewsletterWorker,
   CalcET0Worker,
+  SendUserAccountNotificationWorker,
 } from "./handlers/index.js";
 
 export default [
@@ -35,6 +37,16 @@ export default [
       {
         name: SendNewsletterWorker.worker_name,
         process: (command) => makeSendNewsletterHandler().handler(command),
+      },
+    ],
+  },
+  {
+    queue_name: SendUserAccountNotificationWorker.name_queue,
+    workers: [
+      {
+        name: SendUserAccountNotificationWorker.worker_name,
+        process: (command) =>
+          makeSendAccountNotificationHandler().handler(command),
       },
     ],
   },
