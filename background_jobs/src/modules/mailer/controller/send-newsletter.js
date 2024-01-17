@@ -12,7 +12,7 @@ export class SendNewsLetterController {
     try {
       const idNews = request.getNewsId();
 
-      const resultOrError = await this.#useCase.execute(idNews);
+      const resultOrError = await this.#useCase.execute({ idNews });
 
       if (resultOrError.isError()) {
         return Left.create(resultOrError.error().message);

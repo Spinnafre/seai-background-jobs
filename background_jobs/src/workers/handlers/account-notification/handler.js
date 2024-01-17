@@ -1,4 +1,4 @@
-import { AccountNotificationDTO } from "./dto";
+import { AccountNotificationDTO } from "./dto.js";
 
 export class SendUserAccountNotificationWorker {
   static name_queue = "user-account-notification";
@@ -21,12 +21,7 @@ export class SendUserAccountNotificationWorker {
   async handler(payload) {
     const dto = new AccountNotificationDTO(payload);
 
-    const resultOrError = await this.#controller.handle({
-      to: dto.getRecipientEmail(),
-      subject: dto.getSubject(),
-      action: dto.getAction(),
-      token: dto.getTemporaryToken(),
-    });
+    const resultOrError = await this.#controller.handle(dto);
 
     if (resultOrError.isError()) {
       throw resultOrError.error();

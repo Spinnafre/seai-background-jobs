@@ -3,6 +3,7 @@ import { DATABASES } from "../databases.js";
 
 export class DbNewsLetterRepository {
   async getNewsById(id) {
+    console.log("getNewsById >>> id ", id);
     const result = await connections.newsletter.raw(
       `
       SELECT 

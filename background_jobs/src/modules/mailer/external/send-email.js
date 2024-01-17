@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { MAILER_CONFIG } from "../config/mailer.js";
 
 export class SendEmailService {
   async send(options) {

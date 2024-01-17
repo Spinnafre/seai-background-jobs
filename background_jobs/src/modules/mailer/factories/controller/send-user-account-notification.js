@@ -1,6 +1,8 @@
-import { SendNewsLetterController } from "../../controller/send-newsletter.js";
-import { SendNewsletterUseCaseFactory } from "../use-cases/send-newsletter-usecase-factory.js";
+import { SendUserAccountNotificationController } from "../../controller/send-user-account-notification.js";
+import { makeSendUserAccountNotificationService } from "../use-cases/send-user-account-notification.js";
 
 export const makeUserAccountNotificationController = () => {
-  return new SendNewsLetterController(SendNewsletterUseCaseFactory());
+  return new SendUserAccountNotificationController(
+    makeSendUserAccountNotificationService()
+  );
 };
