@@ -28,6 +28,7 @@
     "knex": "^2.4.2",
     "nodemailer": "^6.9.4",
     "nodemailer-express-handlebars": "^6.1.0",
+    "nodemailer-smtp-transport": "^2.7.4",
     "nodemon": "^3.0.1",
     "pg": "^8.11.0",
     "pg-boss": "^9.0.1",

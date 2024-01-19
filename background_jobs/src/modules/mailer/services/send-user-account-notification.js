@@ -6,6 +6,7 @@ import path from "node:path";
 import { FileNotFoundError } from "../errors/FileNotFound.js";
 import { fileURLToPath } from "node:url";
 import { MAILER_CONFIG } from "../config/mailer.js";
+import { SEAI_API } from "../config/api.js";
 
 export class SendUserAccountNotification {
   constructor(sendMailService, htmlTemplateCompiler, templatesFolders = null) {
@@ -59,6 +60,7 @@ export class SendUserAccountNotification {
             subject,
             from: MAILER_CONFIG.from,
             token,
+            baseURL: SEAI_API.BASE_URL,
           },
         });
 
