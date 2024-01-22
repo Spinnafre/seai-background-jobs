@@ -1,6 +1,6 @@
 import { Logger } from "../../../shared/logger.js";
 import { Left, Right } from "../../../shared/result.js";
-import { MAILER_CONFIG } from "../config/mailer.js";
+import { MAILER_OPTIONS } from "../config/mailer.js";
 import { bufferToBlob, blobToHTML } from "../helpers/convertToBlob.js";
 
 export class SendNewsletterEmail {
@@ -29,17 +29,15 @@ export class SendNewsletterEmail {
         });
       }
 
-      console.log(news);
-
       const html = await blobToHTML(bufferToBlob(news.Data));
 
       const mailList =
         subscribers && subscribers.length
           ? [
               ...subscribers.map((data) => data.Email),
-              ...[MAILER_CONFIG.to],
+              ...[MAILER_OPTIONS.to],
             ].join(",")
-          : [MAILER_CONFIG.to].join(",");
+          : [MAILER_OPTIONS.to].join(",");
 
       Logger.info("Enviando newsletter...");
 

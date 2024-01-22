@@ -1,19 +1,12 @@
 import nodemailer from "nodemailer";
-import { MAILER_CONFIG } from "../config/mailer.js";
+import { MAILER_OPTIONS, MAILER_TRANSPORT_CONFIG } from "../config/mailer.js";
 
 export class SendEmailService {
   async send(options) {
-    const transporter = nodemailer.createTransport({
-      host: MAILER_CONFIG.host,
-      port: MAILER_CONFIG.port,
-      auth: {
-        user: MAILER_CONFIG.auth.username,
-        pass: MAILER_CONFIG.auth.password,
-      },
-    });
+    const transporter = nodemailer.createTransport(MAILER_TRANSPORT_CONFIG);
 
     const command = {
-      from: MAILER_CONFIG.from,
+      from: MAILER_OPTIONS.from,
       to: options.to,
       subject: options.subject,
       attachments: options.attachments,
@@ -39,6 +32,6 @@ export class SendEmailService {
 
     const info = await transporter.sendMail(command);
 
-    console.log("Message sent: %s", info.messageId);
+    console.log("[SendEmailService] Message sent: %s", info.messageId);
   }
 }

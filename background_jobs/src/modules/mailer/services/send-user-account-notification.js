@@ -5,7 +5,7 @@ import { HTML_TEMPLATES } from "../config/resources.js";
 import path from "node:path";
 import { FileNotFoundError } from "../errors/FileNotFound.js";
 import { fileURLToPath } from "node:url";
-import { MAILER_CONFIG } from "../config/mailer.js";
+import { MAILER_OPTIONS } from "../config/mailer.js";
 import { SEAI_API } from "../config/api.js";
 
 export class SendUserAccountNotification {
@@ -58,7 +58,7 @@ export class SendUserAccountNotification {
           args: {
             email: to,
             subject,
-            from: MAILER_CONFIG.from,
+            from: MAILER_OPTIONS.from,
             token,
             baseURL: SEAI_API.BASE_URL,
           },
