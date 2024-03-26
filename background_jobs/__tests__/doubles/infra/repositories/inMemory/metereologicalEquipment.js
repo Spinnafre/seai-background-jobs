@@ -5,8 +5,24 @@ export class MetereologicalEquipmentRepositoryInMemory {
     this.#MetereologicalEquipment = data.length ? data : [];
   }
 
-  async createMetereologicalEquipment(data) {
-    this.#MetereologicalEquipment.push(data);
+  async create(data = []) {
+    this.#MetereologicalEquipment = [...this.#MetereologicalEquipment, ...data];
+  }
+
+  async getTypes() {
+    return {
+      station: 1,
+      pluviometer: 2,
+    };
+  }
+
+  async getOrganByName(organName) {
+    return {
+      id_organ: 1,
+      host: "FUNCEME",
+      user: "TEST",
+      password: "123",
+    };
   }
 
   async getEquipments({ organName = null, eqpType = "" }) {

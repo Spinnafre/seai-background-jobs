@@ -15,6 +15,7 @@ export class MetereologicalOrganRepository {
 
     if (data.rows.length) {
       return data.rows.map((organ) => ({
+        id: organ.IdOrgan,
         host: organ.Host,
         user: organ.User,
         password: organ.Password,
