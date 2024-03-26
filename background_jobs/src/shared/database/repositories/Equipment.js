@@ -65,6 +65,22 @@ export class MetereologicalEquipmentRepository {
     });
   }
 
+  async getOrganByName(organName) {
+    return {
+      id_organ: 1,
+      host: "FUNCEME",
+      user: "TEST",
+      password: "123",
+    };
+  }
+
+  async getTypes() {
+    return {
+      station: 1,
+      pluviometer: 2,
+    };
+  }
+
   async create(equipments = []) {
     await this.#connection.transaction(async (trx) => {
       // TO-DO: how insert coordinates?
