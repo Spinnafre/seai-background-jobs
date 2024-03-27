@@ -1,3 +1,4 @@
+import { Left, Right } from "../../shared/result.js";
 import { StationMapper, PluviometerMapper } from "./core/mappers/index.js";
 
 export class FetchEquipments {
@@ -39,12 +40,12 @@ export class FetchEquipments {
     const existingEquipmentsCodes = new Set();
 
     if (existingStations.length) {
-      existingStations.forEach((eqp) => existingEquipmentsCodes.set(eqp.code));
+      existingStations.forEach((eqp) => existingEquipmentsCodes.add(eqp.code));
     }
 
     if (existingPluviometers.length) {
       existingPluviometers.forEach((eqp) =>
-        existingEquipmentsCodes.set(eqp.code)
+        existingEquipmentsCodes.add(eqp.code)
       );
     }
 
@@ -84,17 +85,47 @@ export class FetchEquipments {
 
     if (stationsToBePersisted.length) {
       console.log("Salvando estações");
-      console.log(stationsToBePersisted);
       // save equipments, location and measures
-      await this.#equipmentRepository.create(stationsToBePersisted);
+      const stationsIds = await this.#equipmentRepository.create(
+        stationsToBePersisted
+      );
       console.log("Sucesso ao salvar estações");
+
+      console.log("Salvando medições das estações");
+
+      const stationsMeasurements = prepareMeasurementsToPersist(
+        stationsToBePersisted,
+        stationsIds
+      );
+
+      await this.#equipmentRepository.insertStationsMeasurements(
+        stationsMeasurements
+      );
+
+      console.log("Sucesso ao salvar medições das estações");
     }
 
     if (pluviometersToBePersisted.length) {
       console.log("Salvando pluviômetros");
       // save equipments, location and measures
-      await this.#equipmentRepository.create(pluviometersToBePersisted);
+      const pluviometersIds = await this.#equipmentRepository.create(
+        pluviometersToBePersisted
+      );
+
       console.log("Sucesso ao salvar pluviometros");
+
+      console.log("Salvando medições dos pluviômetros");
+
+      const pluviometersMeasurements = prepareMeasurementsToPersist(
+        pluviometersToBePersisted,
+        pluviometersIds
+      );
+
+      await this.#equipmentRepository.insertPluviometersMeasurements(
+        pluviometersMeasurements
+      );
+
+      console.log("Sucesso ao salvar medições dos pluviômetros");
     }
 
     // TO-DO : calc ET0 using stations
@@ -103,5 +134,21 @@ export class FetchEquipments {
       if (calcEtoOrError.isError()) {
         return Left.create(calcEtoOrError.error());
       }*/
+
+    return Right.create("Sucesso ao carregar equipamentos e medições");
   }
+}
+
+function prepareMeasurementsToPersist(equipments = [], ids) {
+  const measures = [];
+
+  equipments.forEach((station) => {
+    if (ids.has(station.IdEquipmentExternal)) {
+      station.Measurements.FK_Equipment = ids.get(station.IdEquipmentExternal);
+      station.Measurements.FK_Organ = station.FK_Organ;
+      measures.push(station.Measurements);
+    }
+  });
+
+  return measures;
 }

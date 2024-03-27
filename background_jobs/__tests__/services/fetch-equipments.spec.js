@@ -66,14 +66,54 @@ describe("Fetch Equipments", () => {
       meteorologicalOrganRepositoryInMemory
     );
 
-    const equipmentsRepository =
-      new MetereologicalEquipmentRepositoryInMemory();
+    const equipments = [
+      {
+        IdEquipment: 1,
+        IdEquipmentExternal: "A354",
+        Name: "",
+        Altitude: "154.03",
+        Type: 1,
+        Organ: 1,
+        Organ_Id: 1,
+      },
+      {
+        IdEquipment: 2,
+        IdEquipmentExternal: "A342",
+        Location: "",
+        Name: "",
+        Altitude: "298.19",
+        Type: 1,
+        Organ: 1,
+        Organ_Id: 1,
+      },
+      {
+        IdEquipment: 3,
+        IdEquipmentExternal: "A342",
+        Location: "",
+        Name: "",
+        Altitude: "132.0",
+        Type: 1,
+        Organ: 1,
+        Organ_Id: 1,
+      },
+    ];
+
+    const equipmentsRepository = new MetereologicalEquipmentRepositoryInMemory(
+      equipments
+    );
 
     const fetchEquipments = new FetchEquipments(
       fetchFuncemeEquipments,
       equipmentsRepository
     );
 
-    await fetchEquipments.execute(command);
+    const result = await fetchEquipments.execute(command);
+
+    expect(result.isSuccess()).toBeTruthy();
+    expect(result.value()).toBe("Sucesso ao carregar equipamentos e medições");
+
+    expect(equipmentsRepository.stationsReads.length).toBeGreaterThan(0);
+    console.log(equipmentsRepository.pluviometersReads);
+    // expect(equipmentsRepository.pluviometersReads.length).toBeGreaterThan(0);
   });
 });

@@ -1,40 +1,65 @@
 export class MetereologicalEquipmentRepositoryInMemory {
-  #MetereologicalEquipment;
+  #metereologicalEquipment;
+  #stationsReads = [];
+  #pluviometersReads = [];
 
-  constructor(data = []) {
-    this.#MetereologicalEquipment = data.length ? data : [];
+  constructor(eqps = [], stationsReads = [], pluviometersReads = []) {
+    this.#metereologicalEquipment = eqps.length ? eqps : [];
+    this.#stationsReads = stationsReads;
+    this.#pluviometersReads = pluviometersReads;
+  }
+
+  get stationsReads() {
+    return this.#stationsReads;
+  }
+
+  get pluviometersReads() {
+    return this.#pluviometersReads;
   }
 
   async create(data = []) {
-    this.#MetereologicalEquipment = [...this.#MetereologicalEquipment, ...data];
+    const insertedEquipments = new Map();
+    for (const item of data) {
+      const id = new Date().getTime();
+      item.IdEquipment = id;
+
+      this.#metereologicalEquipment.push(item);
+      insertedEquipments.set(item.IdEquipmentExternal, id);
+    }
+
+    return insertedEquipments;
   }
 
   async getTypes() {
-    return {
-      station: 1,
-      pluviometer: 2,
-    };
+    return new Map([
+      ["station", 1],
+      ["pluviometer", 2],
+    ]);
   }
 
   async getOrganByName(organName) {
     return {
-      id_organ: 1,
-      host: "FUNCEME",
-      user: "TEST",
-      password: "123",
+      Id_Organ: 1,
+      Host: "FUNCEME",
+      User: "TEST",
+      Password: "123",
     };
   }
 
   async getEquipments({ organName = null, eqpType = "" }) {
+    const types = await this.getTypes();
+
+    const idType = types.get(eqpType);
+
     let equipments = [];
 
     if (organName) {
-      equipments = this.#MetereologicalEquipment.filter(
-        (eqp) => eqp.Type == eqpType && eqp.Organ === organName
+      equipments = this.#metereologicalEquipment.filter(
+        (eqp) => eqp.Type == idType && eqp.Organ === organName
       );
     } else {
-      equipments = this.#MetereologicalEquipment.filter(
-        (eqp) => eqp.Type == eqpType
+      equipments = this.#metereologicalEquipment.filter(
+        (eqp) => eqp.Type == idType
       );
     }
 
@@ -49,5 +74,13 @@ export class MetereologicalEquipmentRepositoryInMemory {
         id_organ: station.Organ_Id,
       };
     });
+  }
+
+  async insertStationsMeasurements(measurements = []) {
+    this.#stationsReads = [...measurements, ...this.#stationsReads];
+  }
+
+  async insertPluviometersMeasurements(measurements = []) {
+    this.#pluviometersReads = [...measurements, ...this.#pluviometersReads];
   }
 }

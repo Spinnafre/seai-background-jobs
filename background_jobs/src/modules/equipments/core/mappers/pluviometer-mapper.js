@@ -11,7 +11,7 @@ export class PluviometerMapper {
       Latitude: pluviometerEqp.Latitude,
       Altitude: pluviometerEqp.Altitude,
       Longitude: pluviometerEqp.Longitude,
-      // FK_Organ: pluviometerEqp.FK_Organ,
+      FK_Organ: pluviometerEqp.FK_Organ,
       Measurements: {
         Time: time,
         Pluviometry: toFloat >= 0 ? toFloat : null,
@@ -38,7 +38,7 @@ export class PluviometerMapper {
         Time: date,
       });
 
-    if (!pluviometer.Pluviometry) {
+    if (pluviometer.Measurements.Pluviometry === null) {
       Logger.warn({
         msg: `Não foi possível obter dados de medição do pluviômetro ${pluviometer.Code}, salvando dados sem medições`,
       });
@@ -48,7 +48,7 @@ export class PluviometerMapper {
 
     // const { pluviometer } = measure;
 
-    Object.assign(data, {
+    Object.assign(data.Measurements, {
       Value: pluviometer.Measurements.Pluviometry,
     });
 

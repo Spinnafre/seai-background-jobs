@@ -12,9 +12,26 @@ import {
 import "dotenv/config.js";
 
 import { MetereologicalEquipmentRepository } from "../../src/shared/database/repositories/Equipment";
+import { connections } from "../../src/shared/database/connection.js";
+
+function prepareMeasurementsToPersist(equipments = [], ids) {
+  const measures = [];
+
+  equipments.forEach((station) => {
+    station.Measurements.FK_Equipment = ids.get(station.IdEquipmentExternal);
+    station.Measurements.FK_Organ = station.FK_Organ;
+
+    measures.push(station.Measurements);
+  });
+
+  return measures;
+}
 
 describe("Equipment Repository", () => {
   test("should be able to save equipments", async () => {
+    await connections.equipments.raw(
+      `TRUNCATE TABLE public."MetereologicalEquipment" RESTART IDENTITY CASCADE;`
+    );
     const stations = [
       {
         IdEquipmentExternal: "A354",
@@ -34,7 +51,9 @@ describe("Equipment Repository", () => {
           AverageAtmosphericTemperature: 30.23,
           AtmosphericPressure: 992.46,
           WindVelocity: 99.72,
+          Et0: 14,
           Time: "2023-10-01",
+          Hour: null,
         },
       },
       {
@@ -55,10 +74,25 @@ describe("Equipment Repository", () => {
           AverageAtmosphericTemperature: 28.19,
           AtmosphericPressure: 1007.24,
           WindVelocity: 4.14,
+          Et0: 14,
           Time: "2023-10-01",
+          Hour: null,
         },
       },
     ];
+
     const repository = new MetereologicalEquipmentRepository();
+
+    const eqps = await repository.create(stations);
+
+    const measures = prepareMeasurementsToPersist(stations, eqps);
+
+    await repository.insertStationsMeasurements(measures);
+
+    await connections.equipments.raw(
+      `TRUNCATE TABLE public."MetereologicalEquipment" RESTART IDENTITY CASCADE;`
+    );
+
+    await connections.equipments.destroy();
   });
 });

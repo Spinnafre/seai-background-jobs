@@ -22,7 +22,7 @@ export class StationMapper {
       Latitude: station.Latitude,
       Altitude: station.Altitude,
       Longitude: station.Longitude,
-      // FK_Organ: station.FK_Organ,
+      FK_Organ: station.FK_Organ,
       Measurements: {
         Time,
         AverageAtmosphericTemperature: parseMeasure(

@@ -9,7 +9,7 @@ import { convertCompressedFileStream } from "../external/adapters/unzip/untar-ad
 
 import { EquipmentSerializer } from "../parser/serialize.js";
 // Maybe should be a Util
-function filterEquipmentMeasurementsByDate(equipmentsData, date) {
+function filterEquipmentMeasurementsByDate(equipmentsData, date, organId) {
   const acc = [];
 
   equipmentsData.forEach((data) => {
@@ -21,6 +21,7 @@ function filterEquipmentMeasurementsByDate(equipmentsData, date) {
         Latitude: data.Latitude,
         Altitude: data.Altitude,
         Longitude: data.Longitude,
+        FK_Organ: organId,
         Measurements: measure,
       });
     }
@@ -95,6 +96,7 @@ export class FetchFuncemeEquipments {
       const credentials =
         await this.#metereologicalOrganRepository.getOrganByName(organName);
 
+      console.log(credentials);
       if (credentials === null) {
         return Left.create(
           new Error(
@@ -105,9 +107,9 @@ export class FetchFuncemeEquipments {
 
       // Start a new Connection to FTP
       await this.#ftpAdapter.connect({
-        host: credentials.host,
-        user: credentials.user,
-        password: credentials.password,
+        host: credentials.Host,
+        user: credentials.User,
+        password: credentials.Password,
       });
 
       // Add timeout?
@@ -117,20 +119,25 @@ export class FetchFuncemeEquipments {
       ]);
 
       const [stations, pluviometers] = [
-        await new EquipmentSerializer(StationParser, StationMapper, (list) =>
-          filterEquipmentMeasurementsByDate(
-            list,
-            FetchEquipmentsCommand.getDate()
-          )
-        ).parse(stationLists),
         await new EquipmentSerializer(
-          PluviometerParser,
-          PluviometerMapper,
+          StationParser,
           (list) =>
             filterEquipmentMeasurementsByDate(
               list,
-              FetchEquipmentsCommand.getDate()
-            )
+              FetchEquipmentsCommand.getDate(),
+              credentials.Id
+            ),
+          StationMapper
+        ).parse(stationLists),
+        await new EquipmentSerializer(
+          PluviometerParser,
+          (list) =>
+            filterEquipmentMeasurementsByDate(
+              list,
+              FetchEquipmentsCommand.getDate(),
+              credentials.Id
+            ),
+          PluviometerMapper
         ).parse(pluviometerList),
       ];
 

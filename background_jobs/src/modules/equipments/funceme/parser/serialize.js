@@ -1,8 +1,8 @@
 export class EquipmentSerializer {
-  constructor(parser, mapper, filter) {
+  constructor(parser, filter, mapper) {
     this.parser = parser;
-    this.filter = filter;
     this.mapper = mapper;
+    this.filter = filter;
   }
 
   async parse(list) {

@@ -1,7 +1,7 @@
 export class MetereologicalOrganRepositoryInMemory {
   #data = [
     {
-      IdOgan: 1,
+      IdOrgan: 1,
       Name: "FUNCEME",
       Host: "testr",
       User: "test",
@@ -11,7 +11,7 @@ export class MetereologicalOrganRepositoryInMemory {
   constructor(
     data = [
       {
-        IdOgan: 1,
+        IdOrgan: 1,
         Name: "FUNCEME",
         Host: "testr",
         User: "test",
@@ -23,16 +23,14 @@ export class MetereologicalOrganRepositoryInMemory {
   }
 
   async getOrganByName(organName) {
-    const data = this.#data.filter((organ) => organ.Name === organName);
-    return data.length
-      ? data.map((organ) => {
-          return {
-            id: organ.IdOgan,
-            host: organ.Host,
-            user: organ.User,
-            password: organ.Password,
-          };
-        })
+    const organ = this.#data.find((organ) => organ.Name === organName);
+    return organ
+      ? {
+          Id: organ.IdOrgan,
+          Host: organ.Host,
+          User: organ.User,
+          Password: organ.Password,
+        }
       : null;
   }
 }
