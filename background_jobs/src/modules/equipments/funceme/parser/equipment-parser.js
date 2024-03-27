@@ -1,6 +1,6 @@
 import { CsvParser } from "./contracts/csv-parser.js";
 
-export class PluviometerParser extends CsvParser {
+export class EquipmentParser extends CsvParser {
   constructor() {
     super();
   }
@@ -26,8 +26,14 @@ export class PluviometerParser extends CsvParser {
     return string.slice(5).join("\n");
   }
 
-  static async parse(rawData = []) {
-    const parser = new PluviometerParser();
-    return await parser.parse(rawData);
+  static async parse(rawData = [], filter, mapper) {
+    const parser = new EquipmentParser();
+
+    if (rawData.length) {
+      const raw = await parser.parse(rawData);
+      return filter(raw).map(mapper);
+    }
+
+    return [];
   }
 }

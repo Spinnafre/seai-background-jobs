@@ -4,39 +4,18 @@ import { Logger } from "../../../../shared/logger.js";
 import { Left, Right } from "../../../../shared/result.js";
 import { PluviometerMapper, StationMapper } from "../../core/mappers/index.js";
 import { FUNCEME_FTP_DIRECTORIES } from "../config/funceme-ftp-directories.js";
-import { PluviometerParser, StationParser } from "../parser/index.js";
+import { EquipmentParser } from "../parser/index.js";
 import { convertCompressedFileStream } from "../external/adapters/unzip/untar-adapter.js";
-
-import { EquipmentSerializer } from "../parser/serialize.js";
-// Maybe should be a Util
-function filterEquipmentMeasurementsByDate(equipmentsData, date, organId) {
-  const acc = [];
-
-  equipmentsData.forEach((data) => {
-    const measure = data.Measurements.find((measure) => measure.data == date);
-    if (measure) {
-      acc.push({
-        Code: data.Code,
-        Name: data.Name,
-        Latitude: data.Latitude,
-        Altitude: data.Altitude,
-        Longitude: data.Longitude,
-        FK_Organ: organId,
-        Measurements: measure,
-      });
-    }
-  });
-
-  return acc;
-}
 
 export class FetchFuncemeEquipments {
   #ftpAdapter;
   #metereologicalOrganRepository;
+  #calcEto;
 
-  constructor(ftpClientAdapter, metereologicalOrganRepository) {
+  constructor(ftpClientAdapter, metereologicalOrganRepository, calcEto) {
     this.#ftpAdapter = ftpClientAdapter;
     this.#metereologicalOrganRepository = metereologicalOrganRepository;
+    this.#calcEto = calcEto;
     // this.#logger = logger;
   }
 
@@ -96,7 +75,6 @@ export class FetchFuncemeEquipments {
       const credentials =
         await this.#metereologicalOrganRepository.getOrganByName(organName);
 
-      console.log(credentials);
       if (credentials === null) {
         return Left.create(
           new Error(
@@ -119,27 +97,29 @@ export class FetchFuncemeEquipments {
       ]);
 
       const [stations, pluviometers] = [
-        await new EquipmentSerializer(
-          StationParser,
-          (list) =>
-            filterEquipmentMeasurementsByDate(
-              list,
-              FetchEquipmentsCommand.getDate(),
-              credentials.Id
-            ),
-          StationMapper
-        ).parse(stationLists),
-        await new EquipmentSerializer(
-          PluviometerParser,
-          (list) =>
-            filterEquipmentMeasurementsByDate(
-              list,
-              FetchEquipmentsCommand.getDate(),
-              credentials.Id
-            ),
-          PluviometerMapper
-        ).parse(pluviometerList),
+        await EquipmentParser.parse(
+          stationLists,
+          getLastMeasurements(FetchEquipmentsCommand.getDate(), credentials.Id),
+          StationMapper.toDomain
+        ),
+        await EquipmentParser.parse(
+          pluviometerList,
+          getLastMeasurements(FetchEquipmentsCommand.getDate(), credentials.Id),
+          PluviometerMapper.toDomain
+        ),
       ];
+
+      stations.forEach((station) => {
+        // Is here or delegate to other services?
+        if (Reflect.has(station.Measurements, "Et0") === false) {
+          const year = FetchEquipmentsCommand.getYesterdayDate().getFullYear();
+          const day = FetchEquipmentsCommand.getYesterdayDate().getDay();
+
+          const Et0 = this.#calcEto.calc(station, year, day);
+
+          station.Measurements.Et0 = Et0;
+        }
+      });
 
       // If throw error but connection still alive?
       await this.#ftpAdapter.close();
@@ -164,4 +144,28 @@ export class FetchFuncemeEquipments {
       return Left.create(error);
     }
   }
+}
+
+// Maybe should be a Util
+function getLastMeasurements(date, organId) {
+  return function (list) {
+    const eqps = [];
+
+    list.forEach((data) => {
+      const measure = data.Measurements.find((measure) => measure.data == date);
+      if (measure) {
+        eqps.push({
+          Code: data.Code,
+          Name: data.Name,
+          Latitude: data.Latitude,
+          Altitude: data.Altitude,
+          Longitude: data.Longitude,
+          FK_Organ: organId,
+          Measurements: measure,
+        });
+      }
+    });
+
+    return eqps;
+  };
 }

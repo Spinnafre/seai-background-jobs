@@ -59,6 +59,7 @@ export class StationMapper {
         AverageAtmosphericTemperature: null,
         AtmosphericPressure: null,
         WindVelocity: null,
+        Et0: null,
       },
     };
 
@@ -77,6 +78,7 @@ export class StationMapper {
       AtmosphericPressure,
       TotalRadiation,
       WindVelocity,
+      Et0,
     } = station.Measurements;
 
     Object.assign(data.Measurements, {
@@ -89,6 +91,7 @@ export class StationMapper {
       AtmosphericPressure: AtmosphericPressure || null,
       TotalRadiation: TotalRadiation || null,
       WindVelocity: WindVelocity || null,
+      Et0: WindVelocity || null,
     });
 
     return data;

@@ -4,15 +4,54 @@ import { StationMapper, PluviometerMapper } from "./core/mappers/index.js";
 export class FetchEquipments {
   // Should be a array of services?
   #fetchEquipmentsService;
-  #calcEto = null;
-  #equipmentRepository = null;
+  #equipmentRepository;
 
-  constructor(fetchEquipmentsService, equipmentRepository, calcEto) {
+  constructor(fetchEquipmentsService, equipmentRepository) {
     this.#fetchEquipmentsService = fetchEquipmentsService;
     this.#equipmentRepository = equipmentRepository;
-    this.#calcEto = calcEto;
   }
 
+  async insertStations(stations) {
+    console.log("Salvando estações");
+    // save equipments, location and measures
+    const stationsIds = await this.#equipmentRepository.create(stations);
+    console.log("Sucesso ao salvar estações");
+
+    console.log("Salvando medições das estações");
+
+    const stationsMeasurements = prepareMeasurementsToPersist(
+      stations,
+      stationsIds
+    );
+
+    await this.#equipmentRepository.insertStationsMeasurements(
+      stationsMeasurements
+    );
+
+    console.log("Sucesso ao salvar medições das estações");
+  }
+  async insertPluviometers(pluviometers) {
+    console.log("Salvando pluviômetros");
+    // save equipments, location and measures
+    const pluviometersIds = await this.#equipmentRepository.create(
+      pluviometers
+    );
+
+    console.log("Sucesso ao salvar pluviometros");
+
+    console.log("Salvando medições dos pluviômetros");
+
+    const pluviometersMeasurements = prepareMeasurementsToPersist(
+      pluviometers,
+      pluviometersIds
+    );
+
+    await this.#equipmentRepository.insertPluviometersMeasurements(
+      pluviometersMeasurements
+    );
+
+    console.log("Sucesso ao salvar medições dos pluviômetros");
+  }
   // params : Date to Query
   async execute(command) {
     // stations and pluviometers
@@ -26,7 +65,7 @@ export class FetchEquipments {
 
     const { stations, pluviometers } = equipmentsOrError.value();
 
-    // Replace one query
+    // Replace it to one query
     const [existingStations, existingPluviometers] = await Promise.all([
       this.#equipmentRepository.getEquipments({
         eqpType: "station",
@@ -40,103 +79,68 @@ export class FetchEquipments {
     const existingEquipmentsCodes = new Set();
 
     if (existingStations.length) {
-      existingStations.forEach((eqp) => existingEquipmentsCodes.add(eqp.code));
+      existingStations.forEach((eqp) => existingEquipmentsCodes.add(eqp.Code));
     }
 
     if (existingPluviometers.length) {
       existingPluviometers.forEach((eqp) =>
-        existingEquipmentsCodes.add(eqp.code)
+        existingEquipmentsCodes.add(eqp.Code)
       );
     }
-
-    const stationsToBePersisted = [];
-    const pluviometersToBePersisted = [];
 
     // Is here?
     const equipmentsTypes = await this.#equipmentRepository.getTypes();
 
-    stations.forEach((station) => {
-      if (existingEquipmentsCodes.has(station.Code)) {
-        return;
-      }
+    const stationsToBePersisted = mapEquipmentsToPersistency(
+      existingEquipmentsCodes,
+      stations,
+      equipmentsTypes.get("station"),
+      StationMapper.toPersistency
+    );
 
-      Object.assign(station, {
-        FK_Type: equipmentsTypes.station,
-      });
+    console.log(stationsToBePersisted);
 
-      stationsToBePersisted.push(
-        StationMapper.toPersistency(station, command.getDate())
-      );
-    });
-
-    pluviometers.forEach((pluviometer) => {
-      if (existingEquipmentsCodes.has(pluviometer.Code)) {
-        return;
-      }
-
-      Object.assign(pluviometer, {
-        FK_Type: equipmentsTypes.pluviometer,
-      });
-
-      pluviometersToBePersisted.push(
-        PluviometerMapper.toPersistency(pluviometer, command.getDate())
-      );
-    });
+    const pluviometersToBePersisted = mapEquipmentsToPersistency(
+      existingEquipmentsCodes,
+      pluviometers,
+      equipmentsTypes.get("pluviometer"),
+      PluviometerMapper.toPersistency,
+      command.getDate()
+    );
 
     if (stationsToBePersisted.length) {
-      console.log("Salvando estações");
-      // save equipments, location and measures
-      const stationsIds = await this.#equipmentRepository.create(
-        stationsToBePersisted
-      );
-      console.log("Sucesso ao salvar estações");
-
-      console.log("Salvando medições das estações");
-
-      const stationsMeasurements = prepareMeasurementsToPersist(
-        stationsToBePersisted,
-        stationsIds
-      );
-
-      await this.#equipmentRepository.insertStationsMeasurements(
-        stationsMeasurements
-      );
-
-      console.log("Sucesso ao salvar medições das estações");
+      await this.insertStations(stationsToBePersisted);
     }
 
     if (pluviometersToBePersisted.length) {
-      console.log("Salvando pluviômetros");
-      // save equipments, location and measures
-      const pluviometersIds = await this.#equipmentRepository.create(
-        pluviometersToBePersisted
-      );
-
-      console.log("Sucesso ao salvar pluviometros");
-
-      console.log("Salvando medições dos pluviômetros");
-
-      const pluviometersMeasurements = prepareMeasurementsToPersist(
-        pluviometersToBePersisted,
-        pluviometersIds
-      );
-
-      await this.#equipmentRepository.insertPluviometersMeasurements(
-        pluviometersMeasurements
-      );
-
-      console.log("Sucesso ao salvar medições dos pluviômetros");
+      await this.insertPluviometers(pluviometersToBePersisted);
     }
-
-    // TO-DO : calc ET0 using stations
-    /*const calcEtoOrError = await this.#calcEto.execute(command);
-
-      if (calcEtoOrError.isError()) {
-        return Left.create(calcEtoOrError.error());
-      }*/
 
     return Right.create("Sucesso ao carregar equipamentos e medições");
   }
+}
+
+function mapEquipmentsToPersistency(
+  oldEquipments,
+  newEquipments,
+  idType,
+  mapper,
+  date
+) {
+  const toPersist = [];
+  newEquipments.forEach((station) => {
+    if (oldEquipments.has(station.Code)) {
+      return;
+    }
+
+    Object.assign(station, {
+      FK_Type: idType,
+    });
+
+    toPersist.push(mapper(station, date));
+  });
+
+  return toPersist;
 }
 
 function prepareMeasurementsToPersist(equipments = [], ids) {

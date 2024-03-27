@@ -84,7 +84,7 @@ export class MetereologicalEquipmentRepository {
     return null;
   }
 
-  async getTypesId() {
+  async getTypes() {
     const type = new Map();
 
     const result = await this.#connection

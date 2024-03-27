@@ -3,15 +3,12 @@ import { FTPClientAdapter } from "../external/adapters/ftp/client/ftp-client-ada
 import { FetchFuncemeEquipments } from "./fetch-funceme-measures.js";
 
 import { MetereologicalEquipmentRepository } from "../../../../shared/database/repositories/Equipment.js";
+import { CalcETOService } from "../../../calc-eto/services/calc-eto-by-date-v2.js";
 
 export const makeFetchFuncemeEquipments = () => {
-  const ftpClientAdapter = new FTPClientAdapter();
-
-  const meteorologicalOrganRepositoryInMemory =
-    new MetereologicalEquipmentRepository();
-
   return new FetchFuncemeEquipments(
-    ftpClientAdapter,
-    meteorologicalOrganRepositoryInMemory
+    new FTPClientAdapter(),
+    new MetereologicalEquipmentRepository(),
+    new CalcETOService()
   );
 };

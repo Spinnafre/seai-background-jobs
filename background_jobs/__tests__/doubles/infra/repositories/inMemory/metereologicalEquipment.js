@@ -65,13 +65,13 @@ export class MetereologicalEquipmentRepositoryInMemory {
 
     return equipments.map((station) => {
       return {
-        id: station.IdEquipment,
-        code: station.IdEquipmentExternal,
-        location: station.Name,
-        altitude: station.Altitude,
-        type: station.Type,
-        organ: station.Organ,
-        id_organ: station.Organ_Id,
+        Id: station.IdEquipment,
+        Code: station.IdEquipmentExternal,
+        Location: station.Name,
+        Altitude: station.Altitude,
+        Type: station.Type,
+        Organ: station.Organ,
+        Id_Organ: station.Organ_Id,
       };
     });
   }
