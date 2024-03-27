@@ -84,6 +84,7 @@ export class FetchEquipments {
 
     if (stationsToBePersisted.length) {
       console.log("Salvando estações");
+      console.log(stationsToBePersisted);
       // save equipments, location and measures
       await this.#equipmentRepository.create(stationsToBePersisted);
       console.log("Sucesso ao salvar estações");

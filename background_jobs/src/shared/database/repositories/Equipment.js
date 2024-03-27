@@ -85,20 +85,22 @@ export class MetereologicalEquipmentRepository {
     await this.#connection.transaction(async (trx) => {
       // TO-DO: how insert coordinates?
       // TO-DO: how measurements?
-      const ids = await trx.batchInsert(
-        "MetereologicalEquipment",
-        equipments.map((equipment) => {
-          return {
-            IdEquipmentExternal: equipment.IdEquipmentExternal,
-            Name: equipment.Name,
-            Altitude: equipment.Altitude,
-            FK_Organ: equipment.Fk_Organ,
-            FK_Type: equipment.Fk_Type,
-            Enable: equipment.Enable,
-            CreatedAt: this.#connection.fn.now(),
-          };
-        })
-      );
+      const ids = await trx
+        .batchInsert(
+          "MetereologicalEquipment",
+          equipments.map((equipment) => {
+            return {
+              IdEquipmentExternal: equipment.IdEquipmentExternal,
+              Name: equipment.Name,
+              Altitude: equipment.Altitude,
+              FK_Organ: equipment.Fk_Organ,
+              FK_Type: equipment.Fk_Type,
+              Enable: equipment.Enable,
+              CreatedAt: this.#connection.fn.now(),
+            };
+          })
+        )
+        .returning("IdEquipment");
 
       console.log("[REPOSITORY  ]", ids);
     });
