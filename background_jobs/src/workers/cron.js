@@ -1,4 +1,4 @@
-import { FuncemeFTPWorker, CalcET0Worker } from "./handlers/index.js";
+import { FuncemeFTPWorker } from "./handlers/index.js";
 
 export const cronJobs = [
   {

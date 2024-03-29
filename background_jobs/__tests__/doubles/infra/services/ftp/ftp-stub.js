@@ -28,7 +28,11 @@ class FTPClientAdapterMock {
 
   async getFolderContentDescription(folder) {
     return new Promise((resolve, reject) => {
-      resolve(true);
+      if (folder === "pcds") {
+        return resolve([{ name: "stn_data_2023.tar.gz" }]);
+      }
+
+      resolve([{ name: "prec_data_2023.tar.gz" }]);
     });
   }
 
