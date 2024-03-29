@@ -142,7 +142,7 @@ export class MetereologicalEquipmentRepository {
               ),
               FK_Organ: equipment.FK_Organ,
               FK_Type: equipment.FK_Type,
-              Enabled: equipment.Enabled,
+              Enable: equipment.Enabled,
               CreatedAt: this.#connection.fn.now(),
             };
           })
