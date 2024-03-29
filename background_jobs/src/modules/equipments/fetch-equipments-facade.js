@@ -14,9 +14,11 @@ export class FetchEquipments {
   async insertStations(stations) {
     console.log("Salvando estações");
     // save equipments, location and measures
-    const stationsIds = await this.#equipmentRepository.create(stations);
+    await this.#equipmentRepository.create(stations);
+
     console.log("Sucesso ao salvar estações");
 
+    /*
     console.log("Salvando medições das estações");
 
     const stationsMeasurements = prepareMeasurementsToPersist(
@@ -27,18 +29,18 @@ export class FetchEquipments {
     await this.#equipmentRepository.insertStationsMeasurements(
       stationsMeasurements
     );
+    */
 
     console.log("Sucesso ao salvar medições das estações");
   }
   async insertPluviometers(pluviometers) {
     console.log("Salvando pluviômetros");
     // save equipments, location and measures
-    const pluviometersIds = await this.#equipmentRepository.create(
-      pluviometers
-    );
+    await this.#equipmentRepository.create(pluviometers);
 
     console.log("Sucesso ao salvar pluviometros");
 
+    /*
     console.log("Salvando medições dos pluviômetros");
 
     const pluviometersMeasurements = prepareMeasurementsToPersist(
@@ -51,6 +53,7 @@ export class FetchEquipments {
     );
 
     console.log("Sucesso ao salvar medições dos pluviômetros");
+    */
   }
   // params : Date to Query
   async execute(command) {
@@ -104,8 +107,7 @@ export class FetchEquipments {
       existingEquipmentsCodes,
       pluviometers,
       equipmentsTypes.get("pluviometer"),
-      PluviometerMapper.toPersistency,
-      command.getDate()
+      PluviometerMapper.toPersistency
     );
 
     if (stationsToBePersisted.length) {
@@ -116,7 +118,7 @@ export class FetchEquipments {
       await this.insertPluviometers(pluviometersToBePersisted);
     }
 
-    return Right.create("Sucesso ao carregar equipamentos e medições");
+    return Right.create("Sucesso ao carregar equipamentos");
   }
 }
 
@@ -124,8 +126,7 @@ function mapEquipmentsToPersistency(
   oldEquipments,
   newEquipments,
   idType,
-  mapper,
-  date
+  mapper
 ) {
   const toPersist = [];
   newEquipments.forEach((station) => {
@@ -137,7 +138,7 @@ function mapEquipmentsToPersistency(
       FK_Type: idType,
     });
 
-    toPersist.push(mapper(station, date));
+    toPersist.push(mapper(station));
   });
 
   return toPersist;

@@ -17,6 +17,10 @@ export class MetereologicalEquipmentRepositoryInMemory {
     return this.#pluviometersReads;
   }
 
+  get equipments() {
+    return this.#metereologicalEquipment;
+  }
+
   async create(data = []) {
     const insertedEquipments = new Map();
     for (const item of data) {

@@ -1,4 +1,5 @@
 import { connections } from "../connection.js";
+import { geoLocationExtension } from "../geolocation.js";
 
 export class MetereologicalEquipmentRepository {
   #connection;
@@ -101,6 +102,8 @@ export class MetereologicalEquipmentRepository {
   async create(equipments = []) {
     const insertedEquipments = new Map();
 
+    const st = geoLocationExtension(this.#connection);
+
     await this.#connection.transaction(async (trx) => {
       // TO-DO: how insert coordinates?
       // TO-DO: how measurements?
@@ -112,6 +115,9 @@ export class MetereologicalEquipmentRepository {
               IdEquipmentExternal: equipment.IdEquipmentExternal,
               Name: equipment.Name,
               Altitude: equipment.Altitude,
+              Location: st.geomFromText(
+                `POINT(${equipment.Latitude},${equipment.Longitude})`
+              ),
               FK_Organ: equipment.FK_Organ,
               FK_Type: equipment.FK_Type,
               Enabled: equipment.Enabled,

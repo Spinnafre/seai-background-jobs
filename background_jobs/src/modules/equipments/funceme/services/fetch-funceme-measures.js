@@ -10,12 +10,10 @@ import { convertCompressedFileStream } from "../external/adapters/unzip/untar-ad
 export class FetchFuncemeEquipments {
   #ftpAdapter;
   #metereologicalOrganRepository;
-  #calcEto;
 
-  constructor(ftpClientAdapter, metereologicalOrganRepository, calcEto) {
+  constructor(ftpClientAdapter, metereologicalOrganRepository) {
     this.#ftpAdapter = ftpClientAdapter;
     this.#metereologicalOrganRepository = metereologicalOrganRepository;
-    this.#calcEto = calcEto;
     // this.#logger = logger;
   }
 
@@ -109,7 +107,7 @@ export class FetchFuncemeEquipments {
         ),
       ];
 
-      stations.forEach((station) => {
+      /*stations.forEach((station) => {
         // Is here or delegate to other services?
         if (Reflect.has(station.Measurements, "Et0") === false) {
           const year = FetchEquipmentsCommand.getYesterdayDate().getFullYear();
@@ -119,7 +117,7 @@ export class FetchFuncemeEquipments {
 
           station.Measurements.Et0 = Et0;
         }
-      });
+      });*/
 
       // If throw error but connection still alive?
       await this.#ftpAdapter.close();

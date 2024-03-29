@@ -26,6 +26,7 @@
     "ftp": "^0.3.10",
     "handlebars": "^4.7.8",
     "knex": "^2.4.2",
+    "knex-postgis": "^0.14.3",
     "nodemailer": "^6.9.4",
     "nodemailer-express-handlebars": "^6.1.0",
     "nodemailer-smtp-transport": "^2.7.4",

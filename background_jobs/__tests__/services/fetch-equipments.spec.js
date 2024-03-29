@@ -11,11 +11,10 @@ import {
 import { MetereologicalOrganRepositoryInMemory } from "../doubles/infra/repositories/inMemory/mtereologicalOrganRepository.js";
 import { FTPClientAdapterMock } from "../doubles/infra/services/ftp/ftp-stub.js";
 
-import { MetereologicalEquipmentRepositoryInMemory } from "../doubles/infra/repositories/inMemory/metereologicalEquipment.js";
-import { FetchFuncemeEquipments } from "../../src/modules/equipments/funceme/services/fetch-funceme-measures.js";
 import { FetchEquipmentCommand } from "../../src/modules/equipments/command.js";
 import { FetchEquipments } from "../../src/modules/equipments/fetch-equipments-facade.js";
-import { CalcETOService } from "../../src/modules/calc-eto/services/calc-eto-by-date-v2.js";
+import { FetchFuncemeEquipments } from "../../src/modules/equipments/funceme/services/fetch-funceme-measures.js";
+import { MetereologicalEquipmentRepositoryInMemory } from "../doubles/infra/repositories/inMemory/metereologicalEquipment.js";
 // Domain Model
 
 describe("Fetch Equipments", () => {
@@ -37,12 +36,9 @@ describe("Fetch Equipments", () => {
     const meteorologicalOrganRepositoryInMemory =
       new MetereologicalOrganRepositoryInMemory();
 
-    const calcEto = new CalcETOService();
-
     const fetchFuncemeEquipments = new FetchFuncemeEquipments(
       ftpClientAdapter,
-      meteorologicalOrganRepositoryInMemory,
-      calcEto
+      meteorologicalOrganRepositoryInMemory
     );
 
     const dataOrError = await fetchFuncemeEquipments.execute(command);
@@ -65,11 +61,9 @@ describe("Fetch Equipments", () => {
     const meteorologicalOrganRepositoryInMemory =
       new MetereologicalOrganRepositoryInMemory();
 
-    const calcEto = new CalcETOService();
     const fetchFuncemeEquipments = new FetchFuncemeEquipments(
       ftpClientAdapter,
-      meteorologicalOrganRepositoryInMemory,
-      calcEto
+      meteorologicalOrganRepositoryInMemory
     );
 
     const equipments = [
@@ -116,9 +110,6 @@ describe("Fetch Equipments", () => {
     const result = await fetchEquipments.execute(command);
 
     expect(result.isSuccess()).toBeTruthy();
-    expect(result.value()).toBe("Sucesso ao carregar equipamentos e medições");
-
-    expect(equipmentsRepository.stationsReads.length).toBeGreaterThan(0);
-    expect(equipmentsRepository.pluviometersReads.length).toBeGreaterThan(0);
+    expect(result.value()).toBe("Sucesso ao carregar equipamentos");
   });
 });
