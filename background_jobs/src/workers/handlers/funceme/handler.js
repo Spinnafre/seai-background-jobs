@@ -4,11 +4,9 @@ export class FuncemeFTPWorker {
   static worker_name = "FuncemeETL";
 
   #fetchEquipments = null;
-  #calcEto = null;
 
-  constructor(fetchEquipments, calcEto) {
+  constructor(fetchEquipments) {
     this.#fetchEquipments = fetchEquipments;
-    this.#calcEto = calcEto;
     this.name_queue = FuncemeFTPWorker.name_queue;
   }
 

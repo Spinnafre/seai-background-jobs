@@ -110,6 +110,7 @@ export class FetchEquipments {
       PluviometerMapper.toPersistency
     );
 
+    // Remove it and replace to one query
     if (stationsToBePersisted.length) {
       await this.insertStations(stationsToBePersisted);
     }
