@@ -1,7 +1,9 @@
 // npm run test:dev -i __tests__/services/fetch-equipments.spec.js
 
 import {
+  afterAll,
   afterEach,
+  beforeAll,
   beforeEach,
   describe,
   expect,
@@ -28,71 +30,77 @@ function prepareMeasurementsToPersist(equipments = [], ids) {
 }
 
 describe("Equipment Repository", () => {
-  test("should be able to save equipments", async () => {
+  const repository = new MetereologicalEquipmentRepository();
+
+  // beforeAll(async () => {});
+
+  afterAll(async () => {
+    await connections.equipments.destroy();
+  });
+  beforeEach(async () => {
     await connections.equipments.raw(
       `TRUNCATE TABLE public."MetereologicalEquipment" RESTART IDENTITY CASCADE;`
     );
+  });
+
+  afterEach(async () => {
+    await connections.equipments.raw(
+      `TRUNCATE TABLE public."MetereologicalEquipment" RESTART IDENTITY CASCADE;`
+    );
+  });
+  test("should be able to save equipments", async () => {
     const stations = [
       {
         IdEquipmentExternal: "A354",
         Name: "OEIRAS",
         Altitude: "154.03",
-        Location: ["-6.974135", "-42.146831"],
+        Location: {
+          Latitude: "-6.974135",
+          Longitude: "-42.146831",
+        },
         FK_Type: 1,
         FK_Organ: 1,
         Enabled: false,
-        Measurements: {
-          TotalRadiation: null,
-          MaxRelativeHumidity: 33.21,
-          MinRelativeHumidity: 26.83,
-          AverageRelativeHumidity: 30.04,
-          MaxAtmosphericTemperature: 31.65,
-          MinAtmosphericTemperature: 29.08,
-          AverageAtmosphericTemperature: 30.23,
-          AtmosphericPressure: 992.46,
-          WindVelocity: 99.72,
-          Et0: 14,
-          Time: "2023-10-01",
-          Hour: null,
-        },
       },
       {
         IdEquipmentExternal: "B8522B7C",
         Name: "São Gonçalo do Amarante - Jardim Botânico",
         Altitude: "25.0",
-        Location: ["-3.57055", "-38.886972222222205"],
+        Location: {
+          Latitude: "-3.57055",
+          Longitude: "-38.886972222222205",
+        },
         FK_Type: 1,
         FK_Organ: 1,
         Enabled: false,
-        Measurements: {
-          TotalRadiation: 278.82,
-          MaxRelativeHumidity: 73.18,
-          MinRelativeHumidity: 67.45,
-          AverageRelativeHumidity: 70.51,
-          MaxAtmosphericTemperature: 28.7,
-          MinAtmosphericTemperature: 27.64,
-          AverageAtmosphericTemperature: 28.19,
-          AtmosphericPressure: 1007.24,
-          WindVelocity: 4.14,
-          Et0: 14,
-          Time: "2023-10-01",
-          Hour: null,
-        },
       },
     ];
 
-    const repository = new MetereologicalEquipmentRepository();
+    await repository.create(stations);
 
-    const eqps = await repository.create(stations);
+    const eqps = await repository.getEquipments({
+      eqpType: "station",
+    });
 
-    const measures = prepareMeasurementsToPersist(stations, eqps);
-
-    await repository.insertStationsMeasurements(measures);
-
-    await connections.equipments.raw(
-      `TRUNCATE TABLE public."MetereologicalEquipment" RESTART IDENTITY CASCADE;`
-    );
-
-    await connections.equipments.destroy();
+    expect(eqps).toStrictEqual([
+      {
+        Id: 1,
+        Code: "A354",
+        Location: [-6.974135, -42.146831],
+        Altitude: 154.03,
+        Type: "station",
+        Organ: "INMET",
+        Id_Organ: 1,
+      },
+      {
+        Id: 2,
+        Code: "B8522B7C",
+        Location: [-3.57055, -38.886972222],
+        Altitude: 25,
+        Type: "station",
+        Organ: "INMET",
+        Id_Organ: 1,
+      },
+    ]);
   });
 });

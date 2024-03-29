@@ -8,6 +8,20 @@ export class MetereologicalEquipmentRepository {
     this.#connection = connections.equipments;
   }
 
+  async insertOrgan(organ) {
+    const result = await this.#connection
+      .insert({
+        Name: organ.Name,
+        Host: organ.Host || null,
+        User: organ.User || null,
+        Password: organ.Password || null,
+      })
+      .into("MetereologicalOrgan")
+      .returning("IdOrgan");
+
+    return result.map((data) => data.IdOrgan);
+  }
+
   async getEquipments({ organName = null, eqpType = "" }) {
     let equipments = [];
 
@@ -19,6 +33,9 @@ export class MetereologicalEquipmentRepository {
           equipment."IdEquipmentExternal" AS "Code",
           equipment."Name" AS "Location",
           equipment."Altitude",
+          ST_AsGeoJSON(
+              equipment."Location"::geometry
+          )::json AS "GeoLocation",
           eqp_type."Name" AS "Type",
           organ."Name" AS "Organ",
           organ."IdOrgan" AS "Organ_Id"
@@ -39,6 +56,9 @@ export class MetereologicalEquipmentRepository {
           equipment."IdEquipmentExternal" AS "Code",
           equipment."Name" AS "Location",
           equipment."Altitude",
+          ST_AsGeoJSON(
+              equipment."Location"::geometry
+          )::json AS "GeoLocation",
           eqp_type."Name" AS "Type",
           organ."Name" AS "Organ",
           organ."IdOrgan" AS "Organ_Id"
@@ -59,6 +79,7 @@ export class MetereologicalEquipmentRepository {
         Code: eqp.Code,
         Location: eqp.Location,
         Altitude: eqp.Altitude,
+        Location: eqp.GeoLocation ? eqp.GeoLocation["coordinates"] : null,
         Type: eqp.Type,
         Organ: eqp.Organ,
         Id_Organ: eqp.Organ_Id,
@@ -115,8 +136,9 @@ export class MetereologicalEquipmentRepository {
               IdEquipmentExternal: equipment.IdEquipmentExternal,
               Name: equipment.Name,
               Altitude: equipment.Altitude,
+              // Location: st.geomFromText("Point(-71.064544 44.28787)"),
               Location: st.geomFromText(
-                `POINT(${equipment.Latitude},${equipment.Longitude})`
+                `Point(${equipment.Location.Latitude} ${equipment.Location.Longitude})`
               ),
               FK_Organ: equipment.FK_Organ,
               FK_Type: equipment.FK_Type,

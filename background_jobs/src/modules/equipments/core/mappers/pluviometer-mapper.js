@@ -24,7 +24,10 @@ export class PluviometerMapper {
       IdEquipmentExternal: pluviometer.Code,
       Name: pluviometer.Name,
       Altitude: pluviometer.Altitude,
-      Location: [pluviometer.Latitude, pluviometer.Longitude],
+      Location: {
+        Latitude: pluviometer.Latitude,
+        Longitude: pluviometer.Longitude,
+      },
       FK_Type: pluviometer.FK_Type,
       FK_Organ: pluviometer.FK_Organ,
       Enabled: false,

@@ -45,7 +45,10 @@ export class StationMapper {
       IdEquipmentExternal: station.Code,
       Name: station.Name,
       Altitude: station.Altitude,
-      Location: [station.Latitude, station.Longitude],
+      Location: {
+        Latitude: station.Latitude,
+        Longitude: station.Longitude,
+      },
       FK_Type: station.FK_Type,
       FK_Organ: station.FK_Organ,
       Enabled: false,
