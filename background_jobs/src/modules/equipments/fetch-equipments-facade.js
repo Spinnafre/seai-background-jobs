@@ -101,8 +101,6 @@ export class FetchEquipments {
       StationMapper.toPersistency
     );
 
-    console.log(stationsToBePersisted);
-
     const pluviometersToBePersisted = mapEquipmentsToPersistency(
       existingEquipmentsCodes,
       pluviometers,

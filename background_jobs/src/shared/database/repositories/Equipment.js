@@ -96,7 +96,7 @@ export class MetereologicalEquipmentRepository {
 
     if (result) {
       return {
-        Id_Organ: result.IdOrgan,
+        Id: result.IdOrgan,
         Host: result.Host,
         User: result.User,
         Password: result.Password,

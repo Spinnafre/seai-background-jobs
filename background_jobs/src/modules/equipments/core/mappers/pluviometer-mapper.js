@@ -1,4 +1,4 @@
-import { Logger } from "../../../../shared/logger";
+import { Logger } from "../../../../shared/logger.js";
 
 export class PluviometerMapper {
   static toDomain(pluviometerEqp) {
@@ -42,10 +42,6 @@ export class PluviometerMapper {
       });
 
     if (pluviometer.Measurements.Pluviometry === null) {
-      Logger.warn({
-        msg: `Não foi possível obter dados de medição do pluviômetro ${pluviometer.Code}, salvando dados sem medições`,
-      });
-
       return data;
     }
 

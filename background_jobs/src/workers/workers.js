@@ -1,13 +1,11 @@
 import {
-  makeCalcEtoWorkerHandler,
   makeFetchFuncemeMeasuresHandler,
-  makeSendNewsletterHandler,
   makeSendAccountNotificationHandler,
+  makeSendNewsletterHandler,
 } from "./factories/handlers/index.js";
 import {
   FuncemeFTPWorker,
   SendNewsletterWorker,
-  CalcET0Worker,
   SendUserAccountNotificationWorker,
 } from "./handlers/index.js";
 
@@ -19,15 +17,6 @@ export default [
         name: FuncemeFTPWorker.worker_name,
         process: (command) =>
           makeFetchFuncemeMeasuresHandler().handler(command),
-      },
-    ],
-  },
-  {
-    queue_name: CalcET0Worker.name_queue,
-    workers: [
-      {
-        name: CalcET0Worker.worker_name,
-        process: (command) => makeCalcEtoWorkerHandler().handler(command),
       },
     ],
   },
