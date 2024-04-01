@@ -1,9 +1,23 @@
-import { FuncemeFTPWorker } from "./handlers/index.js";
+import {
+  FuncemeFuncemeEquipmentsWorker,
+  FetchFuncemeMeasurementsWorker,
+} from "./handlers/index.js";
 
 export const cronJobs = [
   {
-    queue: FuncemeFTPWorker.name_queue,
+    queue: FuncemeFuncemeEquipmentsWorker.name_queue,
     cron: "0 0 * * *",
+    data: null,
+    options: {
+      tz: "America/Fortaleza",
+      retryLimit: 3,
+      retryDelay: 60,
+      priority: 2,
+    },
+  },
+  {
+    queue: FetchFuncemeMeasurementsWorker.name_queue,
+    cron: "0 1 * * *",
     data: null,
     options: {
       tz: "America/Fortaleza",

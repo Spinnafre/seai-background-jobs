@@ -142,17 +142,3 @@ function mapEquipmentsToPersistency(
 
   return toPersist;
 }
-
-function prepareMeasurementsToPersist(equipments = [], ids) {
-  const measures = [];
-
-  equipments.forEach((station) => {
-    if (ids.has(station.IdEquipmentExternal)) {
-      station.Measurements.FK_Equipment = ids.get(station.IdEquipmentExternal);
-      station.Measurements.FK_Organ = station.FK_Organ;
-      measures.push(station.Measurements);
-    }
-  });
-
-  return measures;
-}
