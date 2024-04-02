@@ -113,8 +113,8 @@ export class FetchEquipmentsMeasures {
 
 // Optimize
 function mapEquipmentsToPersistency(
-  oldEquipments,
-  newEquipments,
+  oldEquipments, //db
+  newEquipments, // ftp
   idType,
   mapper,
   date

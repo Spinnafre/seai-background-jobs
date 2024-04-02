@@ -42,7 +42,7 @@ export function CalcEto(
 
   const julianDay = day - year + 1;
 
-  const PHI = (-4.19 * Math.PI) / 180;
+  const PHI = (-3.79512699 * Math.PI) / 180;
 
   const solarDeclination =
     0.409 * Math.sin(((2 * Math.PI) / 365) * julianDay - 1.39); // Declinação solar no dia "J"
@@ -100,9 +100,10 @@ export function CalcEto(
     clearSkyRadiation
   );
 
+  // Pressão utilizando a altitude local
   const atmosphericPressure =
     measures.atmosphericPressure ||
-    101.3 * ((293 - 0.0095 * measures.altitude) / 293) ** 5.23; // Pressão utilizando a altitude local
+    101.3 * ((293 - 0.0065 * measures.altitude) / 293) ** 5.26; // Pressão utilizando a altitude local
 
   const { currentSteamPressureValue, saturationSteamPressure } =
     measures.averageRelativeHumidity
