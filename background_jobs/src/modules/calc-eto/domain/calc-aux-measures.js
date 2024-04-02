@@ -156,16 +156,31 @@ export function CalcSteamPressureEstimation(temperatureMin) {
   };
 }
 
-export function CalcSteamPressureWithAverageMeasures(
-  temperatureAverage,
-  humidityAverage
-) {
-  const saturationSteamPressure =
+export function CalcSteamPressure({
+  minAtmosphericTemperature,
+  maxAtmosphericTemperature,
+  minRelativeHumidity,
+  maxRelativeHumidity,
+}) {
+  const saturationSteamPressureMin =
     0.6108 *
-    Math.exp((17.27 * temperatureAverage) / (temperatureAverage + 237.3));
+    Math.exp(
+      (17.27 * minAtmosphericTemperature) / (minAtmosphericTemperature + 237.3)
+    );
+
+  const saturationSteamPressureMax =
+    0.6108 *
+    Math.exp(
+      (17.27 * maxAtmosphericTemperature) / (maxAtmosphericTemperature + 237.3)
+    );
+
+  const saturationSteamPressure =
+    saturationSteamPressureMin + saturationSteamPressureMax / 2;
 
   const currentSteamPressureValue =
-    (humidityAverage / 100) * saturationSteamPressure;
+    ((saturationSteamPressureMin * maxRelativeHumidity) / 100 +
+      (saturationSteamPressureMax * minRelativeHumidity) / 100) /
+    2;
 
   return {
     currentSteamPressureValue,
@@ -184,7 +199,7 @@ export function CalcInclinationBetweenSteamPressureAndTemperature(temperature) {
 
   return delta;
 }
-// antigo etoPrecalc
+
 export function CalcGama(atmosphericPressure) {
   // Gama pelo documento
   return 0.000665 * atmosphericPressure;

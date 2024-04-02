@@ -3,38 +3,38 @@ import { describe, expect, test } from "@jest/globals";
 import { CalcEto } from "../../../src/modules/calc-eto/domain/calc-eto.js";
 
 describe("ET0 calc", () => {
-  test("Should be able to calc ET0 ", () => {
-    const altitude = 35;
-    const averageAtmosphericTemperature = 2;
-    const minAtmosphericTemperature = 2;
-    const maxAtmosphericTemperature = 2;
-    const maxRelativeHumidity = 2;
-    const minRelativeHumidity = null;
-    const atmosphericPressure = 2;
-    const totalRadiation = 2;
-    const windVelocity = 21;
-    const averageRelativeHumidity = 20;
+  test("Should be able to calc ET0 when date is 27/2023", () => {
+    const maxRelativeHumidity = 100;
+    const minRelativeHumidity = 80;
+
+    const maxAtmosphericTemperature = 27.0;
+    const minAtmosphericTemperature = 24.1;
 
     const eto = CalcEto({
       date: {
-        year: 2023,
-        day: 25,
+        year: 2024,
+        month: 2,
+        day: 27,
       },
       measures: {
-        altitude,
-        sunQuantityHoursInDay: 11,
-        averageAtmosphericTemperature,
+        altitude: 30.4,
+        longitude: -38.557368, // useLess
+        latitude: -3.79512699,
+        sunQuantityHoursInDay: 11, // useLess
+        averageAtmosphericTemperature:
+          maxAtmosphericTemperature / minAtmosphericTemperature / 2,
         minAtmosphericTemperature,
         maxAtmosphericTemperature,
-        averageRelativeHumidity,
+        averageRelativeHumidity:
+          (maxRelativeHumidity + minRelativeHumidity) / 2,
         maxRelativeHumidity,
         minRelativeHumidity,
-        atmosphericPressure,
-        totalRadiation,
-        windVelocity,
+        atmosphericPressure: null,
+        totalRadiation: 83.33,
+        windVelocity: 1.07,
       },
     });
 
-    expect(eto).toBe(0.7369587085515771);
+    expect(eto).toBe(1.71);
   });
 });
