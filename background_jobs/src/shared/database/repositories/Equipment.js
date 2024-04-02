@@ -164,7 +164,7 @@ export class MetereologicalEquipmentRepository {
         "ReadStations",
         measurements.map((measures) => {
           return {
-            FK_Equipment: measures.IdEquipment,
+            FK_Equipment: measures.FK_Equipment,
             FK_Organ: measures.FK_Organ,
             Time: measures.Time,
             Hour: measures.Hour,
@@ -191,7 +191,7 @@ export class MetereologicalEquipmentRepository {
         "ReadPluviometers",
         measurements.map((eqp) => {
           return {
-            FK_Equipment: eqp.IdEquipment,
+            FK_Equipment: eqp.FK_Equipment,
             FK_Organ: eqp.FK_Organ,
             Time: eqp.Time,
             Hour: eqp.Hour,
