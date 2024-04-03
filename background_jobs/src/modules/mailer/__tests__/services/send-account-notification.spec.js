@@ -1,9 +1,13 @@
 // npm run test:dev -i __tests__/units/services/send-account-notification/send-account-notification.spec.js
 import { beforeAll, describe, expect, jest, test } from "@jest/globals";
-import { FileNotFoundError } from "../../src/modules/mailer/errors/FileNotFound";
-import { HtmlTemplateEngineAdapter } from "../../src/modules/mailer/external/template-engine-adapter";
-import { SendUserAccountNotification } from "../../src/modules/mailer/services/send-user-account-notification";
+
 import { SendEmailDummy } from "../doubles/services/send-email-dummy";
+
+import { FileNotFoundError } from "../../errors/FileNotFound";
+
+import { HtmlTemplateEngineAdapter } from "../../external/template-engine-adapter";
+
+import { SendUserAccountNotification } from "../../services/send-user-account-notification";
 
 describe("#Send user account notification service", () => {
   let sendEmailService = null;
