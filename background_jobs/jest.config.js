@@ -26,9 +26,7 @@ export default {
   coverageDirectory: "coverage",
 
   // An array of regexp pattern strings used to skip coverage collection
-  // coveragePathIgnorePatterns: [
-  //   "\\\\node_modules\\\\"
-  // ],
+  coveragePathIgnorePatterns: ["\\\\node_modules\\\\"],
 
   // Indicates which provider should be used to instrument code for coverage
   coverageProvider: "v8",
@@ -71,7 +69,7 @@ export default {
   // maxWorkers: "50%",
 
   // An array of directory names to be searched recursively up from the requiring module's location
-  moduleDirectories: ["node_modules", "src", "tests"],
+  moduleDirectories: ["node_modules", "src", "__tests__"],
 
   // An array of file extensions your modules use
   moduleFileExtensions: ["js", "mjs", "cjs"],
@@ -112,9 +110,7 @@ export default {
   // rootDir: "./__tests__",
 
   // A list of paths to directories that Jest should use to search for files in
-  // roots: [
-  //   "<rootDir>"
-  // ],
+  roots: ["<rootDir>"],
 
   // Allows you to use a custom runner instead of Jest's default test runner
   // runner: "jest-runner",

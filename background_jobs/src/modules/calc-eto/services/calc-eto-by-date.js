@@ -1,38 +1,14 @@
 import { Logger } from "../../../shared/logger.js";
-import { Left, Right } from "../../../shared/result.js";
-import { ServiceProtocol } from "../../funceme/core/service-protocol.js";
+import { ServiceProtocol } from "../../equipments/core/service-protocol.js";
 import { CalcEto } from "../domain/calc-eto.js";
 
-export class CalcETOByDate extends ServiceProtocol {
-  #equipmentRepository;
-  #stationReadsRepository;
-
-  constructor(equipmentRepository, stationReadsRepository) {
+// TO-DO : remove useless service
+export class CalcETOService extends ServiceProtocol {
+  constructor() {
     super();
-    this.#equipmentRepository = equipmentRepository;
-    this.#stationReadsRepository = stationReadsRepository;
   }
-
-  /**
-   * @param {CalcEtoDTO} date Instance of CalcEtoDTO class
-   */
-  async execute(date) {
-    const year = date.getDateToQuery().getYear();
-    const day = date.getDateToQuery().getDay();
-
-    Logger.info({
-      msg: `Calculando dados de ETO pela data ${date
-        .getDateToQuery()
-        .getDate()}`,
-    });
-
-    const stationsEqps = await this.#equipmentRepository.getEquipments({
-      eqpType: "station",
-    });
-
-    const stationsEto = [];
-
-    if (stationsEqps.length === 0) {
+  async calc(station, date) {
+    if (!station) {
       Logger.warn({
         msg: "Não há equipamentos de estação cadastrados.",
       });
@@ -41,163 +17,146 @@ export class CalcETOByDate extends ServiceProtocol {
         message: "Não há equipamentos de estação cadastrados.",
       });
 
-      return Left.create(
-        new Error(`Não há equipamentos de estação cadastrados.`)
-      );
+      return null;
     }
 
-    for (const station of stationsEqps) {
-      // buscar leituras da estação usando o Fk_Equipment
-      const stationReads = await this.#stationReadsRepository.getStationReads({
-        idEqp: station.id,
-        date: date.getDateToQuery(),
+    /**
+     {
+        Code: 'A354',
+        Name: 'OEIRAS',
+        Latitude: '-6.974135',
+        Altitude: '154.03',
+        Longitude: '-42.146831',
+        FK_Organ: 1,
+        Measurements: {
+          Time: '2023-10-01',
+          AverageAtmosphericTemperature: 30.23,
+          MaxAtmosphericTemperature: 31.65,
+          MinAtmosphericTemperature: 29.08,
+          AverageRelativeHumidity: 30.04,
+          MaxRelativeHumidity: 33.21,
+          MinRelativeHumidity: 26.83,
+          AtmosphericPressure: 992.46,
+          WindVelocity: 99.72,
+          TotalRadiation: null
+        }
+      }
+     */
+
+    // buscar leituras da estação usando o Fk_Equipment
+
+    // e se não tiver dados de leituras da estação?
+    if (station.Measurements === null) {
+      Logger.warn({
+        msg: " Estação está sem dados de medições.",
       });
 
-      // e se não tiver dados de leituras da estação?
-      if (stationReads === null || stationReads.length === 0) {
-        Logger.warn({
-          msg: " Estação está sem dados de medições.",
-        });
-
-        this.logs.addWarningLog({
-          message: `Não há dados de medições da estação ${station.code} de ${
-            station.location
-          } na data de ${date.getDateToQuery()}`,
-          raw: {
-            equipment: station.id,
-          },
-        });
-
-        continue;
-      }
-
-      const altitude = station.altitude;
-
-      for (const stationRead of stationReads) {
-        const {
-          idRead,
-          averageAtmosphericTemperature,
-          minAtmosphericTemperature,
-          maxAtmosphericTemperature,
-          averageRelativeHumidity,
-          maxRelativeHumidity,
-          minRelativeHumidity,
-          atmosphericPressure,
-          totalRadiation,
-          windVelocity,
-        } = stationRead;
-
-        if (averageAtmosphericTemperature === null) {
-          this.logs.addWarningLog({
-            message: `Não irá computar os dados de ET0 pois não há dados de temperatura atmosférica média da estação ${station.code} de ${station.location}`,
-            raw: { equipment: station.id },
-          });
-
-          continue;
-        }
-
-        if (
-          minAtmosphericTemperature === null ||
-          maxAtmosphericTemperature === null
-        ) {
-          this.logs.addWarningLog({
-            message: `Não há dados de temperatura máxima ou mínima da estação ${station.code} de ${station.location}, portanto os valores irão serem estimados.`,
-            raw: { equipment: station.id },
-          });
-        }
-
-        if (totalRadiation === null) {
-          this.logs.addWarningLog({
-            message: `Não há dados de radiação solar média da estação ${station.code} de ${station.location}, portanto irá ser estimado o valor da radiação solar.`,
-            raw: { equipment: station.id },
-          });
-        }
-
-        if (atmosphericPressure === null) {
-          this.logs.addWarningLog({
-            message: `Não há dados de pressão atmosférica da estação ${station.code} de ${station.location}, portanto o valor irá ser estimado.`,
-            raw: { equipment: station.id },
-          });
-        }
-
-        if (windVelocity === null) {
-          this.logs.addWarningLog({
-            message: `Não há dados da velocidade média do vento da estação ${station.code} de ${station.location}, portanto irá ser adotado o valor de referência de 2 m/s.`,
-            raw: { equipment: station.id },
-          });
-        }
-
-        if (averageRelativeHumidity === null) {
-          this.logs.addWarningLog({
-            message: `Não há dados de umidade relativa média da estação ${station.code} de ${station.location}, portanto irá ser estimado o valor da umidade média.`,
-            raw: { equipment: station.id },
-          });
-        }
-
-        const eto = CalcEto({
-          date: {
-            year,
-            day,
-          },
-          measures: {
-            altitude,
-            sunQuantityHoursInDay: 11,
-            averageAtmosphericTemperature,
-            minAtmosphericTemperature,
-            maxAtmosphericTemperature,
-            averageRelativeHumidity,
-            maxRelativeHumidity,
-            minRelativeHumidity,
-            atmosphericPressure,
-            totalRadiation,
-            windVelocity,
-          },
-        });
-
-        if ((eto === null) | (eto === undefined)) {
-          this.logs.addErrorLog({
-            message: `Não foi possível calcular ET0 da estação ${station.code} de ${station.location} pois não há dados de temperatura média.`,
-            raw: { equipment: station.id },
-          });
-
-          continue;
-        }
-
-        this.logs.addInfoLog({
-          message: `Sucesso ao calcular dados de ET0 da estação ${station.code} de ${station.location}`,
-          raw: { equipment: station.id },
-        });
-
-        stationsEto.push({
-          idRead,
-          eto,
-        });
-      }
-    }
-
-    if (stationsEto.length === 0) {
       this.logs.addWarningLog({
-        message: `Não foi possível calcular ET0 da data ${date.getDateToQuery()}.`,
-      });
-      // return Left.create(
-      //   new Error(
-      //     `Não foi possível calcular ET0 da data ${date.getDateToQuery()}.`
-      //   )
-      // );
-      return Right.create();
-    }
-
-    if (stationsEto.length) {
-      Logger.info({
-        msg: "Salvando dados de ETO...",
+        message: `Não há dados de medições da estação ${station.Code}`,
+        raw: {
+          equipment: station.Code,
+        },
       });
 
-      // await this.#etoRepository.deleteByTime(date.getDate());
-
-      await this.#stationReadsRepository.updateEto(stationsEto);
-
-      // this.logs.addInfoLog(`Sucesso ao calcular dados de ET0 do dia.`);
-      return Right.create();
+      return null;
     }
+
+    const Altitude = station.Altitude;
+
+    const {
+      AverageAtmosphericTemperature,
+      MinAtmosphericTemperature,
+      MaxAtmosphericTemperature,
+      AverageRelativeHumidity,
+      MaxRelativeHumidity,
+      MinRelativeHumidity,
+      AtmosphericPressure,
+      TotalRadiation,
+      WindVelocity,
+    } = station.Measurements;
+
+    if (AverageAtmosphericTemperature === null) {
+      this.logs.addWarningLog({
+        message: `Não irá computar os dados de ET0 pois não há dados de temperatura atmosférica média da estação ${station.Code}`,
+        raw: { equipment: station.Code },
+      });
+
+      return null;
+    }
+
+    if (
+      MinAtmosphericTemperature === null ||
+      MaxAtmosphericTemperature === null
+    ) {
+      this.logs.addWarningLog({
+        message: `Não há dados de temperatura máxima ou mínima da estação ${station.Code}, portanto os valores irão serem estimados.`,
+        raw: { equipment: station.Code },
+      });
+    }
+
+    if (TotalRadiation === null) {
+      this.logs.addWarningLog({
+        message: `Não há dados de radiação solar média da estação ${station.Code}, portanto irá ser estimado o valor da radiação solar.`,
+        raw: { equipment: station.Code },
+      });
+    }
+
+    if (AtmosphericPressure === null) {
+      this.logs.addWarningLog({
+        message: `Não há dados de pressão atmosférica da estação ${station.Code}, portanto o valor irá ser estimado.`,
+        raw: { equipment: station.Code },
+      });
+    }
+
+    if (WindVelocity === null) {
+      this.logs.addWarningLog({
+        message: `Não há dados da velocidade média do vento da estação ${station.Code}, portanto irá ser adotado o valor de referência de 2 m/s.`,
+        raw: { equipment: station.Code },
+      });
+    }
+
+    if (AverageRelativeHumidity === null) {
+      this.logs.addWarningLog({
+        message: `Não há dados de umidade relativa média da estação ${station.Code}, portanto irá ser estimado o valor da umidade média.`,
+        raw: { equipment: station.Code },
+      });
+    }
+
+    const eto = CalcEto({
+      date: {
+        year: date.year,
+        day: date.day,
+        month: date.month,
+      },
+      measures: {
+        altitude: Altitude,
+        sunQuantityHoursInDay: 11,
+        averageAtmosphericTemperature: AverageAtmosphericTemperature,
+        minAtmosphericTemperature: MinAtmosphericTemperature,
+        maxAtmosphericTemperature: MaxAtmosphericTemperature,
+        averageRelativeHumidity: AverageRelativeHumidity,
+        maxRelativeHumidity: MaxRelativeHumidity,
+        minRelativeHumidity: MinRelativeHumidity,
+        atmosphericPressure: AtmosphericPressure,
+        totalRadiation: TotalRadiation,
+        windVelocity: WindVelocity,
+      },
+    });
+
+    if ((eto === null) | (eto === undefined)) {
+      this.logs.addErrorLog({
+        message: `Não foi possível calcular ET0 da estação ${station.Code} pois não há dados de temperatura média.`,
+        raw: { equipment: station.Code },
+      });
+
+      return null;
+    }
+
+    this.logs.addInfoLog({
+      message: `Sucesso ao calcular dados de ET0 da estação ${station.Code}`,
+      raw: { equipment: station.Code },
+    });
+
+    return eto;
   }
 }

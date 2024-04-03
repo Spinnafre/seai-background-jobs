@@ -50,28 +50,26 @@ export class MetereologicalEquipmentRepositoryInMemory {
     };
   }
 
-  async getEquipments({ organName = null, eqpType = "" }) {
+  async getEquipments({ eqpType = "" }) {
     const types = await this.getTypes();
 
     const idType = types.get(eqpType);
 
     let equipments = [];
 
-    if (organName) {
-      equipments = this.#metereologicalEquipment.filter(
-        (eqp) => eqp.Type == idType && eqp.Organ === organName
-      );
-    } else {
-      equipments = this.#metereologicalEquipment.filter(
-        (eqp) => eqp.Type == idType
-      );
-    }
+    equipments = this.#metereologicalEquipment.filter(
+      (eqp) => eqp.Type == idType
+    );
 
     return equipments.map((station) => {
       return {
-        Id: station.IdEquipment,
-        Code: station.IdEquipmentExternal,
-        Location: station.Name,
+        Id: station.Id,
+        Code: station.Code,
+        Name: station.Name,
+        Location: {
+          Latitude: station.Latitude,
+          Longitude: station.Longitude,
+        },
         Altitude: station.Altitude,
         Type: station.Type,
         Organ: station.Organ,

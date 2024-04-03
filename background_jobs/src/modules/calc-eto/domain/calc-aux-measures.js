@@ -11,7 +11,7 @@ export function CalcExtraterrestrialRadiation(
 
   const sinq =
     omega_s * Math.sin(phi) * Math.sin(solarDeclination) +
-    Math.sin(omega_s) * Math.sin(phi) * Math.sin(solarDeclination);
+    Math.sin(omega_s) * Math.cos(phi) * Math.cos(solarDeclination);
 
   return (sinq * 24 * SOLAR_CONSTANT * distanceBetweenEarthAndSun) / Math.PI;
 }
@@ -133,12 +133,14 @@ export function CalcFlowHeatSoil() {
   return 0;
 }
 export function CalcGAsterico(gama, windVelocity) {
+  //Fator da planilha
+  // 200/208 = 0.9615
+  // 50/208 = 0.24
+  // Caso diário -> 70.72/208 = 0.34
   const r_s = 70.72;
 
-  const r_a = windVelocity < 0.5 ? 208 / 0.5 : 208 / windVelocity;
-
-  //Fator da planilha
   //Assume que o vento no mínimo seria 0.5 m/s (Colocar como cadastro?)
+  const r_a = windVelocity < 0.5 ? 208 / 0.5 : 208 / windVelocity;
 
   //Produto com gama no denominador
   return gama * (1 + r_s / r_a);
@@ -162,24 +164,24 @@ export function CalcSteamPressure({
   minRelativeHumidity,
   maxRelativeHumidity,
 }) {
-  const saturationSteamPressureMin =
+  const minSaturationSteamPressure =
     0.6108 *
     Math.exp(
       (17.27 * minAtmosphericTemperature) / (minAtmosphericTemperature + 237.3)
     );
 
-  const saturationSteamPressureMax =
+  const maxSaturationSteamPressure =
     0.6108 *
     Math.exp(
       (17.27 * maxAtmosphericTemperature) / (maxAtmosphericTemperature + 237.3)
     );
 
   const saturationSteamPressure =
-    saturationSteamPressureMin + saturationSteamPressureMax / 2;
+    (minSaturationSteamPressure + maxSaturationSteamPressure) / 2;
 
   const currentSteamPressureValue =
-    ((saturationSteamPressureMin * maxRelativeHumidity) / 100 +
-      (saturationSteamPressureMax * minRelativeHumidity) / 100) /
+    ((minSaturationSteamPressure * maxRelativeHumidity) / 100 +
+      (maxSaturationSteamPressure * minRelativeHumidity) / 100) /
     2;
 
   return {
@@ -188,16 +190,21 @@ export function CalcSteamPressure({
   };
 }
 // antigo etoPrecalc
-export function CalcInclinationBetweenSteamPressureAndTemperature(temperature) {
+export function CalcInclinationBetweenSteamPressureAndTemperature(
+  averageAtmosphericTemperature
+) {
   /*
     Cálculo do Delta (Inclinação da curva entre pressão de vapor de saturação e temperatura)
     pelo documento de referência, a diferença é muito pequena
   */
-  const delta =
-    (2503 * Math.exp((17.27 * temperature) / (temperature + 237.3))) /
-    (temperature + 237.3) ** 2;
-
-  return delta;
+  return (
+    (2503 *
+      Math.exp(
+        (17.27 * averageAtmosphericTemperature) /
+          (averageAtmosphericTemperature + 237.3)
+      )) /
+    (averageAtmosphericTemperature + 237.3) ** 2
+  );
 }
 
 export function CalcGama(atmosphericPressure) {

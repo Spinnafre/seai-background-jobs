@@ -17,28 +17,16 @@ import {
   EstimateSolarRadiation,
 } from "./calc-aux-measures.js";
 
-function calculateJulianDate(year, month, day) {
-  if (month < 3) {
-    year -= 1;
-    month += 12;
-  }
-
-  const A = Math.floor(year / 100);
-  const B = 2 - A + Math.floor(A / 4);
-  const C = year > 0 ? 365.25 * year : 365.25 * year - 0.75;
-  const E = 30.6001 * (month + 1);
-
-  const JD = B + C + day + E + 1720994.5;
-  return JD;
+function calculateJulianDate(currentDate) {
+  const firstYearDate = new Date(currentDate.getFullYear() + "-01-01");
+  return (
+    Math.ceil(Math.abs(currentDate - firstYearDate) / (1000 * 60 * 60 * 24)) + 1
+  );
 }
 
 export function CalcEto(
   { date, measures } = {
-    date: {
-      year: null,
-      day: null,
-      month: null,
-    },
+    date,
     measures: {
       altitude,
       longitude,
@@ -56,22 +44,7 @@ export function CalcEto(
     },
   }
 ) {
-  const year = date.year;
-  const month = date.month;
-  const day = date.day;
-
-  // Example usage
-  const gregorianDate = new Date(`${year}-${month}-${day}`);
-
-  const julianDay = calculateJulianDate(
-    gregorianDate.getUTCFullYear(),
-    gregorianDate.getUTCMonth() + 1,
-    gregorianDate.getUTCDate()
-  );
-
-  // const julianDay = day - year + 1;
-
-  console.log("julianDay ", julianDay);
+  const julianDay = calculateJulianDate(date);
 
   const PHI = (measures.latitude * Math.PI) / 180;
 

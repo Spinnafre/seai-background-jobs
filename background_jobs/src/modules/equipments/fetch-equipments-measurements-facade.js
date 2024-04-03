@@ -66,10 +66,7 @@ export class FetchEquipmentsMeasures {
     stations.forEach((station) => {
       // Is here or delegate to other services?
       if (Reflect.has(station.Measurements, "Et0") === false) {
-        const year = command.getYesterdayDate().getFullYear();
-        const day = command.getYesterdayDate().getDay();
-
-        const Et0 = this.#calcETO.calc(station, year, day);
+        const Et0 = this.#calcETO.calc(station, command.getYesterdayDate());
 
         station.Measurements.Et0 = Et0;
       }

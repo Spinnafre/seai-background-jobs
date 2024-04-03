@@ -3,8 +3,8 @@ import { DateFormatter } from "../../shared/date-formatter.js";
 
 export class FetchEquipmentCommand {
   #currentDate;
-  constructor() {
-    this.#currentDate = new Date();
+  constructor(isoString) {
+    this.#currentDate = isoString ? new Date(isoString) : new Date();
   }
 
   getYesterdayDate() {
