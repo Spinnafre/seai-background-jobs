@@ -1,7 +1,7 @@
 import { Logger } from "../../../../shared/logger.js";
 import { Left, Right } from "../../../../shared/result.js";
 import { PluviometerMapper, StationMapper } from "../../core/mappers/index.js";
-import { CalcEto } from "../../core/et0";
+import { CalcEto } from "../../core/et0/calc-eto.js";
 
 export class FetchEquipmentsMeasures {
   #fetchEquipmentsService;
