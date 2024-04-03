@@ -1,1 +1,1 @@
-export * from "./calc-eto";
+export * from "./calc-eto.js";

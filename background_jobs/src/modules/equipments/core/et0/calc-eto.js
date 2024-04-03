@@ -15,7 +15,7 @@ import {
   CalcSteamPressure,
   CalcSunsetHourAngle,
   EstimateSolarRadiation,
-} from "./helpers";
+} from "./helpers.js";
 
 function calculateJulianDate(currentDate) {
   const firstYearDate = new Date(currentDate.getFullYear() + "-01-01");
