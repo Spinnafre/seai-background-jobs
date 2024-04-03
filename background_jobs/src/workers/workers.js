@@ -1,24 +1,22 @@
 import {
-  makeFetchFuncemeEquipmentsHandler,
-  makeFetchFuncemeMeasurementsHandler,
   makeSendAccountNotificationHandler,
   makeSendNewsletterHandler,
 } from "./factories/handlers/index.js";
+
 import {
+  FetchFuncemeEquipmentsWorker,
   FetchFuncemeMeasurementsWorker,
-  FuncemeFuncemeEquipmentsWorker,
   SendNewsletterWorker,
   SendUserAccountNotificationWorker,
 } from "./handlers/index.js";
 
 export default [
   {
-    queue_name: FuncemeFuncemeEquipmentsWorker.name_queue,
+    queue_name: FetchFuncemeEquipmentsWorker.name_queue,
     workers: [
       {
-        name: FuncemeFuncemeEquipmentsWorker.worker_name,
-        process: (command) =>
-          makeFetchFuncemeEquipmentsHandler().handler(command),
+        name: FetchFuncemeEquipmentsWorker.worker_name,
+        process: (command) => FetchFuncemeEquipmentsWorker.handler(command),
       },
     ],
   },
@@ -27,8 +25,7 @@ export default [
     workers: [
       {
         name: FetchFuncemeMeasurementsWorker.worker_name,
-        process: (command) =>
-          makeFetchFuncemeMeasurementsHandler().handler(command),
+        process: (command) => FetchFuncemeMeasurementsWorker.handler(command),
       },
     ],
   },

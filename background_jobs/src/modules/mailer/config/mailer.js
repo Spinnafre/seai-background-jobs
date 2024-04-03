@@ -7,8 +7,6 @@ const MAILER_TRANSPORT_CONFIG = {
   },
 };
 
-console.log("Mailer environment : ", env);
-
 if (env == "development") {
   Object.assign(MAILER_TRANSPORT_CONFIG, {
     service: process.env.MAIL_SERVICE,
