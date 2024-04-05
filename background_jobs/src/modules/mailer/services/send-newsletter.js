@@ -35,9 +35,9 @@ export class SendNewsletterEmail {
         subscribers && subscribers.length
           ? [
               ...subscribers.map((data) => data.Email),
-              ...[MAILER_OPTIONS.to],
+              // ...[MAILER_OPTIONS.to],
             ].join(",")
-          : [MAILER_OPTIONS.to].join(",");
+          : [MAILER_OPTIONS.from].join(",");
 
       Logger.info("Enviando newsletter...");
 
