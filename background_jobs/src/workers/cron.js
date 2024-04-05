@@ -1,18 +1,18 @@
 import {
-  FuncemeFuncemeEquipmentsWorker,
+  FetchFuncemeEquipmentsWorker,
   FetchFuncemeMeasurementsWorker,
-} from "./handlers/index.js";
+} from "./handlers/funceme/index.js";
 
 export const cronJobs = [
   {
-    queue: FuncemeFuncemeEquipmentsWorker.name_queue,
+    queue: FetchFuncemeEquipmentsWorker.name_queue,
     cron: "0 0 * * *",
     data: null,
     options: {
       tz: "America/Fortaleza",
       retryLimit: 3,
       retryDelay: 60,
-      priority: 2,
+      priority: 1,
     },
   },
   {
@@ -26,15 +26,4 @@ export const cronJobs = [
       priority: 2,
     },
   },
-  // {
-  //   queue: CalcET0Worker.name_queue,
-  //   cron: "10 0 * * *",
-  //   data: null,
-  //   options: {
-  //     tz: "America/Fortaleza",
-  //     retryLimit: 3,
-  //     retryDelay: 15,
-  //     priority: 1,
-  //   },
-  // },
 ];

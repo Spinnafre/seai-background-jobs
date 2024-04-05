@@ -7,18 +7,13 @@ const MAILER_TRANSPORT_CONFIG = {
   },
 };
 
-console.log("Mailer environment : ", env);
-
 if (env == "development") {
   Object.assign(MAILER_TRANSPORT_CONFIG, {
-    service: process.env.MAIL_SERVICE,
+    port: Number(process.env.MAIL_PORT_DEV),
+    host: process.env.MAIL_HOST_DEV,
     auth: {
-      type: process.env.AUTH_TYPE,
-      user: process.env.MAIL_USERNAME,
-      pass: process.env.MAIL_PASSWORD,
-      clientId: process.env.OAUTH_CLIENTID,
-      clientSecret: process.env.OAUTH_CLIENT_SECRET,
-      refreshToken: process.env.OAUTH_CLIENT_REFRESH_TOKEN,
+      user: process.env.MAIL_USERNAME_DEV,
+      pass: process.env.MAIL_PASSWORD_DEV,
     },
   });
 } else {
@@ -33,8 +28,8 @@ if (env == "development") {
 }
 
 const MAILER_OPTIONS = {
-  from: process.env.MAIL_FROM || "test@gmail.com",
-  to: "test@gmail.com",
+  from: MAILER_TRANSPORT_CONFIG.auth.user,
+  to: "test@gmail.com", //???
 };
 
 export { MAILER_TRANSPORT_CONFIG, MAILER_OPTIONS };

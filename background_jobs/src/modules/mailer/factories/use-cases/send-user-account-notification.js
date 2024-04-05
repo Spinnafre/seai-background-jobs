@@ -1,4 +1,3 @@
-import { DbNewsLetterRepository } from "../../../../shared/database/repositories/Newsletter.js";
 import { SendEmailService } from "../../external/send-email.js";
 import { HtmlTemplateEngineAdapter } from "../../external/template-engine-adapter.js";
 import { SendUserAccountNotification } from "../../services/send-user-account-notification.js";

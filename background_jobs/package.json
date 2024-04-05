@@ -7,7 +7,7 @@
   "scripts": {
     "start:dev": "cross-env NODE_ENV=development nodemon",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "test:dev": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watchAll",
+    "test:dev": "NODE_ENV=test node --experimental-vm-modules  node_modules/jest/bin/jest.js --watchAll",
     "testWithCoverage": "jest --coverage"
   },
   "keywords": [
