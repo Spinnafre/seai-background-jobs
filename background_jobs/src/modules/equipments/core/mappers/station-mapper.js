@@ -94,7 +94,7 @@ export class StationMapper {
       AtmosphericPressure: AtmosphericPressure || null,
       TotalRadiation: TotalRadiation || null,
       WindVelocity: WindVelocity || null,
-      Et0: WindVelocity || null,
+      Et0: Et0 || null,
     });
 
     return data;
