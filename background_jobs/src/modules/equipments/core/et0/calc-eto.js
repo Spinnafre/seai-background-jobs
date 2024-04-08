@@ -25,12 +25,14 @@ function calculateJulianDate(currentDate) {
 }
 
 export function CalcEto(
-  { date, measures } = {
+  { date, location, measures } = {
     date,
+    location: {
+      altitude: null,
+      longitude: null,
+      latitude: null,
+    },
     measures: {
-      altitude,
-      longitude,
-      latitude,
       sunQuantityHoursInDay: 11,
       averageAtmosphericTemperature,
       minAtmosphericTemperature,
@@ -44,10 +46,19 @@ export function CalcEto(
     },
   }
 ) {
-  console.log("[CALC-ETO] ::: ", measures);
+  if (
+    [location.altitude, location.latitude].some((location) => location === null)
+  ) {
+    return null;
+  }
+
+  if (Object.values(measures).some((measure) => measure === null)) {
+    return null;
+  }
+
   const julianDay = calculateJulianDate(date);
 
-  const PHI = (measures.latitude * Math.PI) / 180;
+  const PHI = (location.latitude * Math.PI) / 180;
 
   const solarDeclination =
     0.409 * Math.sin(((2 * Math.PI) / 365) * julianDay - 1.39); // Declinação solar no dia "J"
@@ -85,7 +96,7 @@ export function CalcEto(
   }
 
   const clearSkyRadiation = CalcClearSkyRadiation(
-    measures.altitude,
+    location.altitude,
     extraterrestrialRadiation
   ); // radiação de céu limpo
 
@@ -118,7 +129,7 @@ export function CalcEto(
   // Pressão utilizando a altitude local
   const atmosphericPressure =
     measures.atmosphericPressure ||
-    101.3 * ((293 - 0.0065 * measures.altitude) / 293) ** 5.26; // Pressão utilizando a altitude local
+    101.3 * ((293 - 0.0065 * location.altitude) / 293) ** 5.26; // Pressão utilizando a altitude local
 
   // What if any measure not exists?
   const { currentSteamPressureValue, saturationSteamPressure } = [

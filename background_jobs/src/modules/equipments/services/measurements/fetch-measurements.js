@@ -78,10 +78,12 @@ export class FetchEquipmentsMeasures {
 
         const et0 = CalcEto({
           date: command.getYesterdayDate(),
-          measures: {
+          location: {
             altitude: station?.Altitude || null,
             longitude: station?.Longitude || null,
             latitude: station?.Latitude || null,
+          },
+          measures: {
             averageAtmosphericTemperature: AverageAtmosphericTemperature,
             minAtmosphericTemperature: MinAtmosphericTemperature,
             maxAtmosphericTemperature: MaxAtmosphericTemperature,

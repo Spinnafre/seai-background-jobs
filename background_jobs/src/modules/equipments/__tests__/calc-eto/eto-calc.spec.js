@@ -3,7 +3,7 @@ import { describe, expect, test } from "@jest/globals";
 import { CalcEto } from "../../core/et0/index.js";
 
 describe("ET0 calc", () => {
-  test("Should be able to calc ET0 when atmospheric pressure not exists", () => {
+  test("Shouldn't be able to calculate ET0 when there is no measurement", () => {
     const maxRelativeHumidity = 100;
     const minRelativeHumidity = 80;
 
@@ -17,10 +17,12 @@ describe("ET0 calc", () => {
 
     const eto = CalcEto({
       date: new Date("2024-02-27"),
-      measures: {
+      location: {
         altitude: 30.4,
         longitude: -38.557368, // useLess
         latitude: -3.79512699,
+      },
+      measures: {
         sunQuantityHoursInDay: 11, // useLess
         averageAtmosphericTemperature,
         minAtmosphericTemperature,
@@ -35,7 +37,7 @@ describe("ET0 calc", () => {
       },
     });
 
-    expect(eto).toBeCloseTo(1.71, 1);
+    expect(eto).toBe(null);
   });
   test("Should be able to calc ET0 when all measurements exists", () => {
     const maxRelativeHumidity = 99.7;
@@ -49,10 +51,12 @@ describe("ET0 calc", () => {
 
     const eto = CalcEto({
       date: new Date("2024-02-27"),
-      measures: {
+      location: {
         altitude: 30.4,
         longitude: -38.557368, // useLess
         latitude: -3.79512699,
+      },
+      measures: {
         sunQuantityHoursInDay: 11, // useLess
         averageAtmosphericTemperature,
         minAtmosphericTemperature,
