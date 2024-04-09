@@ -348,29 +348,19 @@ export class MetereologicalEquipmentRepository {
 
   async getStationCodesWithMeasurements(equipmentsCodes = [], time) {
     const result = await this.#connection
-      .select(
-        "IdEquipmentExternal",
-        "Time",
-        "TotalRadiation",
-        "MaxRelativeHumidity",
-        "MinRelativeHumidity",
-        "AverageRelativeHumidity",
-        "MaxAtmosphericTemperature",
-        "AverageAtmosphericTemperature",
-        "AtmosphericPressure",
-        "WindVelocity",
-        "Et0"
-      )
-      .from("ReadStations as rs")
+      .select("MetereologicalEquipment.IdEquipmentExternal")
+      .from("ReadStations")
       .innerJoin(
-        "MetereologicalEquipment as me ",
-        "me.IdEquipment",
-        "rs.FK_Equipment"
+        "MetereologicalEquipment",
+        "MetereologicalEquipment.IdEquipment",
+        "ReadStations.FK_Equipment"
       )
       .whereIn({ IdEquipmentExternal: equipmentsCodes })
       .andWhere({ Time: time });
 
     const equipmentsWithMeasures = new Set();
+
+    console.log("[getStationCodesWithMeasurements] ", result);
 
     if (result.length) {
       result.forEach((eqp) => {
@@ -385,12 +375,12 @@ export class MetereologicalEquipmentRepository {
 
   async getPluviometersCodesWithMeasurements(equipmentsCodes = [], time) {
     const result = await this.#connection
-      .select("IdEquipmentExternal", "Time", "Value")
-      .from("ReadPluviometers as rp")
+      .select("MetereologicalEquipment.IdEquipmentExternal")
+      .from("ReadPluviometers")
       .innerJoin(
-        "MetereologicalEquipment as me ",
-        "me.IdEquipment",
-        "rp.FK_Equipment"
+        "MetereologicalEquipment",
+        "MetereologicalEquipment.IdEquipment",
+        "ReadPluviometers.FK_Equipment"
       )
       .whereIn({ IdEquipmentExternal: equipmentsCodes })
       .andWhere({ Time: time });
