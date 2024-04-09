@@ -33,6 +33,7 @@ class FTPClientAdapterMock {
   }
 
   getFile(folder, file) {
+    // /home/spin/dev/nodejs/seai-background-jobs/background_jobs/src/modules/equipments/__tests__/doubles/funceme/data
     console.log(
       "Reading file from : ",
       pathToFileURL(import.meta.url).pathname
@@ -40,7 +41,17 @@ class FTPClientAdapterMock {
     console.log(`[🔍] Getting stream from path ${folder}/${file}`);
     return createReadStream(
       // "background_jobs",
-      resolve("__tests__", "doubles", "funceme", "data", folder, file)
+      resolve(
+        "src",
+        "modules",
+        "equipments",
+        "__tests__",
+        "doubles",
+        "funceme",
+        "data",
+        folder,
+        file
+      )
     );
   }
 }

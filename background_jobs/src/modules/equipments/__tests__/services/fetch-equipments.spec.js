@@ -9,15 +9,15 @@ import {
   test,
 } from "@jest/globals";
 
-import { MetereologicalEquipmentRepositoryInMemory } from "../../../../../__tests__/doubles/infra/repositories/inMemory/metereologicalEquipment.js";
-import { MetereologicalOrganRepositoryInMemory } from "../../../../../__tests__/doubles/infra/repositories/inMemory/mtereologicalOrganRepository.js";
-import { FTPClientAdapterMock } from "../../../../../__tests__/doubles/infra/services/ftp/ftp-stub.js";
+import { MetereologicalEquipmentRepositoryInMemory } from "../../__tests__/doubles/infra/repositories/inMemory/metereologicalEquipment.js";
+import { MetereologicalOrganRepositoryInMemory } from "../../__tests__/doubles/infra/repositories/inMemory/metereologicalOrganRepository.js";
 
 import { EquipmentCommand } from "../../services/commands/command.js";
 
 import { FetchEquipments } from "../../services/equipments/fetch-equipments.js";
 
 import { FetchFuncemeEquipments } from "../../data/funceme/services/fetch-funceme-measures.js";
+import { FTPClientAdapterMock } from "../doubles/infra/ftp/ftp-stub.js";
 // Domain Model
 
 describe("Fetch Equipments", () => {
