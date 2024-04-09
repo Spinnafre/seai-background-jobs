@@ -85,4 +85,47 @@ export class MetereologicalEquipmentRepositoryInMemory {
   async insertPluviometersMeasurements(measurements = []) {
     this.#pluviometersReads = [...measurements, ...this.#pluviometersReads];
   }
+
+  async getStationCodesWithMeasurements(equipmentsCodes = [], time) {
+    const codes = new Set();
+
+    const eqps = this.#metereologicalEquipment.filter((eqp) =>
+      equipmentsCodes.includes(eqp.Code)
+    );
+    // .map((eqp) => eqp.Code);
+
+    this.#stationsReads.forEach((measurements) => {
+      const eqp = eqps.find((eqp) => eqp.Id === measurements.FK_Equipment);
+      if (measurements.Time === time && !!eqp) {
+        codes.add(eqp.Code);
+      }
+    });
+
+    return new Set(codes);
+  }
+
+  async getPluviometersCodesWithMeasurements(equipmentsCodes = [], time) {
+    const codes = new Set();
+
+    const eqps = this.#metereologicalEquipment.filter((eqp) =>
+      equipmentsCodes.includes(eqp.Code)
+    );
+    // .map((eqp) => eqp.Code);
+
+    this.#pluviometersReads.forEach((measurements) => {
+      const eqp = eqps.find((eqp) => eqp.Id === measurements.FK_Equipment);
+      if (measurements.Time === time && !!eqp) {
+        codes.add(eqp.Code);
+      }
+    });
+
+    return new Set(codes);
+  }
+
+  async updateStationsMeasurements(measurements = []) {
+    return true;
+  }
+  async updatePluviometersMeasurements(measurements = []) {
+    return true;
+  }
 }

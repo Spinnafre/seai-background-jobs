@@ -19,8 +19,6 @@ import { connections } from "../../data/database/connection.js";
 describe.skip("Equipment Repository", () => {
   const repository = new MetereologicalEquipmentRepository();
 
-  // beforeAll(async () => {});
-
   afterAll(async () => {
     await connections.equipments.destroy();
   });
