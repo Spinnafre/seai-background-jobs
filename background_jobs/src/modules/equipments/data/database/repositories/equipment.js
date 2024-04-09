@@ -211,12 +211,11 @@ export class MetereologicalEquipmentRepository {
   }
 
   async updateStationsMeasurements(measurements = []) {
-    try {
-      await this.#connection.transaction(async (trx) => {
-        const tempTableName = "Temp_ReadStations";
+    await this.#connection.transaction(async (trx) => {
+      const tempTableName = "Temp_ReadStations";
 
-        // Create a temporary table
-        await trx.raw(`
+      // Create a temporary table
+      await trx.raw(`
         CREATE TABLE "${tempTableName}" (
         "IdRead" INT GENERATED ALWAYS AS IDENTITY,
         "Time" DATE NOT NULL,
@@ -237,33 +236,30 @@ export class MetereologicalEquipmentRepository {
         );
       `);
 
-        const toPersistency = measurements.map((measures) => {
-          return {
-            FK_Equipment: measures.FK_Equipment,
-            FK_Organ: measures.FK_Organ,
-            Time: measures.Time,
-            Hour: measures.Hour,
-            TotalRadiation: measures.TotalRadiation,
-            MaxRelativeHumidity: measures.MaxRelativeHumidity,
-            MinRelativeHumidity: measures.MinRelativeHumidity,
-            AverageRelativeHumidity: measures.AverageRelativeHumidity,
-            MaxAtmosphericTemperature: measures.MaxAtmosphericTemperature,
-            MinAtmosphericTemperature: measures.MinAtmosphericTemperature,
-            AverageAtmosphericTemperature:
-              measures.AverageAtmosphericTemperature,
-            AtmosphericPressure: measures.AtmosphericPressure,
-            WindVelocity: measures.WindVelocity,
-            Et0: measures.Et0,
-          };
-        });
+      const toPersistency = measurements.map((measures) => {
+        return {
+          FK_Equipment: measures.FK_Equipment,
+          FK_Organ: measures.FK_Organ,
+          Time: measures.Time,
+          Hour: measures.Hour,
+          TotalRadiation: measures.TotalRadiation,
+          MaxRelativeHumidity: measures.MaxRelativeHumidity,
+          MinRelativeHumidity: measures.MinRelativeHumidity,
+          AverageRelativeHumidity: measures.AverageRelativeHumidity,
+          MaxAtmosphericTemperature: measures.MaxAtmosphericTemperature,
+          MinAtmosphericTemperature: measures.MinAtmosphericTemperature,
+          AverageAtmosphericTemperature: measures.AverageAtmosphericTemperature,
+          AtmosphericPressure: measures.AtmosphericPressure,
+          WindVelocity: measures.WindVelocity,
+          Et0: measures.Et0,
+        };
+      });
 
-        console.log("[STATIONS MEASURES TO INSERT] ", toPersistency);
+      // Insert new data into the temporary table
+      await trx(tempTableName).insert(toPersistency);
 
-        // Insert new data into the temporary table
-        await trx(tempTableName).insert(toPersistency);
-
-        // Perform the batch update
-        await trx.raw(`
+      // Perform the batch update
+      await trx.raw(`
         UPDATE "ReadStations" AS rs
         SET
           "FK_Equipment" =  t."FK_Equipment",
@@ -284,23 +280,17 @@ export class MetereologicalEquipmentRepository {
         WHERE rs."Time" = t."Time" AND rs."FK_Equipment" = t."FK_Equipment";
     `);
 
-        // Clean up the temporary table
-        await trx.raw(`DROP TABLE IF EXISTS "${tempTableName}"`);
-
-        console.log("Batch update completed successfully.");
-      });
-    } catch (error) {
-      console.error("Error during batch update:", error);
-    }
+      // Clean up the temporary table
+      await trx.raw(`DROP TABLE IF EXISTS "${tempTableName}"`);
+    });
   }
 
   async updatePluviometersMeasurements(measurements = []) {
-    try {
-      await this.#connection.transaction(async (trx) => {
-        const tempTableName = "Temp_ReadPluviometers";
+    await this.#connection.transaction(async (trx) => {
+      const tempTableName = "Temp_ReadPluviometers";
 
-        // Create a temporary table
-        await trx.raw(`
+      // Create a temporary table
+      await trx.raw(`
         CREATE TABLE "${tempTableName}" (
           "IdRead" INT GENERATED ALWAYS AS IDENTITY,
           "Value" REAL,
@@ -312,21 +302,21 @@ export class MetereologicalEquipmentRepository {
         );
       `);
 
-        const toPersistency = measurements.map((eqp) => {
-          return {
-            FK_Equipment: eqp.FK_Equipment,
-            FK_Organ: eqp.FK_Organ,
-            Time: eqp.Time,
-            Hour: eqp.Hour,
-            Value: eqp.Value,
-          };
-        });
+      const toPersistency = measurements.map((eqp) => {
+        return {
+          FK_Equipment: eqp.FK_Equipment,
+          FK_Organ: eqp.FK_Organ,
+          Time: eqp.Time,
+          Hour: eqp.Hour,
+          Value: eqp.Value,
+        };
+      });
 
-        // Insert new data into the temporary table
-        await trx(tempTableName).insert(toPersistency);
+      // Insert new data into the temporary table
+      await trx(tempTableName).insert(toPersistency);
 
-        // Perform the batch update
-        await trx.raw(`
+      // Perform the batch update
+      await trx.raw(`
         UPDATE "ReadPluviometers" AS rp
         SET
           "FK_Equipment" = t."FK_Equipment",
@@ -338,18 +328,12 @@ export class MetereologicalEquipmentRepository {
         WHERE rp."Time" = t."Time" AND rp."FK_Equipment" = t."FK_Equipment";
     `);
 
-        // Clean up the temporary table
-        await trx.raw(`DROP TABLE IF EXISTS "${tempTableName}"`);
-
-        console.log("Batch update completed successfully.");
-      });
-    } catch (error) {
-      console.error("Error during batch update:", error);
-    }
+      // Clean up the temporary table
+      await trx.raw(`DROP TABLE IF EXISTS "${tempTableName}"`);
+    });
   }
 
   async getStationCodesWithMeasurements(equipmentsCodes = [], time) {
-    console.log("[getStationCodesWithMeasurements] ", equipmentsCodes);
     const result = await this.#connection
       .select("MetereologicalEquipment.IdEquipmentExternal")
       .from("ReadStations")
@@ -362,8 +346,6 @@ export class MetereologicalEquipmentRepository {
       .andWhere({ Time: time });
 
     const equipmentsWithMeasures = new Set();
-
-    console.log("[getStationCodesWithMeasurements] ", result);
 
     if (result.length) {
       result.forEach((eqp) => {
