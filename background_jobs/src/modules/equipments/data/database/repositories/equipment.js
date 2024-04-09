@@ -257,6 +257,8 @@ export class MetereologicalEquipmentRepository {
           };
         });
 
+        console.log("[STATIONS MEASURES TO INSERT] ", toPersistency);
+
         // Insert new data into the temporary table
         await trx(tempTableName).insert(toPersistency);
 
@@ -278,12 +280,12 @@ export class MetereologicalEquipmentRepository {
           "AtmosphericPressure" = t."AtmosphericPressure",
           "WindVelocity" = t."WindVelocity",
           "Et0" = t."Et0"
-        FROM ${tempTableName} AS t
-        WHERE rs."IdRead" = t."IdRead";
+        FROM "${tempTableName}" AS t
+        WHERE rs."Time" = t."Time" AND rs."FK_Equipment" = t."FK_Equipment";
     `);
 
         // Clean up the temporary table
-        await trx.dropTable(tempTableName);
+        await trx.raw(`DROP TABLE IF EXISTS "${tempTableName}"`);
 
         console.log("Batch update completed successfully.");
       });
@@ -332,12 +334,12 @@ export class MetereologicalEquipmentRepository {
           "Time" = t."Time",
           "Hour" = t."Hour",
           "Value" = t."Value"
-        FROM ${tempTableName} AS t
-        WHERE rp."IdRead" = t."IdRead";
+        FROM "${tempTableName}" AS t
+        WHERE rp."Time" = t."Time" AND rp."FK_Equipment" = t."FK_Equipment";
     `);
 
         // Clean up the temporary table
-        await trx.dropTable(tempTableName);
+        await trx.raw(`DROP TABLE IF EXISTS "${tempTableName}"`);
 
         console.log("Batch update completed successfully.");
       });
@@ -347,6 +349,7 @@ export class MetereologicalEquipmentRepository {
   }
 
   async getStationCodesWithMeasurements(equipmentsCodes = [], time) {
+    console.log("[getStationCodesWithMeasurements] ", equipmentsCodes);
     const result = await this.#connection
       .select("MetereologicalEquipment.IdEquipmentExternal")
       .from("ReadStations")
@@ -355,7 +358,7 @@ export class MetereologicalEquipmentRepository {
         "MetereologicalEquipment.IdEquipment",
         "ReadStations.FK_Equipment"
       )
-      .whereIn({ IdEquipmentExternal: equipmentsCodes })
+      .whereIn("IdEquipmentExternal", equipmentsCodes)
       .andWhere({ Time: time });
 
     const equipmentsWithMeasures = new Set();
@@ -382,7 +385,7 @@ export class MetereologicalEquipmentRepository {
         "MetereologicalEquipment.IdEquipment",
         "ReadPluviometers.FK_Equipment"
       )
-      .whereIn({ IdEquipmentExternal: equipmentsCodes })
+      .whereIn("IdEquipmentExternal", equipmentsCodes)
       .andWhere({ Time: time });
 
     const equipmentsWithMeasures = new Set();
