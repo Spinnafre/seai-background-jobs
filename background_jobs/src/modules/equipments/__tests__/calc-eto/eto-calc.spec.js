@@ -40,37 +40,27 @@ describe("ET0 calc", () => {
     expect(eto).toBe(null);
   });
   test("Should be able to calc ET0 when all measurements exists", () => {
-    const maxRelativeHumidity = 99.7;
-    const minRelativeHumidity = 85.7;
-
-    const maxAtmosphericTemperature = 27.44;
-    const minAtmosphericTemperature = 23.58;
-
-    const averageAtmosphericTemperature =
-      (maxAtmosphericTemperature + minAtmosphericTemperature) / 2;
-
     const eto = CalcEto({
-      date: new Date("2024-02-27"),
+      date: new Date("2024-04-11"),
       location: {
-        altitude: 30.4,
+        altitude: 28,
         longitude: -38.557368, // useLess
         latitude: -3.79512699,
       },
       measures: {
         sunQuantityHoursInDay: 11, // useLess
-        averageAtmosphericTemperature,
-        minAtmosphericTemperature,
-        maxAtmosphericTemperature,
-        averageRelativeHumidity:
-          (maxRelativeHumidity + minRelativeHumidity) / 2,
-        maxRelativeHumidity,
-        minRelativeHumidity,
-        atmosphericPressure: 100.814,
-        totalRadiation: 83.33,
-        windVelocity: 1.07,
+        averageAtmosphericTemperature: 27.58,
+        maxAtmosphericTemperature: 33.2,
+        minAtmosphericTemperature: 24.45,
+        averageRelativeHumidity: 86.58,
+        maxRelativeHumidity: 99.5,
+        minRelativeHumidity: 61.66,
+        atmosphericPressure: 1008.33,
+        totalRadiation: 206.98,
+        windVelocity: 1.64,
       },
     });
 
-    expect(eto).toBeCloseTo(1.66, 1);
+    expect(eto).toBeCloseTo(2.9596856, 1);
   });
 });
