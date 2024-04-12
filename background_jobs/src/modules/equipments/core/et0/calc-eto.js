@@ -128,7 +128,7 @@ export function CalcEto(
 
   // Pressão utilizando a altitude local
   const atmosphericPressure =
-    measures.atmosphericPressure ||
+    measures.atmosphericPressure / 10 ||
     101.3 * ((293 - 0.0065 * location.altitude) / 293) ** 5.26; // Pressão utilizando a altitude local
 
   // What if any measure not exists?

@@ -61,6 +61,6 @@ describe("ET0 calc", () => {
       },
     });
 
-    expect(eto).toBeCloseTo(2.9596856, 1);
+    expect(eto).toBeCloseTo(4.097766, 1);
   });
 });
